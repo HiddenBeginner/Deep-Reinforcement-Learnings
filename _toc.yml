@@ -1,0 +1,14 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: book/intro
+parts:
+- caption: Markov Decision Process
+  numbered: true
+  chapters:
+  - file: book/Chapter1/1-sequential-decision-making-problems
+  - file: book/Chapter1/2-markov-decision-processes
+- caption: 참고문헌
+  chapters:
+  - file: book/Reference
