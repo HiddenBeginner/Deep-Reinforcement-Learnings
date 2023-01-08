@@ -9,6 +9,7 @@ parts:
   chapters:
   - file: book/Chapter1/1-sequential-decision-making-problems
   - file: book/Chapter1/2-markov-decision-processes
+  - file: book/Chapter1/3-policy-return-value
 - caption: 참고문헌
   chapters:
   - file: book/Reference

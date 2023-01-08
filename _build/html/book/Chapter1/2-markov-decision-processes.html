@@ -54,7 +54,7 @@ const thebe_selector_output = ".output, .cell_output"
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="참고문헌" href="../Reference.html" />
+    <link rel="next" title="3. 정책, Return, 가치 함수" href="3-policy-return-value.html" />
     <link rel="prev" title="1. 순차적 의사 결정 문제, 에이전트, 환경" href="1-sequential-decision-making-problems.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -129,6 +129,11 @@ const thebe_selector_output = ".output, .cell_output"
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    2. Markov Decision Process (MDP)
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="3-policy-return-value.html">
+   3. 정책, Return, 가치 함수
   </a>
  </li>
 </ul>
@@ -298,12 +303,51 @@ title="Print to PDF"
     </ul>
   </div>
 </div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
 
     </div>
 </div>
 
 <!-- Table of contents -->
 <div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#state-space-action-space">
+   2.1. 상태 공간 (state space)과 행동 공간 (action space)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#reward-function">
+   2.2. 보상 함수 (reward function)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#trajectory-transition-probability-distribution">
+   2.3. Trajectory와 전이 확률 분포 (transition probability distribution)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#discount-factor">
+   2.4. 할인률 (discount factor)
+  </a>
+ </li>
+</ul>
+
+    </nav>
 </div>
     </div>
     <div class="article row">
@@ -315,6 +359,34 @@ title="Print to PDF"
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#state-space-action-space">
+   2.1. 상태 공간 (state space)과 행동 공간 (action space)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#reward-function">
+   2.2. 보상 함수 (reward function)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#trajectory-transition-probability-distribution">
+   2.3. Trajectory와 전이 확률 분포 (transition probability distribution)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#discount-factor">
+   2.4. 할인률 (discount factor)
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -326,34 +398,58 @@ title="Print to PDF"
 <h1><span class="section-number">2. </span>Markov Decision Process (MDP)<a class="headerlink" href="#markov-decision-process-mdp" title="Permalink to this headline">#</a></h1>
 <p>우리의 목표는 순차적 의사 결정 문제를 해결하는 것이다. 하지만 아직 순차적 의사 결정 문제는 너무 추상적인 대상이다. 상태는 무엇이고, 행동은 무엇이며, 환경은 어떤 규칙에 의해 상태를 변경하며, 어떤 규칙에 의해 에이전트에 보상을 주는 것일까? 우리는 순차적 의사 결정 문제를 해결하기 전에 먼저 순차적 의사 결정 문제를 수학적으로 기술할 수 있는 틀이 필요하다.</p>
 <br>
-<p>Markov Decision Process (MDP)는 순차적 의사 결정 문제를 적당히 단순화하여 정의할 수 있게 만들어주는 틀이다. 어떤 순차적 의사 결정 문제를 MDP로 모델링할 경우, 이 “순차적 의사 결정 문제는 MDP를 따른다”라고 말한다. MDP는 여섯 가지를 정의하여 순차적 의사 결정 문제를 기술한다. 여섯 가지는 각각 상태 공간 <span class="math notranslate nohighlight">\(\mathcal{S}\)</span>, 행동 공간 <span class="math notranslate nohighlight">\(\mathcal{A}\)</span>, 초기 상태의 확률 분포 <span class="math notranslate nohighlight">\(\rho\)</span>, 전이 함수 <span class="math notranslate nohighlight">\(\mathcal{P}\)</span>, 보상 함수 <span class="math notranslate nohighlight">\(r\)</span>, 할인률 <span class="math notranslate nohighlight">\(\gamma\)</span>이다.</p>
+<p>Markov Decision Process (MDP)는 순차적 의사 결정 문제를 적당히 단순화하여 정의할 수 있게 만들어주는 틀이다. 어떤 순차적 의사 결정 문제를 MDP로 모델링할 경우, 이 “순차적 의사 결정 문제는 MDP를 따른다”라고 말한다. MDP는 여섯 가지를 정의하여 순차적 의사 결정 문제를 기술한다. 여섯 가지는 각각 상태 공간 <span class="math notranslate nohighlight">\(\mathcal{S}\)</span>, 행동 공간 <span class="math notranslate nohighlight">\(\mathcal{A}\)</span>, 초기 상태의 확률 분포 <span class="math notranslate nohighlight">\(\rho_0\)</span>, 보상 함수 <span class="math notranslate nohighlight">\(r\)</span>, 전이 확률 분포 <span class="math notranslate nohighlight">\(p\)</span>, 할인률 <span class="math notranslate nohighlight">\(\gamma\)</span>이다. 조금 더 학술적으로는 한 MDP는 순서쌍 <span class="math notranslate nohighlight">\((\mathcal{S}, \mathcal{A}, r, \rho_0, p, \gamma)\)</span>으로 정의된다고 말한다.</p>
 <br>
+<section id="state-space-action-space">
+<h2><span class="section-number">2.1. </span>상태 공간 (state space)과 행동 공간 (action space)<a class="headerlink" href="#state-space-action-space" title="Permalink to this headline">#</a></h2>
 <p>상태 공간 <span class="math notranslate nohighlight">\(\mathcal{S}\)</span>는 환경이 가질 수 있는 모든 상태들의 집합이다. 6축 관절 로봇 제어의 경우, 각 관절의 각도로 로봇의 현재 상태를 표현할 수 있기 때문에 상태 공간 <span class="math notranslate nohighlight">\(\mathcal{S}\)</span>는 <span class="math notranslate nohighlight">\(\mathbb{R}^6\)</span>의 부분 집합이다. 부분 집합이라고 표현한 이유는 각 관절이 가질 수 있는 최대 각도가 정해져 있기 때문이다. 일부 관절은 <span class="math notranslate nohighlight">\(0^\circ\)</span>부터 <span class="math notranslate nohighlight">\(360^\circ\)</span> 사이의 값만 가질 수 있을 것이고, 일부 관절은 <span class="math notranslate nohighlight">\(0^\circ\)</span>부터 <span class="math notranslate nohighlight">\(180^\circ\)</span> 사이의 값만 가질 수 있을 것이다. 상태는 주로 <span class="math notranslate nohighlight">\(s \in \mathcal{S}\)</span>로 표기해준다. 특정 시점의 상태 (예를 들어 <span class="math notranslate nohighlight">\(t\)</span> 시점의 상태)를 나타내고 싶을 경우 <span class="math notranslate nohighlight">\(s_t\)</span>으로 표기해준다.</p>
 <br>
 <p>행동 공간 <span class="math notranslate nohighlight">\(\mathcal{A}\)</span>는 에이전트가 취할 수 있는 모든 행동들의 집합이다. 6축 관절 로봇 제어의 경우, 각 관절을 몇 도만큼 회전하는 것을 행동으로 정의한다면 행동공간 <span class="math notranslate nohighlight">\(\mathcal{A}\)</span>는 <span class="math notranslate nohighlight">\(\mathbb{R}^6\)</span>의 부분 집합이다. 단, 각 관절마다 한번에 회전할 수 있는 최대 각도가 제한되어 있을 것이기 때문에 부분 집합이라고 표현했다. 슈퍼 마리오 게임의 경우 행동은 왼쪽으로 이동, 오른쪽으로 이동, 앉기, 점프가 있을 것이다. 행동은 주로 <span class="math notranslate nohighlight">\(a \in \mathcal{A}\)</span>로 표기해준다. 특정 시점의 행동 (예를 들어 <span class="math notranslate nohighlight">\(t\)</span> 시점의 상태)를 나타내고 싶을 경우 <span class="math notranslate nohighlight">\(a_t\)</span>으로 표기해준다.</p>
 <br>
-<p>초기 상태 확률 분포 <span class="math notranslate nohighlight">\(\rho\)</span>는 말 그대로 환경이 가질 수 있는 초기 상태의 확률 분포이다. 각 상태마다 환경이 해당 상태를 초기 상태로 가질 확률이 정의되어 있는 함수로 해석할 수 있기 때문에 <span class="math notranslate nohighlight">\(\rho:\mathcal{S} \rightarrow [0,1]\)</span>로 적어준다. <span class="math notranslate nohighlight">\(\rho\)</span>는 각 상태를 0과 1사이의 값으로 보내는 함수라고 읽으면 된다. 초기 상태, 즉 첫 번째 시점에서의 환경의 상태를 <span class="math notranslate nohighlight">\(s_1 \sim \rho\)</span>로 적어준다. 환경의 첫 번째 상태 <span class="math notranslate nohighlight">\(s_1\)</span>는 초기 상태 확률 분포 <span class="math notranslate nohighlight">\(\rho\)</span>에서 샘플링되었다는 의미이다.</p>
+</section>
+<section id="reward-function">
+<h2><span class="section-number">2.2. </span>보상 함수 (reward function)<a class="headerlink" href="#reward-function" title="Permalink to this headline">#</a></h2>
+<p>보상 함수 <span class="math notranslate nohighlight">\(r\)</span>은 에이전트가 특정 상태에서 취한 행동의 좋고 나쁨을 나타내는 함수이다. 논문마다 보상 함수의 정의역이 조금씩 다른데, 가장 보편적인 보상 함수는 상태 <span class="math notranslate nohighlight">\(s\)</span>에서 행동 <span class="math notranslate nohighlight">\(a\)</span>에 대해서 보상을 부여한다. 즉, <span class="math notranslate nohighlight">\(r: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}\)</span> 인 함수이다. 다음으로 많이 사용되는 정의는 상태 <span class="math notranslate nohighlight">\(s\)</span>에서 행동 <span class="math notranslate nohighlight">\(a\)</span>를 취하여 상태가 <span class="math notranslate nohighlight">\(s'\)</span>으로 바뀐 것에 대해서 보상을 부여한다. 즉, <span class="math notranslate nohighlight">\(r: \mathcal{S} \times \mathcal{A} \times \mathcal{S} \rightarrow \mathbb{R}\)</span> 인 함수이다. 따로 언급하지 않는 이상 이 책에서는 첫 번째 정의를 사용할 것이다.</p>
 <br>
-<p>환경의 초기 상태 <span class="math notranslate nohighlight">\(s_1\)</span>에서 시작해서 에이전트는 행동을 취하기 시작한다. 에이전트의 첫 번째 행동을 <span class="math notranslate nohighlight">\(a_1\)</span>, 환경의 두 번째 상태 <span class="math notranslate nohighlight">\(s_2\)</span>, 에이전트의 두 번째 행동 <span class="math notranslate nohighlight">\(a_2\)</span>, 환경의 세 번째 상태 <span class="math notranslate nohighlight">\(s_3\)</span>, … 으로 적어주면 우리는 이 일련의 과정의 다음과 같이 적어줄 수 있다.</p>
+<p>보상 함수는 각 상태, 행동 순서쌍 <span class="math notranslate nohighlight">\((s, a)\)</span>에 대해서 딱 정해진 (determinitic) 보상을 부여할 수도 있지만, 더 일반적으로 어떤 확률 분포에서 보상을 stochastic하게 샘플링하여 부여할 수도 있다. 추가적으로 강화학습 알고리즘의 수렴성을 보장하기 위해서 보상의 최대값이 정해져있다고 가정한다. 즉, 보상 함수는 bounded 되어 있다.</p>
+<br>
+</section>
+<section id="trajectory-transition-probability-distribution">
+<h2><span class="section-number">2.3. </span>Trajectory와 전이 확률 분포 (transition probability distribution)<a class="headerlink" href="#trajectory-transition-probability-distribution" title="Permalink to this headline">#</a></h2>
+<p>초기 상태 확률 분포 <span class="math notranslate nohighlight">\(\rho_0\)</span>는 말 그대로 환경이 가질 수 있는 초기 상태의 확률 분포이다. 각 상태마다 환경이 해당 상태를 초기 상태로 가질 확률이 정의되어 있는 함수로 해석할 수 있기 때문에 <span class="math notranslate nohighlight">\(\rho_0:\mathcal{S} \rightarrow [0,1]\)</span>로 적어준다. <span class="math notranslate nohighlight">\(\rho_0\)</span>는 각 상태를 0과 1사이의 값으로 보내는 함수라고 읽으면 된다. 초기 상태, 즉 첫 번째 시점에서의 환경의 상태를 <span class="math notranslate nohighlight">\(s_0 \sim \rho\)</span>로 적어준다. 환경의 첫 번째 상태 <span class="math notranslate nohighlight">\(s_0\)</span>는 초기 상태 확률 분포 <span class="math notranslate nohighlight">\(\rho\)</span>에서 샘플링되었다는 의미이다.</p>
+<br>
+<p>환경의 초기 상태 <span class="math notranslate nohighlight">\(s_0\)</span>에서 시작해서 에이전트는 행동을 취하기 시작한다. 에이전트가 <span class="math notranslate nohighlight">\(s_0\)</span>에 대해 취한 행동을 <span class="math notranslate nohighlight">\(a_0\)</span>, 받은 보상을 <span class="math notranslate nohighlight">\(r_0=r(s_0, a_0)\)</span>이라고 표기하자. 그리고 다음 시점인 <span class="math notranslate nohighlight">\(t=1\)</span>에서의 환경의 상태를 <span class="math notranslate nohighlight">\(s_1\)</span>, 대응하는 에이전트의 행동을 <span class="math notranslate nohighlight">\(a_1\)</span>, 받은 보상을 <span class="math notranslate nohighlight">\(r_1=r(s_1,a_1)\)</span>, … 으로 적어주면 우리는 이 일련의 과정의 다음과 같이 적어줄 수 있다.</p>
 <div class="math notranslate nohighlight">
 \[
-\tau=(s_1, a_1, r_1, s_2, a_2, r_2, \ldots, s_T, a_T),
+\tau=(s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T, a_T),
 \]</div>
-<p>여기서 이 일련의 과정 <span class="math notranslate nohighlight">\(\tau\)</span> (타우라고 읽음)을 trajectory라고 부른다. Trajectory를 직역하면 탄도, 궤도, 궤적인데 뜻이 뜻이 직접적으로 와닿지 않아서 trajectory라고 부를 것이다.</p>
+<p>여기서 <span class="math notranslate nohighlight">\(r_t = r(s_t, a_t)\)</span>이고, 이 일련의 과정 <span class="math notranslate nohighlight">\(\tau\)</span> (타우라고 읽음)을 trajectory라고 부른다. Trajectory를 직역하면 탄도, 궤도, 궤적인데 뜻이 뜻이 직접적으로 와닿지 않아서 trajectory라고 부를 것이다.</p>
 <p><span class="math notranslate nohighlight">\(t\)</span> 시점에서의 환경의 상태 <span class="math notranslate nohighlight">\(s_t\)</span>는 초기 상태부터 시작해서 <span class="math notranslate nohighlight">\(t-1\)</span>번 째 행동까지가 만들어낸 산출물이다. 따라서 <span class="math notranslate nohighlight">\(t\)</span> 시점에서 어떤 상태가 발생할지 알고 싶으면 다음과 같은 조건부 확률 분포를 고려해야 한다.</p>
-<br>
 <div class="math notranslate nohighlight">
 \[
-p\left(s_t|s_1, a_1, s_2, a_2, \ldots, s_{t-1},a_{t-1}\right).
+p\left(s_t|s_0, a_0, s_1, a_1, \ldots, s_{t-1},a_{t-1}\right).
 \]</div>
+<br>
 <p>이 조건부 확률이 어떻게 정의되는지 모르겠지만 우리가 다루고 계산하기 굉장히 어려울 것이 분명하다. 앞전에 MDP가 순차적 의사 결정 문제를 적당히 단순화하여 모델링한다고 언급했었는데, MDP는 <span class="math notranslate nohighlight">\(t\)</span> 시점의 상태를 <span class="math notranslate nohighlight">\(t-1\)</span> 시점의 상태와 행동에 의해서만 결정된다고 가정하여 문제를 단순화시킨다. 즉,</p>
 <div class="math notranslate nohighlight">
 \[
-p\left(s_t|s_1, a_1, s_2, a_2, \ldots, s_{t-1},a_{t-1}\right)=p\left(s_t|s_{t-1},a_{t-1}\right),
+p\left(s_t|s_0, a_0, s_1, a_1, \ldots, s_{t-1},a_{t-1}\right)=p\left(s_t|s_{t-1},a_{t-1}\right),
 \]</div>
 <p>라고 가정을 하는 것이다. 이 가정이 성립할 경우 해당 순차적 의사 결정 문제가 Markov property를 만족한다고 말한다. 순차적 의사 결정 문제가 Markov property를 성립한다고 가정하기 때문에 Markov decision process라고 부르는 것이다.</p>
 <br>
-<p>처음에는 이 가정이 합리적인 가정인지 잘 와닿지 않는다. 현재의 상태를 기술하기 위해서는 과거의 모든 상태와 행동을 알아야 하는 것이 아닐까 싶은 것이다. 예를 들어 100m 달리기를 생각해보자. 원점에서 속도가 0인 상태로 시작한다고 하자. 문제 단순화를 위해 등속운동이나 가속도가 일정하다고 가정하자. <span class="math notranslate nohighlight">\(t\)</span> 시점에서 위치와 속도는 과거 내가 어디에 있었는지, 속도는 몇이었는지 알 필요 없이 <span class="math notranslate nohighlight">\(t-1\)</span> 시점에서의 위치와 속도만 알면 완벽하게 결정된다.</p>
+<p>처음에는 이 가정이 합리적인 가정인지 잘 와닿지 않는다. 현재의 상태를 기술하기 위해서는 과거의 모든 상태와 행동을 알아야 하는 것이 아닐까 싶은 것이다. 예를 들어 100m 달리기를 생각해보자. 문제 단순화를 위하여 원점에서 속도가 0인 상태로 시작하고 가속도는 일정하다고 가정하자. 상태 공간을 위치와 속도로 정의해보자. <span class="math notranslate nohighlight">\(t\)</span> 시점에서 위치와 속도는 과거 내가 어디에 있었는지, 속도는 몇이었는지 전부 다 알 필요 없이 <span class="math notranslate nohighlight">\(t-1\)</span> 시점에서의 위치와 속도만 알면 완벽하게 결정된다.</p>
+<br>
+<p>Markov property를 가정하여 상태가 어떻게 바뀌는지 더 쉽게 계산할 수 있게 되었다. 전이 확률 분포 (transition probability distribution) <span class="math notranslate nohighlight">\(p\)</span>는 상태 <span class="math notranslate nohighlight">\(s\)</span>에서 행동 <span class="math notranslate nohighlight">\(a\)</span>를 취했을 때 환경의 상태가 <span class="math notranslate nohighlight">\(s'\)</span>으로 전이할 확률을 나타낸다. 즉, <span class="math notranslate nohighlight">\(p: \mathcal{S} \times \mathcal{A} \times \mathcal{S} \rightarrow [0, 1]\)</span>인 함수이고, 각 함수값마다 확률이 부여되어 있다. 즉, <span class="math notranslate nohighlight">\(p(s, a, s') = \text{Pr}[s' | S_t=s, A_t=a]\)</span>으로 정의되며, 직관성을 위해 <span class="math notranslate nohighlight">\(p(s, a, s')\)</span> 대신 <span class="math notranslate nohighlight">\(p(s'|s, a)\)</span>으로 표기해준다.</p>
+<br>
+</section>
+<section id="discount-factor">
+<h2><span class="section-number">2.4. </span>할인률 (discount factor)<a class="headerlink" href="#discount-factor" title="Permalink to this headline">#</a></h2>
+<p>할인률 <span class="math notranslate nohighlight">\(\gamma \in [0, 1]\)</span> 은 0과 1사이의 값을 갖는 실수값이며, 더 나중에 받은 보상일수록 더 낮은 가중치를 부여하는 역할을 한다. 예를 들어, trajectory <span class="math notranslate nohighlight">\(\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots)\)</span>가 주어졌을 때, 이 trajectory에서 받은 총 누적 보상을 계산할 때 단순하게 더해주는 대신 다음과 같이 가중합을 하는 것이다.</p>
+<div class="math notranslate nohighlight">
+\[r_0 + \gamma r_1 + \gamma^2 r_2 + \gamma^3 r_3 + \ldots\]</div>
+<br>
+<p>할인률에 대해서는 다음 절에서 더 자세히 알아볼 예정이다.</p>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -390,10 +486,10 @@ p\left(s_t|s_1, a_1, s_2, a_2, \ldots, s_{t-1},a_{t-1}\right)=p\left(s_t|s_{t-1}
             <p class="prev-next-title"><span class="section-number">1. </span>순차적 의사 결정 문제, 에이전트, 환경</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="../Reference.html" title="next page">
+    <a class='right-next' id="next-link" href="3-policy-return-value.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">참고문헌</p>
+        <p class="prev-next-title"><span class="section-number">3. </span>정책, Return, 가치 함수</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

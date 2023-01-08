@@ -1,0 +1,5 @@
+@media print {
+    p {
+        padding-left: 30px
+    }
+}
