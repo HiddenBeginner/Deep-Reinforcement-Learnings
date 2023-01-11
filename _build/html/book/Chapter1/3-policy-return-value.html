@@ -42,6 +42,40 @@
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
     <script src="../../_static/togglebutton.js"></script>
+    <script kind="utterances">
+
+    var commentsRunWhenDOMLoaded = cb => {
+    if (document.readyState != 'loading') {
+        cb()
+    } else if (document.addEventListener) {
+        document.addEventListener('DOMContentLoaded', cb)
+    } else {
+        document.attachEvent('onreadystatechange', function() {
+        if (document.readyState == 'complete') cb()
+        })
+    }
+}
+
+var addUtterances = () => {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = "https://utteranc.es/client.js";
+    script.async = "async";
+
+    script.setAttribute("repo", "HiddenBeginner/Deep-Reinforcement-Learnings");
+    script.setAttribute("issue-term", "pathname");
+    script.setAttribute("theme", "github-light");
+    script.setAttribute("label", "💬 comment");
+    script.setAttribute("crossorigin", "anonymous");
+
+    sections = document.querySelectorAll("div.section");
+    if (sections !== null) {
+        section = sections[sections.length-1];
+        section.appendChild(script);
+    }
+}
+commentsRunWhenDOMLoaded(addUtterances);
+</script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../../_static/design-tabs.js"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
@@ -50,6 +84,8 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="참고문헌" href="../Reference.html" />
@@ -301,12 +337,41 @@ title="Print to PDF"
     </ul>
   </div>
 </div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
 
     </div>
 </div>
 
 <!-- Table of contents -->
 <div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#policy">
+   3.1. 정책 (policy)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id1">
+   3.2. 가치 함수
+  </a>
+ </li>
+</ul>
+
+    </nav>
 </div>
     </div>
     <div class="article row">
@@ -318,6 +383,24 @@ title="Print to PDF"
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#policy">
+   3.1. 정책 (policy)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id1">
+   3.2. 가치 함수
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -327,6 +410,20 @@ title="Print to PDF"
                 
   <section class="tex2jax_ignore mathjax_ignore" id="return">
 <h1><span class="section-number">3. </span>정책, Return, 가치 함수<a class="headerlink" href="#return" title="Permalink to this headline">#</a></h1>
+<section id="policy">
+<h2><span class="section-number">3.1. </span>정책 (policy)<a class="headerlink" href="#policy" title="Permalink to this headline">#</a></h2>
+<p>지금까지 우리는 순차적 의사 결정 문제를 MDP로 정의하는 방법에 대해서 알아보았다. 에이전트는 정책 (policy)이라는 것을 통해 매 시점마다 환경의 상태에 알맞은 행동을 취해서 환경을 제어한다. 정책 <span class="math notranslate nohighlight">\(\pi\)</span>는 각 상태 <span class="math notranslate nohighlight">\(s\)</span>에서 행동 <span class="math notranslate nohighlight">\(a\)</span>를 취할 확률을 정의하는 함수이다. 즉, <span class="math notranslate nohighlight">\(\pi:\mathcal{S} \times \mathcal{A} \rightarrow [0, 1]\)</span> such that <span class="math notranslate nohighlight">\(\pi(s, a) = \text{Pr}[a | S=s]\)</span>인 함수이다. 조건부 확률 분포임을 잘 나타내기 위하여 <span class="math notranslate nohighlight">\(\pi(s, a)\)</span> 대신 <span class="math notranslate nohighlight">\(\pi(a|s)\)</span>로 표기해준다. 비유하건데, 정책은 각 상태마다 어떤 행동을 취해야 할지 적어놓은 지침서이다.</p>
+<br>
+<p>정책은 확률적 정책 (stochastic policy)과 결정적 정책 (deterministic policy)로 구분될 수 있다. 앞서 사용한 정의가 확률적 정책이다. 각 상태에서 확률에 따라 행동을 선택하기 때문이다. 결정적 정책은 한 상태에서 취할 행동이 딱 하나로 정해져 있는 정책을 의미한다. 해당 행동을 선택할 확률이 <span class="math notranslate nohighlight">\(1\)</span>이고, 나머지 행동을 선택할 확률이 <span class="math notranslate nohighlight">\(0\)</span>인 조건부 확률 분포로 해석할 수 있기 때문에 결정적 정책은 확률적 정책의 특별한 경우이다. 결정적 정책의 경우, 각 상태를 입력 받아 취할 행동을 출력하는 함수로 생각할 수 있기 때문에 <span class="math notranslate nohighlight">\(\pi:\mathcal{S} \rightarrow \mathcal{A}\)</span> such that <span class="math notranslate nohighlight">\(\pi(s)=a\)</span> 으로 적어준다.</p>
+<br>
+<p>주어진 환경에서 사용할 수 있는 정책은 굉장히 많다. 정책의 정의상 각 상태마다 취할 각 행동을 취할 확률만 정의되어 있으면 정책이 될 수 있다. 따라서, 정책을 따라서 행동을 취하면 받게 되는 누적 보상이 적은 바보 정책이 있을 수도 있고, 받게 되는 누적 보상이 굉장이 큰 좋은 정책이 있을 수 있다. 에이전트의 목표는 정책을 따랐을 때 받게 되는 누적 보상이 가장 큰 정책을 찾아내는 것이다.</p>
+<br>
+<p>이를 위해서는 우리는 먼저 좋은 정책과 나쁜 정책의 기준을 세워야 한다. 강화학습에서 가장 중요한 개념인 가치 함수에 대해 알아보자.</p>
+<br>
+</section>
+<section id="id1">
+<h2><span class="section-number">3.2. </span>가치 함수<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
+</section>
 </section>
 
     <script type="text/x-thebe-config">

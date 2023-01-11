@@ -42,6 +42,40 @@
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
     <script src="../_static/togglebutton.js"></script>
+    <script kind="utterances">
+
+    var commentsRunWhenDOMLoaded = cb => {
+    if (document.readyState != 'loading') {
+        cb()
+    } else if (document.addEventListener) {
+        document.addEventListener('DOMContentLoaded', cb)
+    } else {
+        document.attachEvent('onreadystatechange', function() {
+        if (document.readyState == 'complete') cb()
+        })
+    }
+}
+
+var addUtterances = () => {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = "https://utteranc.es/client.js";
+    script.async = "async";
+
+    script.setAttribute("repo", "HiddenBeginner/Deep-Reinforcement-Learnings");
+    script.setAttribute("issue-term", "pathname");
+    script.setAttribute("theme", "github-light");
+    script.setAttribute("label", "💬 comment");
+    script.setAttribute("crossorigin", "anonymous");
+
+    sections = document.querySelectorAll("div.section");
+    if (sections !== null) {
+        section = sections[sections.length-1];
+        section.appendChild(script);
+    }
+}
+commentsRunWhenDOMLoaded(addUtterances);
+</script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../_static/design-tabs.js"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
@@ -339,8 +373,11 @@ title="Print to PDF"
 <br>
 <p>강화학습 분야를 처음부터 꼼꼼하게 공부하면 더할 나위 없이 좋겠지만,
 분명 전통적인 강화학습 내용 중에서 현대의 심층강화학습을 공부하는 데 꼭 필요하지 않은 내용들도 더러 있다.
-이 책의 목표는 딥러닝을 잘 이해하고 있는 분들이 심층강화학습 분야를 빠르게 입문할 수 있도록 도와주는 것이다.
-부디 나의 설명이 여러분들에게 작은 도움이 되었으면 좋겠다.</p>
+이 책의 목표는 딥러닝을 잘 이해하고 있는 분들이 심층강화학습 분야를 빠르게 입문할 수 있도록 도와주는 것이다.</p>
+<br>
+<p>이 책은 출판을 목적으로 작성된 것이 아니기 때문에 독자의 원활한 이해를 위해서라면 용어를 번역하지 않고 영문 그대로 사용한다거나, 최신 인터넷 밈을 사용하는 등 아주 케주얼하게 내용을 전개해 나갈 것이다. 책을 읽다가 오류를 발견하거나 질문이 생기면 페이지마다 댓글을 남겨주면 감사드리겠다 (문어체와 예의차림 어딘가). 댓글은 깃헙 아이디만 있으면 쉽게 남길 수 있으니 주저하지 말고 남겨주시면 감사드리겠다.</p>
+<br>
+<p>부디 나의 설명이 여러분들에게 작은 도움이 되었으면 좋겠다.</p>
 <br>
 <p>&lt;재야의 숨은 초보&gt;</p>
 <hr class="footnotes docutils" />
