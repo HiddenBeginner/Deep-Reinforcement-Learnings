@@ -366,7 +366,12 @@ title="Print to PDF"
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id1">
-   3.2. 가치 함수
+   3.2. Return
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id3">
+   3.3. 가치 함수
   </a>
  </li>
 </ul>
@@ -395,7 +400,12 @@ title="Print to PDF"
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id1">
-   3.2. 가치 함수
+   3.2. Return
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id3">
+   3.3. 가치 함수
   </a>
  </li>
 </ul>
@@ -418,11 +428,48 @@ title="Print to PDF"
 <br>
 <p>주어진 환경에서 사용할 수 있는 정책은 굉장히 많다. 정책의 정의상 각 상태마다 취할 각 행동을 취할 확률만 정의되어 있으면 정책이 될 수 있다. 따라서, 정책을 따라서 행동을 취하면 받게 되는 누적 보상이 적은 바보 정책이 있을 수도 있고, 받게 되는 누적 보상이 굉장이 큰 좋은 정책이 있을 수 있다. 에이전트의 목표는 정책을 따랐을 때 받게 되는 누적 보상이 가장 큰 정책을 찾아내는 것이다.</p>
 <br>
-<p>이를 위해서는 우리는 먼저 좋은 정책과 나쁜 정책의 기준을 세워야 한다. 강화학습에서 가장 중요한 개념인 가치 함수에 대해 알아보자.</p>
+<p>이를 위해서는 우리는 먼저 좋은 정책과 나쁜 정책의 기준을 세워야 한다. 정책의 성능은 가치 함수라는 것으로 측정될 수 있다. 가치 함수는 정책을 따랐을 때 받게 되는 return의 기댓값이다. 그럼 먼저 return이 무엇인지 알아보자.</p>
 <br>
 </section>
+<hr class="docutils" />
 <section id="id1">
-<h2><span class="section-number">3.2. </span>가치 함수<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
+<h2><span class="section-number">3.2. </span>Return<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
+<p>초기 상태 <span class="math notranslate nohighlight">\(s_0\)</span>에서 시작하여 정책 <span class="math notranslate nohighlight">\(\pi\)</span>를 따르며 얻은 trajectory를 <span class="math notranslate nohighlight">\(\tau\)</span>라 하자.</p>
+<div class="math notranslate nohighlight">
+\[\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T, a_T),\]</div>
+<p>이때,</p>
+<ul class="simple">
+<li><p>초기 상태는 초기 상태 확률 분포로부터 샘플링되었고 <span class="math notranslate nohighlight">\(s_0 \sim \rho_0\)</span>,</p></li>
+<li><p><span class="math notranslate nohighlight">\(t\)</span> 시점의 행동은 정책을 따라 선택되었으며 <span class="math notranslate nohighlight">\(a_t \sim \pi(\cdot| s_t)\)</span>,</p></li>
+<li><p><span class="math notranslate nohighlight">\(t+1\)</span> 시점의 상태는 전이 확률 분포에 따라 바뀌었고 <span class="math notranslate nohighlight">\(s_{t+1} \sim p(\cdot|s_t, a_t)\)</span>,</p></li>
+<li><p><span class="math notranslate nohighlight">\(t\)</span> 시점의 보상은 보상 함수에 의해 결정되었다 <span class="math notranslate nohighlight">\(r_t=r(s_t, a_t)\)</span>.</p></li>
+</ul>
+<br>
+<p>환경은 특정 종료 조건에 의해 <span class="math notranslate nohighlight">\(T\)</span> 시점까지만 진행될 수 있지만, 정해진 종료 조건 없이 무한히 진행될 수도 있다. 이후부터는 보다 더 일반적인 상황인 무한히 진행되는 환경을 고려할 것이다<a class="footnote-reference brackets" href="#infinite-horizon" id="id2">1</a>.</p>
+<div class="math notranslate nohighlight">
+\[\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots).\]</div>
+<br>
+<p>Return은 <span class="math notranslate nohighlight">\(t\)</span>시점부터 받은 보상들의 할인된 누적 합 (discounted cummulative sum)이며, <span class="math notranslate nohighlight">\(G_t\)</span>라고 표기해준다.</p>
+<div class="math notranslate nohighlight">
+\[G_t = r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + \gamma^2 r_{t+3} + \ldots,\]</div>
+<br>
+<p>이때, 할인률 <span class="math notranslate nohighlight">\(\gamma \in [0, 1]\)</span>은 0과 1사이의 값이며, <span class="math notranslate nohighlight">\(t\)</span> 시점에 취한 행동 <span class="math notranslate nohighlight">\(a_t\)</span>을 return을 통해 평가할 때, <span class="math notranslate nohighlight">\(t\)</span>시점보다 먼 시점에 받은 보상일수록 낮은 가중치를 주는 역할을 한다. <span class="math notranslate nohighlight">\(\gamma=0\)</span>이면, <span class="math notranslate nohighlight">\(t\)</span> 시점에 받은 보상 <span class="math notranslate nohighlight">\(r_t\)</span>만 고려하며, <span class="math notranslate nohighlight">\(\gamma=1\)</span>이면 <span class="math notranslate nohighlight">\(t\)</span> 시점 이후에 받는 모든 보상의 총합을 고려한다.</p>
+<br>
+<p>요컨데, return <span class="math notranslate nohighlight">\(G_t\)</span>는 <span class="math notranslate nohighlight">\(t\)</span>시점에 취한 행동을 평가하기 위한 값이라고 할 수 있다. <span class="math notranslate nohighlight">\(t\)</span>시점의 보상 <span class="math notranslate nohighlight">\(r_t\)</span>만 고려하지 않고 미래에 받을 보상까지 모두 고려하는 이유는 아무튼 <span class="math notranslate nohighlight">\(a_t\)</span>가 <span class="math notranslate nohighlight">\(s_{t+1}\)</span> 만들어 낸 것이고 이후에 받을 보상들이 어떻게 보면 <span class="math notranslate nohighlight">\(a_t\)</span> 덕분에 만들어진 것이기 때문이다.</p>
+<br>
+<p>하지만, 환경과 정책에 있는 많은 확률적 요소 (randomness)에 의해 하나의 관측값인 <span class="math notranslate nohighlight">\(G_t\)</span>만으로 행동을 평가하기엔 불확실성이 너무 크다. 따라서 우리는 <span class="math notranslate nohighlight">\(G_t\)</span>의 기댓값으로 정책과 행동의 좋고 나쁨을 평가할 것이다.</p>
+<br>
+</section>
+<hr class="docutils" />
+<section id="id3">
+<h2><span class="section-number">3.3. </span>가치 함수<a class="headerlink" href="#id3" title="Permalink to this headline">#</a></h2>
+<p>Coming soon!</p>
+<hr class="footnotes docutils" />
+<dl class="footnote brackets">
+<dt class="label" id="infinite-horizon"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
+<dd><p>끝이 정해져 있는 환경의 경우 종료 조건에 의해 실제 <span class="math notranslate nohighlight">\(T\)</span>까지만 진행되었어도, 이후 상태가 행동에 의해 바뀌지 않는 종료 상태 (terminal state)로 유지되고 보상은 0을 받는 상호작용을 하는 것으로 간주하여 무한히 진행되는 것으로 생각할 수 있다.</p>
+</dd>
+</dl>
 </section>
 </section>
 
