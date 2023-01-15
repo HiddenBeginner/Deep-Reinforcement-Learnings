@@ -138,5 +138,3 @@ $$J(\theta) := \mathbb{E}_{S_0 \sim \rho_0, \pi_\theta} \left[ V^{\pi}(S_0) \rig
 Coming soon!
 
 [^infinite-horizon]: 끝이 정해져 있는 환경의 경우 종료 조건에 의해 실제 $T$까지만 진행되었어도, 이후 상태가 행동에 의해 바뀌지 않는 종료 상태 (terminal state)로 유지되고 보상은 0을 받는 상호작용을 하는 것으로 간주하여 무한히 진행되는 것으로 생각할 수 있다.
-
-.
