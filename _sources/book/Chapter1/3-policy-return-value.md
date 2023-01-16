@@ -135,6 +135,44 @@ $$J(\theta) := \mathbb{E}_{S_0 \sim \rho_0, \pi_\theta} \left[ V^{\pi}(S_0) \rig
 
 ### 행동 가치 함수 (Action value function)
 
+상태 가치 함수 $V^{\pi}(s)$가 상태 $s$에서 정책 $\pi$의 성능을 알려주는 함수였다면, 상태 $s$에서 (정책을 따르지 않고) 행동 $a$를 취했을 때 정책 $\pi$의 성능을 알려주는 함수를 행동 가치 함수라고 한다.
+
+> **행동 가치 함수 (action value function)**
+>
+> 한 정책 $\pi$의 상태 $s \in \mathcal{S}$와 행동 $a \in \mathcal{A}$에서의 행동 가치 함수 $Q^{\pi}: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}$는 상태 $s$에서 행동 $a$를 취하고 정책 $\pi$를 따랐을 때 받게 되는 return의 기댓값으로 정의된다. 즉,
+> ```{math}
+> :label: action_value_function
+>    Q^{\pi}(s, a) := \mathbb{E}_{\pi} \left[ G_t | S_t = s, A_t=a  \right] \quad \forall s \in \mathcal{S}, a \in \mathcal{A}.
+> ```
+
+<br>
+
+식 {eq}`action_value_function`에서 조건부의 $A_t=a$는 $t$ 시점의 행동이 $a$로 주어졌다는 것을 의미한다. 상태 가치 함수의 정의인 식 {eq}`state_value_function`에서  $A_t$가 $\pi(\cdot | s)$에서 샘플링된 것과 다르다.
+
+<br>
+
+상태 가치 함수는 상태 $s$에서 정책 $\pi$를 바로 따랐을 때 받게 되는 return의 기댓값이고, 행동 가치 함수는 상태 $s$에서 정해진 행동 $a$를 취한 후 $\pi$를 따랐을 때 받게 되는 return의 기댓값이다. 그럼 상태 $s$에서 다음을 만족하는 행동 $a$가 있다는 것은 무엇을 의미할까?
+
+$$Q^{\pi}(s, a) \ge V^{\pi}(s).$$
+
+<br>
+
+상태 $s$에서 정책을 바로 따르는 것보다, 행동 $a$를 취하고 정책을 따랐을 때 더 큰 return을 기대할 수 있다는 것이다. 그럼, 우리는 상태 $s$에서 행동 $a$를 취하도록 정책을 변경함으로서 정책을 개선할 수 있다. 
+
+<br>
+
+기댓값의 정의를 잘 생각해보면, 상태 가치 함수와 행동 가치 함수가 다음과 같은 관계를 갖고 있는 것을 알 수 있다.
+
+$$V^{\pi}(s) = \mathbb{E}_{a\sim\pi(\cdot|s)} \left[ Q^{\pi}(s, a) \right].$$
+
+<br>
+
+---
+
+### Advantage 함수 (Advantage function)
+
 Coming soon!
+
+<br>
 
 [^infinite-horizon]: 끝이 정해져 있는 환경의 경우 종료 조건에 의해 실제 $T$까지만 진행되었어도, 이후 상태가 행동에 의해 바뀌지 않는 종료 상태 (terminal state)로 유지되고 보상은 0을 받는 상호작용을 하는 것으로 간주하여 무한히 진행되는 것으로 생각할 수 있다.
