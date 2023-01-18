@@ -161,7 +161,13 @@ $$Q^{\pi}(s, a) \ge V^{\pi}(s).$$
 
 <br>
 
-기댓값의 정의를 잘 생각해보면, 상태 가치 함수와 행동 가치 함수가 다음과 같은 관계를 갖고 있는 것을 알 수 있다.
+조금 더 극적으로 정책을 개선할 수도 있다. 상태 $s$에서 가장 큰 행동 가치 함수를 갖는 행동을 찾아서 정책을 개선하는 것이다. 즉, 현재 정책을 $\pi$, 개선된 정책을  $\pi'$라고 하자. 상태 $s$에서 가장 큰 $Q^{\pi}(s, a)$를 갖는 행동 $a$를 1의 확률로 선택하게 정책을 수정하는 것이다.
+
+$$\pi'(a|s)=\begin{cases} 1 & \text{ if } a = \operatorname*{argmax}\limits_{a\in\mathcal{A}} Q^{\pi}(s, a) \\ 0 & \text{ otherwise} \end{cases}, \text{ for all } s \in \mathcal{S}$$
+
+<br>
+
+한편, 알아두면 좋은 두 가치 함수 사이의 관계식이 있다. 기댓값의 정의를 잘 생각해보면, 상태 가치 함수와 행동 가치 함수가 다음과 같은 관계를 갖고 있는 것을 알 수 있다. 증명은 다음 절에 나올 예정이다 (예정일껄...).
 
 $$V^{\pi}(s) = \mathbb{E}_{a\sim\pi(\cdot|s)} \left[ Q^{\pi}(s, a) \right].$$
 
@@ -171,7 +177,21 @@ $$V^{\pi}(s) = \mathbb{E}_{a\sim\pi(\cdot|s)} \left[ Q^{\pi}(s, a) \right].$$
 
 ### Advantage 함수 (Advantage function)
 
-Coming soon!
+Advantage 함수는 상태 $s$와 행동 $a$에 대해서 정의되는 함수로서, 행동 가치 함수에서 상태 가치 함수를 뺀 것이다. 상태 $s$에서 정책을 따르는 대신 행동 $a$를 취했을 때, 상태 가치 함수와 비교하여 얼마나 더 많은 이득 (advantage)를 얻는가를 나타낸다. Advantage 함수값이 0보다 큰 행동은 현재 정책을 따르는 것보다 더 좋은 행동을 의미하며, 0보다 작은 행동을 현재 정책을 따르는 것보다 더 안 좋은 행동을 의미한다. 
+
+> **Advantage 함수 (advantage function)**
+>
+> 한 정책 $\pi$의 상태 $s \in \mathcal{S}$와 행동 $a \in \mathcal{A}$에서의 advantage 함수 $A^{\pi}: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}$는 행동 가치 함수에서 상태 가치 함수를 뺀 것으로 정의된다. 즉,
+> ```{math}
+> :label: advantage_function
+>    A^{\pi}(s, a) := Q^{\pi}(s, a) - V^{\pi}(s) \forall s \in \mathcal{S}, a \in \mathcal{A}.
+> ```
+
+<br>
+
+---
+
+이번 절에서는 세 가지 가치 함수를 알아보았다. 가치 함수만 알면 정책의 성능을 평가할 수 있고, 성능을 최대화하는 정책을 찾으면 이제 게임이 끝난다. 딥러닝에서 목적함수가 준비된 셈이다. 하지만 문제가 하나 있다. 대부분의 경우 이 가치 함수를 실제로 계산하는 것이 불가능하다. 따라서 대부분의 심층 강화 학습 알고리즘들은 가치 함수를 추정하거나 가치 함수의 그레디언트를 추정하게 된다. 이를 추정하기 위한 중요한 개념 하나 남아 있는데, 이를 다음 절에서 알아본다.
 
 <br>
 
