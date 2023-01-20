@@ -30,3 +30,16 @@ $G_t$를 다음 스탭 return인 $G_{t+1}$으로 표현된 모습이다.
 ## 상태 가치 함수의 재귀적 표현
 
 Coming soon!
+
+```{raw} html
+<script
+   type="text/javascript"
+   src="https://utteranc.es/client.js"
+   async="async"
+   repo="HiddenBeginner/Deep-Reinforcement-Learnings"
+   issue-term="pathname"
+   theme="github-light"
+   label="💬 comment"
+   crossorigin="anonymous"
+/>
+```
