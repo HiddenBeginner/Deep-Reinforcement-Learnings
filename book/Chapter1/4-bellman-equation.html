@@ -84,6 +84,8 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="참고문헌" href="../Reference.html" />
@@ -367,6 +369,11 @@ title="Print to PDF"
    4.1. Return의 재귀적 표현
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id2">
+   4.2. 상태 가치 함수의 재귀적 표현
+  </a>
+ </li>
 </ul>
 
     </nav>
@@ -391,6 +398,11 @@ title="Print to PDF"
    4.1. Return의 재귀적 표현
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id2">
+   4.2. 상태 가치 함수의 재귀적 표현
+  </a>
+ </li>
 </ul>
 
                         </nav>
@@ -403,8 +415,28 @@ title="Print to PDF"
                 
   <section class="tex2jax_ignore mathjax_ignore" id="id1">
 <h1><span class="section-number">4. </span>벨만 방정식: 가치 함수의 재귀적 성질<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h1>
+<p>지난 장에서는 강화학습 분야에서 가장 중요한 개념 중 하나인 가치 함수에 대해 알아보았다. 어떤 정책의 가치 함수는 해당 정책을 따랐을 때 얻게 되는 보상들의 할인된 누적 합의 기댓값으로서, 정책의 좋고 나쁨을 수치로 표현해준다. 이번 장에서는 가치 함수의 중요한 성질에 대해서 알아본다.</p>
 <section id="return">
 <h2><span class="section-number">4.1. </span>Return의 재귀적 표현<a class="headerlink" href="#return" title="Permalink to this headline">#</a></h2>
+<p>Return의 정의를 다시 한번 적어보자.</p>
+<div class="math notranslate nohighlight">
+\[G_t = R_t + \gamma R_{t+1} + \gamma^2 R_{t+2} + \ldots,\]</div>
+<br>
+<p>이때, <span class="math notranslate nohighlight">\(R_{t'} = r(S_{t'}, A_{t'}) \; \forall \; t'=t, t+1, \ldots\)</span>으로 계산된다. 두 번째 텀부터 <span class="math notranslate nohighlight">\(\gamma\)</span>를 공통적으로 갖고 있기 때문에 <span class="math notranslate nohighlight">\(\gamma\)</span>로 묶어주자.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{matrix}
+G_t &amp; = &amp; R_t + \gamma \left( R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} +\ldots  \right) \\
+&amp; = &amp; R_{t} + \gamma G_{t+1}.
+\end{matrix}
+\end{split}\]</div>
+<br>
+<p><span class="math notranslate nohighlight">\(G_t\)</span>를 다음 스탭 return인 <span class="math notranslate nohighlight">\(G_{t+1}\)</span>으로 표현된 모습이다.</p>
+<br>
+</section>
+<hr class="docutils" />
+<section id="id2">
+<h2><span class="section-number">4.2. </span>상태 가치 함수의 재귀적 표현<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h2>
 <p>Coming soon!</p>
 </section>
 </section>

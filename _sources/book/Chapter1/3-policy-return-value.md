@@ -84,17 +84,23 @@ $$G_t = r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + \gamma^2 r_{t+3} + \ldots,$$
 
 한 정책 $\pi$의 상태 $s \in \mathcal{S}$에서의 상태 가치 함수는 상태 $s$에서 정책 $\pi$를 따랐을 때 받게 되는 return의 기댓값이다. 수식적으로는 다음과 같다.
 
-> **상태 가치 함수 (state value function)**
->
-> 한 정책 $\pi$의 상태 $s \in \mathcal{S}$의 상태 가치 함수 $V^{\pi}: \mathcal{S} \rightarrow \mathbb{R}$는 상태 $s$에서 정책 $\pi$를 따랐을 때 받게 되는 return의 기댓값으로 정의된다. 즉,
-> ```{math}
-> :label: state_value_function
->    V^{\pi}(s) := \mathbb{E}_{\pi} \left[ G_t | S_t = s \right] \quad \forall s \in \mathcal{S}.
-> ```
+```{admonition} **상태 가치 함수 (state value function)**
+:class: tip
+
+한 정책 $\pi$의 상태 $s \in \mathcal{S}$의 상태 가치 함수 $V^{\pi}: \mathcal{S} \rightarrow \mathbb{R}$는 상태 $s$에서 정책 $\pi$를 따랐을 때 받게 되는 return의 기댓값으로 정의된다. 즉,
+
+```{math}
+:label: state_value_function
+V^{\pi}(s) := \mathbb{E}_{\pi} \left[ G_t | S_t = s \right] \quad \forall s \in \mathcal{S}.
+```
 
 <br>
 
 가치 함수를 더 잘 이해할 수 있기 위해 확률론적인 이야기를 조금만 해보자. 식 {eq}`state_value_function`의 기댓값 안에 겉으로 보이는 확률 변수 (random variable)는 $G_t$ 하나이다. 하지만 사실 이 $G_t$ 안에 엄청나게 많은 확률 변수들이 있다. 우선, $G_t = R_t + \gamma R_{t+1} + \gamma^2 R_{t+2} + \ldots$이고, 각 보상은 $R_{t'}=r(S_{t'}, A_{t'})$으로 정의되기 때문에 확률 변수가 $A_t, S_{t+1}, A_{t+1}, \ldots$이 있다. $S_t$는 조건부에 의해 $S_t=s$로 결정되었기 때문에 확률 변수가 아니다.
+
+```{note}
+본 책에서는 확률 변수 (random variable)는 대문자로, 확률 변수의 실현값 (realization)은 소문자로 표기하려고 최대한 노력하였다.
+```
 
 <br>
 
@@ -137,13 +143,16 @@ $$J(\theta) := \mathbb{E}_{S_0 \sim \rho_0, \pi_\theta} \left[ V^{\pi}(S_0) \rig
 
 상태 가치 함수 $V^{\pi}(s)$가 상태 $s$에서 정책 $\pi$의 성능을 알려주는 함수였다면, 상태 $s$에서 (정책을 따르지 않고) 행동 $a$를 취했을 때 정책 $\pi$의 성능을 알려주는 함수를 행동 가치 함수라고 한다.
 
-> **행동 가치 함수 (action value function)**
->
-> 한 정책 $\pi$의 상태 $s \in \mathcal{S}$와 행동 $a \in \mathcal{A}$에서의 행동 가치 함수 $Q^{\pi}: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}$는 상태 $s$에서 행동 $a$를 취하고 정책 $\pi$를 따랐을 때 받게 되는 return의 기댓값으로 정의된다. 즉,
-> ```{math}
-> :label: action_value_function
->    Q^{\pi}(s, a) := \mathbb{E}_{\pi} \left[ G_t | S_t = s, A_t=a  \right] \quad \forall s \in \mathcal{S}, a \in \mathcal{A}.
-> ```
+```{admonition} **행동 가치 함수 (action value function)**
+:class: tip
+
+$\mathcal{A}$에서의 행동 가치 함수 $Q^{\pi}: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}$는 상태 $s$에서 행동 $a$를 취하고 정책 $\pi$를 따랐을 때 받게 되는 return의 기댓값으로 정의된다. 즉,
+
+```{math}
+:label: action_value_function
+Q^{\pi}(s, a) := \mathbb{E}_{\pi} \left[ G_t | S_t = s, A_t=a  \right] \quad \forall s \in \mathcal{S}, a \in \mathcal{A}.
+```
+
 
 <br>
 
@@ -179,13 +188,15 @@ $$V^{\pi}(s) = \mathbb{E}_{a\sim\pi(\cdot|s)} \left[ Q^{\pi}(s, a) \right].$$
 
 Advantage 함수는 상태 $s$와 행동 $a$에 대해서 정의되는 함수로서, 행동 가치 함수에서 상태 가치 함수를 뺀 것이다. 상태 $s$에서 정책을 따르는 대신 행동 $a$를 취했을 때, 상태 가치 함수와 비교하여 얼마나 더 많은 이득 (advantage)를 얻는가를 나타낸다. Advantage 함수값이 0보다 큰 행동은 현재 정책을 따르는 것보다 더 좋은 행동을 의미하며, 0보다 작은 행동을 현재 정책을 따르는 것보다 더 안 좋은 행동을 의미한다. 
 
-> **Advantage 함수 (advantage function)**
->
-> 한 정책 $\pi$의 상태 $s \in \mathcal{S}$와 행동 $a \in \mathcal{A}$에서의 advantage 함수 $A^{\pi}: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}$는 행동 가치 함수에서 상태 가치 함수를 뺀 것으로 정의된다. 즉,
-> ```{math}
-> :label: advantage_function
->    A^{\pi}(s, a) := Q^{\pi}(s, a) - V^{\pi}(s) \forall s \in \mathcal{S}, a \in \mathcal{A}.
-> ```
+```{admonition} **Advantage 함수 (advantage function)**
+:class: tip
+
+한 정책 $\pi$의 상태 $s \in \mathcal{S}$와 행동 $a \in \mathcal{A}$에서의 advantage 함수 $A^{\pi}: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}$는 행동 가치 함수에서 상태 가치 함수를 뺀 것으로 정의된다. 즉,
+
+```{math}
+:label: advantage_function
+A^{\pi}(s, a) := Q^{\pi}(s, a) - V^{\pi}(s) \quad \forall s \in \mathcal{S}, a \in \mathcal{A}.
+```
 
 <br>
 
