@@ -75,3 +75,17 @@ $$r_0 + \gamma r_1 + \gamma^2 r_2 + \gamma^3 r_3 + \ldots$$
 <br>
 
 할인률에 대해서는 다음 절에서 더 자세히 알아볼 예정이다.
+
+
+```{raw} html
+<script
+   type="text/javascript"
+   src="https://utteranc.es/client.js"
+   async="async"
+   repo="HiddenBeginner/Deep-Reinforcement-Learnings"
+   issue-term="pathname"
+   theme="github-light"
+   label="💬 comment"
+   crossorigin="anonymous"
+/>
+```

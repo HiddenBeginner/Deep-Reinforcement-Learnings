@@ -207,3 +207,17 @@ A^{\pi}(s, a) := Q^{\pi}(s, a) - V^{\pi}(s) \quad \forall s \in \mathcal{S}, a \
 <br>
 
 [^infinite-horizon]: 끝이 정해져 있는 환경의 경우 종료 조건에 의해 실제 $T$까지만 진행되었어도, 이후 상태가 행동에 의해 바뀌지 않는 종료 상태 (terminal state)로 유지되고 보상은 0을 받는 상호작용을 하는 것으로 간주하여 무한히 진행되는 것으로 생각할 수 있다.
+
+
+```{raw} html
+<script
+   type="text/javascript"
+   src="https://utteranc.es/client.js"
+   async="async"
+   repo="HiddenBeginner/Deep-Reinforcement-Learnings"
+   issue-term="pathname"
+   theme="github-light"
+   label="💬 comment"
+   crossorigin="anonymous"
+/>
+```
