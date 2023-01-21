@@ -10,6 +10,7 @@ parts:
   - file: book/Chapter1/1-sequential-decision-making-problems
   - file: book/Chapter1/2-markov-decision-processes
   - file: book/Chapter1/3-policy-return-value
+  - file: book/Chapter1/4-bellman-equation
 - caption: 참고문헌
   chapters:
   - file: book/Reference

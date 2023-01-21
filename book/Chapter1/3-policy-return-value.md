@@ -14,8 +14,210 @@
 
 <br>
 
-이를 위해서는 우리는 먼저 좋은 정책과 나쁜 정책의 기준을 세워야 한다. 강화학습에서 가장 중요한 개념인 가치 함수에 대해 알아보자.
+이를 위해서는 우리는 먼저 좋은 정책과 나쁜 정책의 기준을 세워야 한다. 정책의 성능은 가치 함수라는 것으로 측정될 수 있다. 가치 함수는 정책을 따랐을 때 받게 되는 return의 기댓값이다. 그럼 먼저 return이 무엇인지 알아보자.
 
 <br>
 
+---
+
+## Return
+
+초기 상태 $s_0$에서 시작하여 정책 $\pi$를 따르며 얻은 trajectory를 $\tau$라 하자.
+
+$$\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T, a_T),$$
+
+이때, 
+- 초기 상태는 초기 상태 확률 분포로부터 샘플링되었고 $s_0 \sim \rho_0$,
+- $t$ 시점의 행동은 정책을 따라 선택되었으며 $a_t \sim \pi(\cdot| s_t)$,
+- $t+1$ 시점의 상태는 전이 확률 분포에 따라 바뀌었고 $s_{t+1} \sim p(\cdot|s_t, a_t)$,
+- $t$ 시점의 보상은 보상 함수에 의해 결정되었다 $r_t=r(s_t, a_t)$.
+
+<br>
+
+환경은 특정 종료 조건에 의해 $T$ 시점까지만 진행될 수 있지만, 정해진 종료 조건 없이 무한히 진행될 수도 있다. 이후부터는 보다 더 일반적인 상황인 무한히 진행되는 환경을 고려할 것이다[^infinite-horizon].
+
+$$\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots).$$
+
+<br>
+
+Return은 $t$시점부터 받은 보상들의 할인된 누적 합 (discounted cummulative sum)이며, $G_t$라고 표기해준다.
+
+$$G_t = r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + \gamma^2 r_{t+3} + \ldots,$$
+
+<br>
+
+이때, 할인률 $\gamma \in [0, 1]$은 0과 1사이의 값이며, $t$ 시점에 취한 행동 $a_t$을 return을 통해 평가할 때, $t$시점보다 먼 시점에 받은 보상일수록 낮은 가중치를 주는 역할을 한다. $\gamma=0$이면, $t$ 시점에 받은 보상 $r_t$만 고려하며, $\gamma=1$이면 $t$ 시점 이후에 받는 모든 보상의 총합을 고려한다. 
+
+<br>
+
+요컨데, return $G_t$는 $t$시점에 취한 행동을 평가하기 위한 값이라고 할 수 있다. $t$시점의 보상 $r_t$만 고려하지 않고 미래에 받을 보상까지 모두 고려하는 이유는 아무튼 $a_t$가 $s_{t+1}$ 만들어 낸 것이고 이후에 받을 보상들이 어떻게 보면 $a_t$ 덕분에 만들어진 것이기 때문이다.
+
+<br>
+
+하지만, 환경과 정책에 있는 많은 확률적 요소 (randomness)에 의해 하나의 관측값인 $G_t$만으로 행동을 평가하기엔 불확실성이 너무 크다. 따라서 우리는 $G_t$의 기댓값으로 정책과 행동의 좋고 나쁨을 평가할 것이다.
+
+<br>
+
+---
+
 ## 가치 함수
+
+자, 이제 강화학습에서 가장 중요한 개념 중 하나인 가치 함수에 대해서 알아보자. 가치 함수는 정책의 좋고 나쁨을 수치적으로 측정할 수 있는 함수이다. 여기서 잠깐. 강화 학습에 어떻게 딥러닝을 적용할 수 있을지 다음 질문에 대한 답변을 각자 한번 생각해보자. 
+
+<center><i>"어떤 함수를 뉴럴 네트워크로 학습할 것인가? 그리고 어떤 목적함수를 최적화하여 파라미터를 업데이트할 것인가?"</i></center>
+
+<br>
+
+딥러닝에 익숙한 분들이라면 어쩌면 지금까지 공부한 것만으로도 위 질문에 답변을 냈을지도 모른다. 모든 심층 강화 학습 알고리즘이 이 부류에 속하지는 않지만, 한 가지 답은 다음과 같다.
+
+<center><i>정책을 뉴럴 네트워크로 학습할 것이고, 가치 함수를 최대로 만들어주는 방향으로 파라미터를 업데이트할 것이다.</i></center>
+
+<br>
+
+가치 함수는 심층 강화 학습을 알기 위해 꼭 필요한 개념이니 지금부터 차근 차근 공부해보자. 가치 함수에는 크게 3종류가 있다. 상태 가치 함수, 행동 가치 함수, advantage function.
+
+<br>
+
+---
+
+### 상태 가치 함수 (State value function)
+
+한 정책 $\pi$의 상태 $s \in \mathcal{S}$에서의 상태 가치 함수는 상태 $s$에서 정책 $\pi$를 따랐을 때 받게 되는 return의 기댓값이다. 수식적으로는 다음과 같다.
+
+```{admonition} **상태 가치 함수 (state value function)**
+:class: tip
+
+한 정책 $\pi$의 상태 $s \in \mathcal{S}$의 상태 가치 함수 $V^{\pi}: \mathcal{S} \rightarrow \mathbb{R}$는 상태 $s$에서 정책 $\pi$를 따랐을 때 받게 되는 return의 기댓값으로 정의된다. 즉,
+
+```{math}
+:label: state_value_function
+V^{\pi}(s) := \mathbb{E}_{\pi} \left[ G_t | S_t = s \right] \quad \forall s \in \mathcal{S}.
+```
+
+<br>
+
+가치 함수를 더 잘 이해할 수 있기 위해 확률론적인 이야기를 조금만 해보자. 식 {eq}`state_value_function`의 기댓값 안에 겉으로 보이는 확률 변수 (random variable)는 $G_t$ 하나이다. 하지만 사실 이 $G_t$ 안에 엄청나게 많은 확률 변수들이 있다. 우선, $G_t = R_t + \gamma R_{t+1} + \gamma^2 R_{t+2} + \ldots$이고, 각 보상은 $R_{t'}=r(S_{t'}, A_{t'})$으로 정의되기 때문에 확률 변수가 $A_t, S_{t+1}, A_{t+1}, \ldots$이 있다. $S_t$는 조건부에 의해 $S_t=s$로 결정되었기 때문에 확률 변수가 아니다.
+
+```{note}
+본 책에서는 확률 변수 (random variable)는 대문자로, 확률 변수의 실현값 (realization)은 소문자로 표기하려고 최대한 노력하였다.
+```
+
+<br>
+
+기댓값을 계산할 때는 각 확률 변수가 어떤 확률 분포를 따르는지  $\mathbb{E}$의 아래 첨자로 적어줘야 한다. 
+- 확률 변수 $A_t$는 정책에 의해 결정되기 때문에 $A_t \sim \pi(\cdot|s)$이고, 
+- 확률 변수 $S_{t+1}$은 전이 확률 분포에 의해 결정되기 때문에 $S_{t+1} \sim p(\cdot\ | s, A_t)$이며, 
+- 다시 정책을 따라 확률 변수 $A_{t+1} \sim \pi(\cdot|S_{t+1}), S_{t+2} \sim p(\cdot\ | s_{t+1}, A_{t+1})$
+- 그리고 이후 모든 확률 변수에 대해서도 적어줘야 한다. 
+ 
+<br>
+
+하지만 이 모든 확률 변수를 적어줄 수 없기 때문에 $\mathbb{E}_{\pi}$라고 적어주었으며, 이 표기에는 다음이 내포되어 있다. 요컨데, 그냥 정책 상태가 $s$인 $t$ 시점부터 정책 $\pi$을 쭉 따랐다는 의미이다.
+
+$$A_{t} \sim \pi(\cdot|s), \; S_{k+1} \sim p(\cdot | S_{k}, A_{k}), \; A_k \sim \pi(\cdot | S_k), \forall k=t+1, t+2, \ldots$$
+
+<br>
+
+정책의 상태 가치 함수의 정의에 대해 알아보았다. 상태 가치 함수를 통해 두 정책 $\pi$와 $\pi'$의 성능을 비교할 수 있다. 모든 상태 $s \in \mathcal{S}$에 대해서 정책 $\pi$의 상태 가치 함수가 정책 $\pi'$보다 클 때, 우리는 정책 $\pi$가 $\pi'$가 더 좋다고 말한다. 즉,
+
+```{math}
+:label: policy_order
+\pi \ge \pi', \text{ if } \; V^{\pi}(s) \ge V^{\pi'}(s) \text{ for all } s \in \mathcal{S}.
+```
+
+<br>
+
+식 {eq}`policy_order`에 정의된 순서 (order) 사용하여 정책을 쭉 줄세웠을 때, 가장 좋은 정책을 최적의 정책 (optimal policy)라고 부르며 보통 $\pi^{*}$라고 부른다.
+
+<br>
+
+그리고 심층 강화 학습에서 정책을 뉴럴 네트워크로 학습시킬 때 사용하는 목적 함수 중 하나는 초기 상태에 대한 가치 함수의 기댓값이다. 즉,
+
+$$J(\theta) := \mathbb{E}_{S_0 \sim \rho_0, \pi_\theta} \left[ V^{\pi}(S_0) \right].$$
+
+<br>
+
+---
+
+### 행동 가치 함수 (Action value function)
+
+상태 가치 함수 $V^{\pi}(s)$가 상태 $s$에서 정책 $\pi$의 성능을 알려주는 함수였다면, 상태 $s$에서 (정책을 따르지 않고) 행동 $a$를 취했을 때 정책 $\pi$의 성능을 알려주는 함수를 행동 가치 함수라고 한다.
+
+```{admonition} **행동 가치 함수 (action value function)**
+:class: tip
+
+$\mathcal{A}$에서의 행동 가치 함수 $Q^{\pi}: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}$는 상태 $s$에서 행동 $a$를 취하고 정책 $\pi$를 따랐을 때 받게 되는 return의 기댓값으로 정의된다. 즉,
+
+```{math}
+:label: action_value_function
+Q^{\pi}(s, a) := \mathbb{E}_{\pi} \left[ G_t | S_t = s, A_t=a  \right] \quad \forall s \in \mathcal{S}, a \in \mathcal{A}.
+```
+
+
+<br>
+
+식 {eq}`action_value_function`에서 조건부의 $A_t=a$는 $t$ 시점의 행동이 $a$로 주어졌다는 것을 의미한다. 상태 가치 함수의 정의인 식 {eq}`state_value_function`에서  $A_t$가 $\pi(\cdot | s)$에서 샘플링된 것과 다르다.
+
+<br>
+
+상태 가치 함수는 상태 $s$에서 정책 $\pi$를 바로 따랐을 때 받게 되는 return의 기댓값이고, 행동 가치 함수는 상태 $s$에서 정해진 행동 $a$를 취한 후 $\pi$를 따랐을 때 받게 되는 return의 기댓값이다. 그럼 상태 $s$에서 다음을 만족하는 행동 $a$가 있다는 것은 무엇을 의미할까?
+
+$$Q^{\pi}(s, a) \ge V^{\pi}(s).$$
+
+<br>
+
+상태 $s$에서 정책을 바로 따르는 것보다, 행동 $a$를 취하고 정책을 따랐을 때 더 큰 return을 기대할 수 있다는 것이다. 그럼, 우리는 상태 $s$에서 행동 $a$를 취하도록 정책을 변경함으로서 정책을 개선할 수 있다. 
+
+<br>
+
+조금 더 극적으로 정책을 개선할 수도 있다. 상태 $s$에서 가장 큰 행동 가치 함수를 갖는 행동을 찾아서 정책을 개선하는 것이다. 즉, 현재 정책을 $\pi$, 개선된 정책을  $\pi'$라고 하자. 상태 $s$에서 가장 큰 $Q^{\pi}(s, a)$를 갖는 행동 $a$를 1의 확률로 선택하게 정책을 수정하는 것이다.
+
+$$\pi'(a|s)=\begin{cases} 1 & \text{ if } a = \operatorname*{argmax}\limits_{a\in\mathcal{A}} Q^{\pi}(s, a) \\ 0 & \text{ otherwise} \end{cases}, \text{ for all } s \in \mathcal{S}$$
+
+<br>
+
+한편, 알아두면 좋은 두 가치 함수 사이의 관계식이 있다. 기댓값의 정의를 잘 생각해보면, 상태 가치 함수와 행동 가치 함수가 다음과 같은 관계를 갖고 있는 것을 알 수 있다. 증명은 다음 절에 나올 예정이다 (예정일껄...).
+
+$$V^{\pi}(s) = \mathbb{E}_{a\sim\pi(\cdot|s)} \left[ Q^{\pi}(s, a) \right].$$
+
+<br>
+
+---
+
+### Advantage 함수 (Advantage function)
+
+Advantage 함수는 상태 $s$와 행동 $a$에 대해서 정의되는 함수로서, 행동 가치 함수에서 상태 가치 함수를 뺀 것이다. 상태 $s$에서 정책을 따르는 대신 행동 $a$를 취했을 때, 상태 가치 함수와 비교하여 얼마나 더 많은 이득 (advantage)를 얻는가를 나타낸다. Advantage 함수값이 0보다 큰 행동은 현재 정책을 따르는 것보다 더 좋은 행동을 의미하며, 0보다 작은 행동을 현재 정책을 따르는 것보다 더 안 좋은 행동을 의미한다. 
+
+```{admonition} **Advantage 함수 (advantage function)**
+:class: tip
+
+한 정책 $\pi$의 상태 $s \in \mathcal{S}$와 행동 $a \in \mathcal{A}$에서의 advantage 함수 $A^{\pi}: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}$는 행동 가치 함수에서 상태 가치 함수를 뺀 것으로 정의된다. 즉,
+
+```{math}
+:label: advantage_function
+A^{\pi}(s, a) := Q^{\pi}(s, a) - V^{\pi}(s) \quad \forall s \in \mathcal{S}, a \in \mathcal{A}.
+```
+
+<br>
+
+---
+
+이번 절에서는 세 가지 가치 함수를 알아보았다. 가치 함수만 알면 정책의 성능을 평가할 수 있고, 성능을 최대화하는 정책을 찾으면 이제 게임이 끝난다. 딥러닝에서 목적함수가 준비된 셈이다. 하지만 문제가 하나 있다. 대부분의 경우 이 가치 함수를 실제로 계산하는 것이 불가능하다. 따라서 대부분의 심층 강화 학습 알고리즘들은 가치 함수를 추정하거나 가치 함수의 그레디언트를 추정하게 된다. 이를 추정하기 위한 중요한 개념 하나 남아 있는데, 이를 다음 절에서 알아본다.
+
+<br>
+
+[^infinite-horizon]: 끝이 정해져 있는 환경의 경우 종료 조건에 의해 실제 $T$까지만 진행되었어도, 이후 상태가 행동에 의해 바뀌지 않는 종료 상태 (terminal state)로 유지되고 보상은 0을 받는 상호작용을 하는 것으로 간주하여 무한히 진행되는 것으로 생각할 수 있다.
+
+
+```{raw} html
+<script
+   type="text/javascript"
+   src="https://utteranc.es/client.js"
+   async="async"
+   repo="HiddenBeginner/Deep-Reinforcement-Learnings"
+   issue-term="pathname"
+   theme="github-light"
+   label="💬 comment"
+   crossorigin="anonymous"
+/>
+```

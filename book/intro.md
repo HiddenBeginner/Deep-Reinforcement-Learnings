@@ -31,4 +31,18 @@
 
 <재야의 숨은 초보>
 
+
+```{raw} html
+<script
+   type="text/javascript"
+   src="https://utteranc.es/client.js"
+   async="async"
+   repo="HiddenBeginner/Deep-Reinforcement-Learnings"
+   issue-term="pathname"
+   theme="github-light"
+   label="💬 comment"
+   crossorigin="anonymous"
+/>
+```
+
 [^SOTA]: State of the art의 줄임말. 해당 분야에서 성능이 제일 좋은 논문을 의미한다.

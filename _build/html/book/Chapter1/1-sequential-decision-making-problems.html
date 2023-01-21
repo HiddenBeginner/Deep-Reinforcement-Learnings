@@ -94,6 +94,14 @@ const thebe_selector_output = ".output, .cell_output"
 
     <!-- Google Analytics -->
     
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-FTQEC31PV8"></script>
+<script>
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){ dataLayer.push(arguments); }
+                    gtag('js', new Date());
+                    gtag('config', 'G-FTQEC31PV8');
+                </script>
+
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
 <!-- Checkboxes to toggle the left sidebar -->
@@ -166,6 +174,11 @@ const thebe_selector_output = ".output, .cell_output"
  <li class="toctree-l1">
   <a class="reference internal" href="3-policy-return-value.html">
    3. 정책, Return, 가치 함수
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="4-bellman-equation.html">
+   4. 벨만 방정식: 가치 함수의 재귀적 성질
   </a>
  </li>
 </ul>
@@ -253,7 +266,7 @@ title="Fullscreen mode"
   <div class="menu-dropdown__content">
     <ul>
       <li>
-        <a href="https://github.com/hiddenbeginner/jupyter-book"
+        <a href="https://github.com/hiddenbeginner/Deep-Reinforcement-Learnings"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -270,7 +283,7 @@ title="Source repository"
       </li>
       
       <li>
-        <a href="https://github.com/hiddenbeginner/jupyter-book/issues/new?title=Issue%20on%20page%20%2Fbook/Chapter1/1-sequential-decision-making-problems.html&body=Your%20issue%20content%20here."
+        <a href="https://github.com/hiddenbeginner/Deep-Reinforcement-Learnings/issues/new?title=Issue%20on%20page%20%2Fbook/Chapter1/1-sequential-decision-making-problems.html&body=Your%20issue%20content%20here."
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -367,7 +380,16 @@ title="Print to PDF"
 그럼 에이전트는 환경의 바뀐 다음 상태를 관측하고 또 다시 행동을 취하며, 환경은 상태가 바뀌고 에이전트에게 보상을 부여한다.
 이 과정을 정해진 횟수나 조건만큼 반복하거나 또는 무한히 반복하는 것을 순차적 의사 결정 문제라고 한다.</p>
 <p>에이전트의 목표는 이 과정을 반복하여 얻게 되는 보상들의 총합을 최대화하는 것이다. 에이전트가 환경의 상태에 적절하지 못한 행동을 취했다면 보상을 적게 받았을테고, 환경의 상태에 딱 좋은 행동을 취했다면 보상을 많이 받았을 것이다.</p>
-</section>
+<script
+   type="text/javascript"
+   src="https://utteranc.es/client.js"
+   async="async"
+   repo="HiddenBeginner/Deep-Reinforcement-Learnings"
+   issue-term="pathname"
+   theme="github-light"
+   label="💬 comment"
+   crossorigin="anonymous"
+/></section>
 
     <script type="text/x-thebe-config">
     {
