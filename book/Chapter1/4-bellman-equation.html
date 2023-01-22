@@ -382,6 +382,11 @@ title="Print to PDF"
    4.2. 상태 가치 함수의 재귀적 표현
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id3">
+   4.3. 행동 가치 함수의 재귀적 표현
+  </a>
+ </li>
 </ul>
 
     </nav>
@@ -411,6 +416,11 @@ title="Print to PDF"
    4.2. 상태 가치 함수의 재귀적 표현
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id3">
+   4.3. 행동 가치 함수의 재귀적 표현
+  </a>
+ </li>
 </ul>
 
                         </nav>
@@ -431,21 +441,65 @@ title="Print to PDF"
 \[G_t = R_t + \gamma R_{t+1} + \gamma^2 R_{t+2} + \ldots,\]</div>
 <br>
 <p>이때, <span class="math notranslate nohighlight">\(R_{t'} = r(S_{t'}, A_{t'}) \; \forall \; t'=t, t+1, \ldots\)</span>으로 계산된다. 두 번째 텀부터 <span class="math notranslate nohighlight">\(\gamma\)</span>를 공통적으로 갖고 있기 때문에 <span class="math notranslate nohighlight">\(\gamma\)</span>로 묶어주자.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{matrix}
-G_t &amp; = &amp; R_t + \gamma \left( R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} +\ldots  \right) \\
-&amp; = &amp; R_{t} + \gamma G_{t+1}.
-\end{matrix}
+<div class="math notranslate nohighlight" id="equation-1step-return">
+<span class="eqno">(4.1)<a class="headerlink" href="#equation-1step-return" title="Permalink to this equation">#</a></span>\[\begin{split}
+   \begin{matrix}
+   G_t &amp; = &amp; R_t + \gamma \left( R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} +\ldots  \right) \\
+   &amp; = &amp; R_{t} + \gamma G_{t+1}.
+   \end{matrix}
 \end{split}\]</div>
 <br>
-<p><span class="math notranslate nohighlight">\(G_t\)</span>를 다음 스탭 return인 <span class="math notranslate nohighlight">\(G_{t+1}\)</span>으로 표현된 모습이다.</p>
+<p><span class="math notranslate nohighlight">\(G_t\)</span>를 다음 스탭 return인 <span class="math notranslate nohighlight">\(G_{t+1}\)</span>으로 표현된 모습이다. <span class="math notranslate nohighlight">\(G_t\)</span>의 다른 형태인 <span class="math notranslate nohighlight">\(R_{t} + \gamma G_{t+1}\)</span>을 1step return이라고 부른다. 물론, 2step return을 포함하여 <span class="math notranslate nohighlight">\(n\)</span>-step return도 있지만, 이에 대해서는 나중에 자세히 알아볼 예정이다. 우선은 1step return을 사용해서 가치 함수의 아주 좋은 성질을 유도해보자.</p>
 <br>
 </section>
 <hr class="docutils" />
 <section id="id2">
 <h2><span class="section-number">4.2. </span>상태 가치 함수의 재귀적 표현<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h2>
+<p>식 <a class="reference internal" href="#equation-1step-return">(4.1)</a>을 상태 가치 함수 정의 <a class="reference internal" href="3-policy-return-value.html#equation-state-value-function">(3.1)</a>에 대입해보자.</p>
+<div class="math notranslate nohighlight" id="equation-1step-state-value-function">
+<span class="eqno">(4.2)<a class="headerlink" href="#equation-1step-state-value-function" title="Permalink to this equation">#</a></span>\[\begin{split}
+\begin{matrix}
+   V^{\pi}(s) &amp; := &amp; \mathbb{E}_{\pi} \left[ G_t | S_t = s \right] &amp; \\
+   &amp; = &amp; \mathbb{E}_{\pi} \left[ R_t + \gamma G_{t+1}| S_t = s \right] &amp;  \\
+   &amp; = &amp; \mathbb{E}_{\pi} \left[ R_t + \gamma \mathbb{E}_{\pi} \left[ G_{t+1} | S_{t+1}\right] | S_t = s \right] &amp; \quad (*) \\
+   &amp; = &amp; \mathbb{E}_{\pi} \left[ R_t + \gamma V^{\pi}(S_{t+1}) | S_t = s \right]. &amp; \quad (**)
+\end{matrix}
+\end{split}\]</div>
+<p>식 <a class="reference internal" href="#equation-1step-state-value-function">(4.2)</a>의 <span class="math notranslate nohighlight">\((*)\)</span>은 <a class="reference external" href="https://en.wikipedia.org/wiki/Law_of_total_expectation">Law of total expectation</a>을 사용한 것이다. 이 법칙에서 중요한 점은 안쪽 기댓값의 조건부에 있는 <span class="math notranslate nohighlight">\(S_{t+1}\)</span>은 확률 변수 (random variable)이라는 것이다. Law of total expectation를 증명하는 것은 굉장히 간단하지만 확률 변수에 대한 이해가 적을 경우 법칙이 잘 와닿지 않을 수 있다. 법칙에 대한 직관적인 예시 하나를 아래 박스에 들어놓았다.</p>
+<div class="admonition-law-of-total-expectation admonition">
+<p class="admonition-title"><strong>Law of total expectation</strong></p>
+<p>Law of total expectation은 <span class="math notranslate nohighlight">\(\mathbb{E} \left[ X \right] = \mathbb{E} \left[ \mathbb{E} \left[ X | Y \right] \right]\)</span>이다. 쉽게 이해하자면, 1학년 학생들의 평균 키 <span class="math notranslate nohighlight">\((X)\)</span>는 각 반 <span class="math notranslate nohighlight">\((Y)\)</span> 학생들의 평균 키를 구하고 다시 평균을 내서 구할 수 있다는 것을 나타낸다. 조금 더 어려운 이야기를 해보자면 우변에서 대괄호 안의 기댓값은 <span class="math notranslate nohighlight">\(X\)</span>에 대한 기댓값이고, 바깥 기댓값은 <span class="math notranslate nohighlight">\(Y\)</span>에 대한 기댓값이다. 바깥 기댓값이 없다고 생각하면 <span class="math notranslate nohighlight">\(\mathbb{E} \left[ X | Y = y \right]\)</span> 등으로 적어줘야 한다. 예를 들어, 1반의 평균 키를 나타낸다. 모든 반에 대한 평균을 내는 것이 바깥 기댓값이다.</p>
+</div>
+<br>
+<p>식 <a class="reference internal" href="#equation-1step-state-value-function">(4.2)</a>의 <span class="math notranslate nohighlight">\((**)\)</span>은 다시 한번 상태 가치 함수의 정의인 식 <a class="reference internal" href="3-policy-return-value.html#equation-state-value-function">(3.1)</a>을 사용한 것이다. 정리하자면, 상태 <span class="math notranslate nohighlight">\(s\)</span>에서의 상태 가치 함수는 정책을 따랐을 때 바로 받게 되는 보상 <span class="math notranslate nohighlight">\(R_{t}\)</span> 더하기 이어지는 다음 상태의 상태 가치 함수의 기댓값이다.</p>
+<br>
+<p>이제 기댓값의 정의를 사용하여 식 <a class="reference internal" href="#equation-1step-state-value-function">(4.2)</a>의 <span class="math notranslate nohighlight">\((**)\)</span>을 다시 적어볼 것이다. 표기의 편의성을 위하여 상태 공간과 행동 공간의 크기가 유한하다고 가정하자 (이를 유한 상태 공간, 유한 행동 공간이라 한다). 확률 변수 <span class="math notranslate nohighlight">\(X\)</span>의 기댓값의 정의는 다음과 같다. 확률 변수 <span class="math notranslate nohighlight">\(X\)</span>의 모든 실현값 <span class="math notranslate nohighlight">\(x\)</span>에 대해서 <span class="math notranslate nohighlight">\(x\)</span>가 발생할 확률과 <span class="math notranslate nohighlight">\(x\)</span>를 곱해준 것을 모두 더해준 것이다.</p>
+<div class="math notranslate nohighlight">
+\[\mathbb{E}_{X} \left[ X \right] = \sum_{x}x \cdot p(x).\]</div>
+<br>
+<p>이를 바탕으로 식 <a class="reference internal" href="#equation-1step-state-value-function">(4.2)</a>의 <span class="math notranslate nohighlight">\((**)\)</span>을 다시 적어보자.</p>
+<div class="math notranslate nohighlight" id="equation-state-bellman-equation">
+<span class="eqno">(4.3)<a class="headerlink" href="#equation-state-bellman-equation" title="Permalink to this equation">#</a></span>\[\begin{split}
+\begin{matrix}
+V^{\pi}(s) &amp; = &amp; \mathbb{E}_{\pi} \left[ R_t + \gamma V^{\pi}(S_{t+1}) | S_t = s \right] \\
+&amp; = &amp; \sum\limits_{a \in \mathcal{A}} \pi(a|s) \sum\limits_{s' \in \mathcal{S}}p(s', r|s, a) \left(r + V^{\pi}(s') \right)
+\end{matrix}
+\end{split}\]</div>
+<br>
+<p>여기서 주의할 점은 기댓값 안에 확률 변수가 어떤 것이 있는지이다. 눈에 보이는 확률 변수는 <span class="math notranslate nohighlight">\(R_t\)</span>와 <span class="math notranslate nohighlight">\(S_{t+1}\)</span>이다. 하지만 <span class="math notranslate nohighlight">\(R_t=r(s, A_t)\)</span>로 계산되기 때문에 사실상 확률 변수는 <span class="math notranslate nohighlight">\(A_t\)</span>와 <span class="math notranslate nohighlight">\(S_{t+1}\)</span>이 있다. 따라서 기댓값의 정의를 적어줄 때 확률 변수 <span class="math notranslate nohighlight">\(A_t\)</span>가 정책 <span class="math notranslate nohighlight">\(\pi(\cdot | s)\)</span>를 따르는 것부터 시작하면 된다 (<span class="math notranslate nohighlight">\(\sum\limits_{a \in \mathcal{A}} \pi(a|s)\)</span>).</p>
+<br>
+<p>다음으로 행동이 <span class="math notranslate nohighlight">\(A_t=a\)</span>라고 할 때, 보상 <span class="math notranslate nohighlight">\(R_t\)</span>은 <span class="math notranslate nohighlight">\(r(s, a)\)</span>로 결정된다. 보상 함수의 정의에 따라 deterministic 하지 않고 stochastic 할 수도 있다. 다음 상태 <span class="math notranslate nohighlight">\(S_{t+1}\)</span>은 전이 확률 분포 <span class="math notranslate nohighlight">\(p(\cdot|s, a)\)</span>에서 샘플링된다. 이 두 가지를 요약하여 나타낸 것이 <span class="math notranslate nohighlight">\(\sum\limits_{s' \in \mathcal{S}}p(s', r|s, a)\)</span>이다.</p>
+<br>
+<p>기댓값의 정의에서 <span class="math notranslate nohighlight">\(\sum\limits_{a \in \mathcal{A}} \pi(a|s) \sum\limits_{s' \in \mathcal{S}}p(s', r|s, a)\)</span> 까지가 확률 계산이고, 실현값이 <span class="math notranslate nohighlight">\(p(s', r|s, a) \left(r + V^{\pi}(s') \right)\)</span>이 되어 확률과 실현값이 곱해진 형태가 최종적으로 식 <a class="reference internal" href="#equation-state-bellman-equation">(4.3)</a>이 되는 것이다.</p>
+<br>
+<p>식 <a class="reference internal" href="#equation-state-bellman-equation">(4.3)</a>은 상태 가치 함수라면 만족하는 등식이며, 이 식을 벨만 방정식 Bellman equation이라고 부른다.</p>
+<br>
+</section>
+<hr class="docutils" />
+<section id="id3">
+<h2><span class="section-number">4.3. </span>행동 가치 함수의 재귀적 표현<a class="headerlink" href="#id3" title="Permalink to this headline">#</a></h2>
 <p>Coming soon!</p>
+<br>
 <script
    type="text/javascript"
    src="https://utteranc.es/client.js"

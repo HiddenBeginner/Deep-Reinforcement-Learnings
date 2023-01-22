@@ -463,21 +463,21 @@ title="Print to PDF"
 </section>
 <section id="trajectory-transition-probability-distribution">
 <h2><span class="section-number">2.3. </span>Trajectory와 전이 확률 분포 (transition probability distribution)<a class="headerlink" href="#trajectory-transition-probability-distribution" title="Permalink to this headline">#</a></h2>
-<p>초기 상태 확률 분포 <span class="math notranslate nohighlight">\(\rho_0\)</span>는 말 그대로 환경이 가질 수 있는 초기 상태의 확률 분포이다. 각 상태마다 환경이 해당 상태를 초기 상태로 가질 확률이 정의되어 있는 함수로 해석할 수 있기 때문에 <span class="math notranslate nohighlight">\(\rho_0:\mathcal{S} \rightarrow [0,1]\)</span>로 적어준다. <span class="math notranslate nohighlight">\(\rho_0\)</span>는 각 상태를 0과 1사이의 값으로 보내는 함수라고 읽으면 된다. 초기 상태, 즉 첫 번째 시점에서의 환경의 상태를 <span class="math notranslate nohighlight">\(s_0 \sim \rho\)</span>로 적어준다. 환경의 첫 번째 상태 <span class="math notranslate nohighlight">\(s_0\)</span>는 초기 상태 확률 분포 <span class="math notranslate nohighlight">\(\rho\)</span>에서 샘플링되었다는 의미이다.</p>
+<p>초기 상태 확률 분포 <span class="math notranslate nohighlight">\(\rho_0\)</span>는 말 그대로 환경이 가질 수 있는 초기 상태의 확률 분포이다. 각 상태마다 환경이 해당 상태를 초기 상태로 가질 확률이 정의되어 있는 함수로 해석할 수 있기 때문에 <span class="math notranslate nohighlight">\(\rho_0:\mathcal{S} \rightarrow [0,1]\)</span>로 적어준다. <span class="math notranslate nohighlight">\(\rho_0\)</span>는 각 상태를 0과 1사이의 값으로 보내는 함수라고 읽으면 된다. 초기 상태, 즉 첫 번째 시점에서의 환경의 상태를 <span class="math notranslate nohighlight">\(s_0 \sim \rho_0\)</span>로 적어준다. 환경의 첫 번째 상태 <span class="math notranslate nohighlight">\(s_0\)</span>는 초기 상태 확률 분포 <span class="math notranslate nohighlight">\(\rho_0\)</span>에서 샘플링되었다는 의미이다.</p>
 <br>
 <p>환경의 초기 상태 <span class="math notranslate nohighlight">\(s_0\)</span>에서 시작해서 에이전트는 행동을 취하기 시작한다. 에이전트가 <span class="math notranslate nohighlight">\(s_0\)</span>에 대해 취한 행동을 <span class="math notranslate nohighlight">\(a_0\)</span>, 받은 보상을 <span class="math notranslate nohighlight">\(r_0=r(s_0, a_0)\)</span>이라고 표기하자. 그리고 다음 시점인 <span class="math notranslate nohighlight">\(t=1\)</span>에서의 환경의 상태를 <span class="math notranslate nohighlight">\(s_1\)</span>, 대응하는 에이전트의 행동을 <span class="math notranslate nohighlight">\(a_1\)</span>, 받은 보상을 <span class="math notranslate nohighlight">\(r_1=r(s_1,a_1)\)</span>, … 으로 적어주면 우리는 이 일련의 과정의 다음과 같이 적어줄 수 있다.</p>
 <div class="math notranslate nohighlight">
 \[
 \tau=(s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T, a_T),
 \]</div>
-<p>여기서 <span class="math notranslate nohighlight">\(r_t = r(s_t, a_t)\)</span>이고, 이 일련의 과정 <span class="math notranslate nohighlight">\(\tau\)</span> (타우라고 읽음)을 trajectory라고 부른다. Trajectory를 직역하면 탄도, 궤도, 궤적인데 뜻이 뜻이 직접적으로 와닿지 않아서 trajectory라고 부를 것이다.</p>
+<p>여기서 <span class="math notranslate nohighlight">\(r_t = r(s_t, a_t)\)</span>이고, 이 일련의 과정 <span class="math notranslate nohighlight">\(\tau\)</span> (타우라고 읽음)을 trajectory라고 부른다. Trajectory를 직역하면 탄도, 궤도, 궤적인데 의미가 직접적으로 와닿지 않아서 trajectory라고 부를 것이다.</p>
 <p><span class="math notranslate nohighlight">\(t\)</span> 시점에서의 환경의 상태 <span class="math notranslate nohighlight">\(s_t\)</span>는 초기 상태부터 시작해서 <span class="math notranslate nohighlight">\(t-1\)</span>번 째 행동까지가 만들어낸 산출물이다. 따라서 <span class="math notranslate nohighlight">\(t\)</span> 시점에서 어떤 상태가 발생할지 알고 싶으면 다음과 같은 조건부 확률 분포를 고려해야 한다.</p>
 <div class="math notranslate nohighlight">
 \[
 p\left(s_t|s_0, a_0, s_1, a_1, \ldots, s_{t-1},a_{t-1}\right).
 \]</div>
 <br>
-<p>이 조건부 확률이 어떻게 정의되는지 모르겠지만 우리가 다루고 계산하기 굉장히 어려울 것이 분명하다. 앞전에 MDP가 순차적 의사 결정 문제를 적당히 단순화하여 모델링한다고 언급했었는데, MDP는 <span class="math notranslate nohighlight">\(t\)</span> 시점의 상태를 <span class="math notranslate nohighlight">\(t-1\)</span> 시점의 상태와 행동에 의해서만 결정된다고 가정하여 문제를 단순화시킨다. 즉,</p>
+<p>이 조건부 확률이 어떻게 정의되는지 모르겠지만, 우리가 다루고 계산하기 굉장히 어려울 것이 분명하다. 앞전에 MDP가 순차적 의사 결정 문제를 적당히 단순화하여 모델링한다고 언급했었는데, MDP는 <span class="math notranslate nohighlight">\(t\)</span> 시점의 상태를 <span class="math notranslate nohighlight">\(t-1\)</span> 시점의 상태와 행동에 의해서만 결정된다고 가정하여 문제를 단순화시킨다. 즉,</p>
 <div class="math notranslate nohighlight">
 \[
 p\left(s_t|s_0, a_0, s_1, a_1, \ldots, s_{t-1},a_{t-1}\right)=p\left(s_t|s_{t-1},a_{t-1}\right),
