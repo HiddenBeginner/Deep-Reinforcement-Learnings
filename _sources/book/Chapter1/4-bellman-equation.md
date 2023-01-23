@@ -63,21 +63,17 @@ $$\mathbb{E}_{X} \left[ X \right] = \sum_{x}x \cdot p(x).$$
 $$
 \begin{matrix}
 V^{\pi}(s) & = & \mathbb{E}_{\pi} \left[ R_t + \gamma V^{\pi}(S_{t+1}) | S_t = s \right] \\
-& = & \sum\limits_{a \in \mathcal{A}} \pi(a|s) \sum\limits_{s' \in \mathcal{S}}p(s', r|s, a) \left(r + V^{\pi}(s') \right)
+& = & \sum\limits_{a \in \mathcal{A}} \pi(a|s) \left( r(s, a) + \gamma \sum\limits_{s' \in \mathcal{S}}p(s'|s, a) \ V^{\pi}(s') \right)
 \end{matrix}
 $$ (state_bellman_equation)
 
 <br>
 
-여기서 주의할 점은 기댓값 안에 확률 변수가 어떤 것이 있는지이다. 눈에 보이는 확률 변수는 $R_t$와 $S_{t+1}$이다. 하지만 $R_t=r(s, A_t)$로 계산되기 때문에 사실상 확률 변수는 $A_t$와 $S_{t+1}$이 있다. 따라서 기댓값의 정의를 적어줄 때 확률 변수 $A_t$가 정책 $\pi(\cdot | s)$를 따르는 것부터 시작하면 된다 ($\sum\limits_{a \in \mathcal{A}} \pi(a|s)$). 
+식을 이해하기 위한 첫 걸음은 기댓값 안에 확률 변수 (random variable)가 어떤 것이 있는지이다. 눈에 보이는 확률 변수는 $R_t$와 $S_{t+1}$이다. 하지만 $R_t=r(s, A_t)$로 계산되기 때문에 사실상 확률 변수는 $A_t$와 $S_{t+1}$이 있다. 따라서 기댓값의 정의를 적어줄 때 확률 변수 $A_t$가 정책 $\pi(\cdot | s)$를 따르는 것부터 시작하면 된다. 이는 식 {eq}`state_bellman_equation`에서 $\sum\limits_{a \in \mathcal{A}} \pi(a|s)$에 해당한다.
 
 <br>
 
-다음으로 행동이 $A_t=a$라고 할 때, 보상 $R_t$은 $r(s, a)$로 결정된다. 보상 함수의 정의에 따라 deterministic 하지 않고 stochastic 할 수도 있다. 다음 상태 $S_{t+1}$은 전이 확률 분포 $p(\cdot|s, a)$에서 샘플링된다. 이 두 가지를 요약하여 나타낸 것이 $\sum\limits_{s' \in \mathcal{S}}p(s', r|s, a)$이다.
-
-<br>
-
-기댓값의 정의에서 $\sum\limits_{a \in \mathcal{A}} \pi(a|s) \sum\limits_{s' \in \mathcal{S}}p(s', r|s, a)$ 까지가 확률 계산이고, 실현값이 $p(s', r|s, a) \left(r + V^{\pi}(s') \right)$이 되어 확률과 실현값이 곱해진 형태가 최종적으로 식 {eq}`state_bellman_equation`이 되는 것이다.
+다음으로 행동이 $A_t=a$라고 할 때, 보상 $R_t$은 $r(s, a)$로 결정된다. 여기까지가 $\sum\limits_{a \in \mathcal{A}} \pi(a|s) \cdot r(s, a)$에 해당한다. 한편, 다음 상태 $S_{t+1}$은 전이 확률 분포 $p(\cdot|s, a)$에서 샘플링된다. 확률 변수 $S_{t+1}$의 각 실현값 $s'$에 대한 확률 계산이 $\sum\limits_{a \in \mathcal{A}} \pi(a|s) \sum\limits_{s' \in \mathcal{S}}p(s'|s, a)$에 해당하고, 여기에 $\gamma V^{\pi}(s')$을 곱해준다.
 
 <br>
 
@@ -92,7 +88,6 @@ $$ (state_bellman_equation)
 Coming soon!
 
 <br>
-
 
 ```{raw} html
 <script
