@@ -86,6 +86,7 @@ const thebe_selector_output = ".output, .cell_output"
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="shortcut icon" href="../../_static/HDBG.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="5. 가치 함수 근사하기: Stochastic approximation" href="5-stochastic-approximation.html" />
@@ -487,7 +488,7 @@ title="Print to PDF"
 <span class="eqno">(4.3)<a class="headerlink" href="#equation-state-bellman-equation" title="Permalink to this equation">#</a></span>\[\begin{split}
 \begin{matrix}
 V^{\pi}(s) &amp; = &amp; \mathbb{E}_{\pi} \left[ R_t + \gamma V^{\pi}(S_{t+1}) | S_t = s \right] \\
-&amp; = &amp; \sum\limits_{a \in \mathcal{A}} \pi(a|s) \left( r(s, a) + \gamma \sum\limits_{s' \in \mathcal{S}}p(s'|s, a) \ V^{\pi}(s') \right)
+&amp; = &amp; \sum\limits_{a \in \mathcal{A}} \pi(a|s) \left( r(s, a) + \gamma \sum\limits_{s' \in \mathcal{S}}p(s'|s, a) \ V^{\pi}(s') \right).
 \end{matrix}
 \end{split}\]</div>
 <br>
@@ -495,14 +496,64 @@ V^{\pi}(s) &amp; = &amp; \mathbb{E}_{\pi} \left[ R_t + \gamma V^{\pi}(S_{t+1}) |
 <br>
 <p>다음으로 행동이 <span class="math notranslate nohighlight">\(A_t=a\)</span>라고 할 때, 보상 <span class="math notranslate nohighlight">\(R_t\)</span>은 <span class="math notranslate nohighlight">\(r(s, a)\)</span>로 결정된다. 여기까지가 <span class="math notranslate nohighlight">\(\sum\limits_{a \in \mathcal{A}} \pi(a|s) \cdot r(s, a)\)</span>에 해당한다. 한편, 다음 상태 <span class="math notranslate nohighlight">\(S_{t+1}\)</span>은 전이 확률 분포 <span class="math notranslate nohighlight">\(p(\cdot|s, a)\)</span>에서 샘플링된다. 확률 변수 <span class="math notranslate nohighlight">\(S_{t+1}\)</span>의 각 실현값 <span class="math notranslate nohighlight">\(s'\)</span>에 대한 확률 계산이 <span class="math notranslate nohighlight">\(\sum\limits_{a \in \mathcal{A}} \pi(a|s) \sum\limits_{s' \in \mathcal{S}}p(s'|s, a)\)</span>에 해당하고, 여기에 <span class="math notranslate nohighlight">\(\gamma V^{\pi}(s')\)</span>을 곱해준다.</p>
 <br>
-<p>식 <a class="reference internal" href="#equation-state-bellman-equation">(4.3)</a>은 상태 가치 함수라면 만족하는 등식이며, 이 식을 벨만 방정식 Bellman equation이라고 부른다.</p>
+<p>식 <a class="reference internal" href="#equation-state-bellman-equation">(4.3)</a>은 상태 가치 함수라면 만족하는 등식이며, 이 식을 상태 가치 함수에 대한 벨만 방정식 Bellman equation이라고 부른다.</p>
 <br>
 </section>
 <hr class="docutils" />
 <section id="id3">
 <h2><span class="section-number">4.3. </span>행동 가치 함수의 재귀적 표현<a class="headerlink" href="#id3" title="Permalink to this headline">#</a></h2>
-<p>Coming soon!</p>
+<p>상태 가치 함수의 벨만 방정식을 유도했던 것처럼 행동 가치 함수도 재귀적으로 나타낼 수 있다. 상태 가치 함수와 다른 부분은 행동 가치 함수 <span class="math notranslate nohighlight">\(Q^{\pi}(s, a)\)</span>는 확률 변수 <span class="math notranslate nohighlight">\(A_t\)</span>가 <span class="math notranslate nohighlight">\(a\)</span>로 고정되었다는 것이다. 아래 식을 보자.</p>
+<div class="math notranslate nohighlight" id="equation-1step-action-value-function">
+<span class="eqno">(4.4)<a class="headerlink" href="#equation-1step-action-value-function" title="Permalink to this equation">#</a></span>\[\begin{split}
+\begin{matrix}
+   Q^{\pi}(s, a) &amp; := &amp; \mathbb{E}_{\pi} \left[ G_t | S_t = s, A_t = a \right] &amp; \\
+   &amp; = &amp; \mathbb{E}_{\pi} \left[ R_t + \gamma G_{t+1}| S_t = s, A_t = a \right] &amp;  \\
+   &amp; = &amp;  r(s, a)  + \mathbb{E}_{\pi} \left[\gamma G_{t+1}| S_t = s, A_t = a \right] &amp;  \quad (*) \\
+\end{matrix}
+\end{split}\]</div>
 <br>
+<p>식 <a class="reference internal" href="#equation-1step-action-value-function">(4.4)</a>의 <span class="math notranslate nohighlight">\((*)\)</span>에서 <span class="math notranslate nohighlight">\(S_t=s, A_t=a\)</span>로 고정되었으니 보상 <span class="math notranslate nohighlight">\(R_t=r(s, a)\)</span>로 딱 결정된다. <span class="math notranslate nohighlight">\(R_t\)</span>에 더 이상 확률 변수가 없기 때문에 기댓값 계산에서 상수가 되어 밖으로 나올 수 있게 된다. 이제 Law of total expectation 법칙을 사용할 차례이다. 여기서 2가지 선택권이 있다. 쉬운 버전부터 보자</p>
+<div class="math notranslate nohighlight" id="equation-action-bellman-equation1">
+<span class="eqno">(4.5)<a class="headerlink" href="#equation-action-bellman-equation1" title="Permalink to this equation">#</a></span>\[\begin{split}
+\begin{matrix}
+   Q^{\pi}(s, a) &amp; = &amp;  r(s, a)  + \mathbb{E}_{\pi} \left[\gamma G_{t+1}| S_t = s, A_t = a \right] &amp;  \\
+   &amp; = &amp;  r(s, a)  + \mathbb{E}_{\pi} \left[\gamma \mathbb{E} \left[ G_{t+1} | S_{t+1}\right] | S_t = s, A_t = a \right] &amp;  \quad (*) \\
+   &amp; = &amp;  r(s, a)  + \gamma \mathbb{E}_{\pi} \left[ V^{\pi}(S_{t+1}) | S_t = s, A_t = a \right] &amp;  \quad(**) \\
+   &amp; = &amp; r(s, a) + \gamma \sum\limits_{s' \in \mathcal{S}}p(s'|s, a) \ V^{\pi}(s'). &amp; \quad(***)
+\end{matrix}
+\end{split}\]</div>
+<br>
+<p>식 <a class="reference internal" href="#equation-action-bellman-equation1">(4.5)</a>의 <span class="math notranslate nohighlight">\((*)\)</span>는 안쪽 기댓값의 조건부에 확률 변수 <span class="math notranslate nohighlight">\(S_{t+1}\)</span>만 추가된 형태이다. 식 <a class="reference internal" href="#equation-action-bellman-equation1">(4.5)</a>의 <span class="math notranslate nohighlight">\((**)\)</span>은 행동 가치 함수와 상태 가치 함수 사이의 관계를 잘 보여준다. 행동 가치 함수 <span class="math notranslate nohighlight">\(Q^{\pi}(s, a)\)</span>는 보상 <span class="math notranslate nohighlight">\(r(s, a)\)</span>에다가 전이 확률 분포를 따라 방문할 다음 상태들의 상태 가치 함수의 기댓값에 <span class="math notranslate nohighlight">\(\gamma\)</span>를 곱해 더해준 것이다.</p>
+<br>
+<p>식 <a class="reference internal" href="#equation-action-bellman-equation1">(4.5)</a>의 <span class="math notranslate nohighlight">\((***)\)</span>를 상태 가치 함수에 대한 벨만 방정식 <a class="reference internal" href="#equation-state-bellman-equation">(4.3)</a>에 집어 넣으면 다음과 같은 관계식도 유도할 수 있다.</p>
+<div class="math notranslate nohighlight" id="equation-relation-between-state-action-value-function">
+<span class="eqno">(4.6)<a class="headerlink" href="#equation-relation-between-state-action-value-function" title="Permalink to this equation">#</a></span>\[\begin{split}
+\begin{matrix}
+V^{\pi}(s) &amp; = &amp; \sum\limits_{a \in \mathcal{A}} \pi(a|s) \left( r(s, a) + \gamma \sum\limits_{s' \in \mathcal{S}}p(s'|s, a) \ V^{\pi}(s') \right) \\
+&amp; = &amp; \sum\limits_{a \in \mathcal{A}} \pi(a|s) Q^{\pi}(s, a) \\
+&amp; = &amp; \mathbb{E}_{a\sim\pi(\cdot|s)} \left[ Q^{\pi}(s, a) \right].
+\end{matrix}
+\end{split}\]</div>
+<br>
+<p>식 <a class="reference internal" href="#equation-relation-between-state-action-value-function">(4.6)</a>는 상태 <span class="math notranslate nohighlight">\(s\)</span>에서의 상태 가치 함수는 정책을 따라 선택한 행동 <span class="math notranslate nohighlight">\(a\)</span>의 행동 가치 함수의 기댓값이라는 것을 말해준다.</p>
+<br>
+<p>한편, Law of total expectation을 적용할 때 안쪽 기댓값의 조건부에 확률 변수 <span class="math notranslate nohighlight">\(A_{t+1}\)</span>까지 넣어주면 다음과 같은 식이 유도된다.</p>
+<div class="math notranslate nohighlight" id="equation-action-bellman-equation2">
+<span class="eqno">(4.7)<a class="headerlink" href="#equation-action-bellman-equation2" title="Permalink to this equation">#</a></span>\[\begin{split}
+\begin{matrix}
+   Q^{\pi}(s, a) &amp; = &amp;  r(s, a)  + \mathbb{E}_{\pi} \left[\gamma G_{t+1}| S_t = s, A_t = a \right] &amp;  \\
+   &amp; = &amp;  r(s, a)  + \mathbb{E}_{\pi} \left[\gamma \mathbb{E} \left[ G_{t+1} | S_{t+1}, A_{t+1} \right] | S_t = s, A_t = a \right] &amp; \quad (*) \\
+   &amp; = &amp;  r(s, a)  + \mathbb{E}_{\pi} \left[\gamma Q^{\pi}(S_{t+1}, A_{t+1}) | S_t = s, A_t = a \right] &amp; \quad (**) \\
+   &amp; = &amp; r(s, a) + \gamma \sum\limits_{s' \in \mathcal{S}}p(s'|s, a) \sum\limits_{a' \in \mathcal{A}} \pi(a'|s') Q^{\pi}(s', a') &amp; \quad(***)
+\end{matrix}
+\end{split}\]</div>
+<br>
+<p>식 <a class="reference internal" href="#equation-action-bellman-equation2">(4.7)</a>의 <span class="math notranslate nohighlight">\((*)\)</span>는 안쪽 기댓값의 조건부에 확률 변수 <span class="math notranslate nohighlight">\(S_{t+1}\)</span>와 <span class="math notranslate nohighlight">\(A_{t+1}\)</span>가 있는 형태이다. 확률 변수를 2개를 넣어주는 것도 가능하다 (가능할껄…?). 식 <a class="reference internal" href="#equation-action-bellman-equation2">(4.7)</a>의 <span class="math notranslate nohighlight">\((***)\)</span>은 행동 가치 함수의 재귀적 성질을 잘 보여주며, 이를 행동 가치 함수에 대한 벨만 방정식이라고 부른다.</p>
+<br>
+<hr class="docutils" />
+<p>이번 장에서는 가치 함수의 중요한 성질인 벨만 방정식에 대해 알아보았다. 가치 함수는 정책의 성능을 평가할 수 있는 아주 중요한 지표이다. 하지만 많은 경우 가치 함수를 직접 계산하는 것은 불가능 (intractable)하다. 따라서 우리는 가치 함수를 추정 (estimate)하게 될 것인데, 이때 벨만 방정식이 유용하게 사용된다.</p>
+<br>
+<p>미리 스포를 하자면, 실제 가치 함수이면 벨만 방정식을 만족해야 한다는 성질을 이용해서 벨만 방정식의 좌변과 우변의 차이가 0이 되도록 가치 네트워크 <span class="math notranslate nohighlight">\(V_{\theta}(s)\)</span>나 <span class="math notranslate nohighlight">\(Q_{\theta}(s, a)\)</span>를 학습시킨다. 이에 대한 근거가 되는 방법론인 stochastic approximation 다음 장에서 알아보자.</p>
 <script
    type="text/javascript"
    src="https://utteranc.es/client.js"

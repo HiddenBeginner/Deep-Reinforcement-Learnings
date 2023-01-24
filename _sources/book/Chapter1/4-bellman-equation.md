@@ -17,7 +17,7 @@ $$
    G_t & = & R_t + \gamma \left( R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} +\ldots  \right) \\
    & = & R_{t} + \gamma G_{t+1}.
    \end{matrix}
-$$  (1step_return)
+$$ (1step_return)
 
 <br>
 
@@ -63,7 +63,7 @@ $$\mathbb{E}_{X} \left[ X \right] = \sum_{x}x \cdot p(x).$$
 $$
 \begin{matrix}
 V^{\pi}(s) & = & \mathbb{E}_{\pi} \left[ R_t + \gamma V^{\pi}(S_{t+1}) | S_t = s \right] \\
-& = & \sum\limits_{a \in \mathcal{A}} \pi(a|s) \left( r(s, a) + \gamma \sum\limits_{s' \in \mathcal{S}}p(s'|s, a) \ V^{\pi}(s') \right)
+& = & \sum\limits_{a \in \mathcal{A}} \pi(a|s) \left( r(s, a) + \gamma \sum\limits_{s' \in \mathcal{S}}p(s'|s, a) \ V^{\pi}(s') \right).
 \end{matrix}
 $$ (state_bellman_equation)
 
@@ -77,7 +77,7 @@ $$ (state_bellman_equation)
 
 <br>
 
-식 {eq}`state_bellman_equation`은 상태 가치 함수라면 만족하는 등식이며, 이 식을 벨만 방정식 Bellman equation이라고 부른다.
+식 {eq}`state_bellman_equation`은 상태 가치 함수라면 만족하는 등식이며, 이 식을 상태 가치 함수에 대한 벨만 방정식 Bellman equation이라고 부른다.
 
 <br>
 
@@ -85,9 +85,76 @@ $$ (state_bellman_equation)
 
 ## 행동 가치 함수의 재귀적 표현
 
-Coming soon!
+상태 가치 함수의 벨만 방정식을 유도했던 것처럼 행동 가치 함수도 재귀적으로 나타낼 수 있다. 상태 가치 함수와 다른 부분은 행동 가치 함수 $Q^{\pi}(s, a)$는 확률 변수 $A_t$가 $a$로 고정되었다는 것이다. 아래 식을 보자. 
+
+$$
+\begin{matrix}
+   Q^{\pi}(s, a) & := & \mathbb{E}_{\pi} \left[ G_t | S_t = s, A_t = a \right] & \\
+   & = & \mathbb{E}_{\pi} \left[ R_t + \gamma G_{t+1}| S_t = s, A_t = a \right] &  \\
+   & = &  r(s, a)  + \mathbb{E}_{\pi} \left[\gamma G_{t+1}| S_t = s, A_t = a \right] &  \quad (*) \\
+\end{matrix}
+$$ (1step_action_value_function)
 
 <br>
+
+식 {eq}`1step_action_value_function`의 $(*)$에서 $S_t=s, A_t=a$로 고정되었으니 보상 $R_t=r(s, a)$로 딱 결정된다. $R_t$에 더 이상 확률 변수가 없기 때문에 기댓값 계산에서 상수가 되어 밖으로 나올 수 있게 된다. 이제 Law of total expectation 법칙을 사용할 차례이다. 여기서 2가지 선택권이 있다. 쉬운 버전부터 보자
+
+$$
+\begin{matrix}
+   Q^{\pi}(s, a) & = &  r(s, a)  + \mathbb{E}_{\pi} \left[\gamma G_{t+1}| S_t = s, A_t = a \right] &  \\
+   & = &  r(s, a)  + \mathbb{E}_{\pi} \left[\gamma \mathbb{E} \left[ G_{t+1} | S_{t+1}\right] | S_t = s, A_t = a \right] &  \quad (*) \\
+   & = &  r(s, a)  + \gamma \mathbb{E}_{\pi} \left[ V^{\pi}(S_{t+1}) | S_t = s, A_t = a \right] &  \quad(**) \\
+   & = & r(s, a) + \gamma \sum\limits_{s' \in \mathcal{S}}p(s'|s, a) \ V^{\pi}(s'). & \quad(***)
+\end{matrix}
+$$ (action_bellman_equation1)
+
+<br>
+
+식 {eq}`action_bellman_equation1`의 $(*)$는 안쪽 기댓값의 조건부에 확률 변수 $S_{t+1}$만 추가된 형태이다. 식 {eq}`action_bellman_equation1`의 $(**)$은 행동 가치 함수와 상태 가치 함수 사이의 관계를 잘 보여준다. 행동 가치 함수 $Q^{\pi}(s, a)$는 보상 $r(s, a)$에다가 전이 확률 분포를 따라 방문할 다음 상태들의 상태 가치 함수의 기댓값에 $\gamma$를 곱해 더해준 것이다. 
+
+<br>
+
+식 {eq}`action_bellman_equation1`의 $(***)$를 상태 가치 함수에 대한 벨만 방정식 {eq}`state_bellman_equation`에 집어 넣으면 다음과 같은 관계식도 유도할 수 있다.
+
+$$
+\begin{matrix}
+V^{\pi}(s) & = & \sum\limits_{a \in \mathcal{A}} \pi(a|s) \left( r(s, a) + \gamma \sum\limits_{s' \in \mathcal{S}}p(s'|s, a) \ V^{\pi}(s') \right) \\
+& = & \sum\limits_{a \in \mathcal{A}} \pi(a|s) Q^{\pi}(s, a) \\
+& = & \mathbb{E}_{a\sim\pi(\cdot|s)} \left[ Q^{\pi}(s, a) \right].
+\end{matrix}
+$$ (relation_between_state_action_value_function)
+
+<br>
+
+식 {eq}`relation_between_state_action_value_function`는 상태 $s$에서의 상태 가치 함수는 정책을 따라 선택한 행동 $a$의 행동 가치 함수의 기댓값이라는 것을 말해준다. 
+
+<br>
+
+한편, Law of total expectation을 적용할 때 안쪽 기댓값의 조건부에 확률 변수 $A_{t+1}$까지 넣어주면 다음과 같은 식이 유도된다.
+
+$$
+\begin{matrix}
+   Q^{\pi}(s, a) & = &  r(s, a)  + \mathbb{E}_{\pi} \left[\gamma G_{t+1}| S_t = s, A_t = a \right] &  \\
+   & = &  r(s, a)  + \mathbb{E}_{\pi} \left[\gamma \mathbb{E} \left[ G_{t+1} | S_{t+1}, A_{t+1} \right] | S_t = s, A_t = a \right] & \quad (*) \\
+   & = &  r(s, a)  + \mathbb{E}_{\pi} \left[\gamma Q^{\pi}(S_{t+1}, A_{t+1}) | S_t = s, A_t = a \right] & \quad (**) \\
+   & = & r(s, a) + \gamma \sum\limits_{s' \in \mathcal{S}}p(s'|s, a) \sum\limits_{a' \in \mathcal{A}} \pi(a'|s') Q^{\pi}(s', a') & \quad(***)
+\end{matrix}
+$$ (action_bellman_equation2)
+
+<br>
+
+식 {eq}`action_bellman_equation2`의 $(*)$는 안쪽 기댓값의 조건부에 확률 변수 $S_{t+1}$와 $A_{t+1}$가 있는 형태이다. 확률 변수를 2개를 넣어주는 것도 가능하다 (가능할껄...?). 식 {eq}`action_bellman_equation2`의 $(***)$은 행동 가치 함수의 재귀적 성질을 잘 보여주며, 이를 행동 가치 함수에 대한 벨만 방정식이라고 부른다.
+
+<br>
+
+---
+
+이번 장에서는 가치 함수의 중요한 성질인 벨만 방정식에 대해 알아보았다. 가치 함수는 정책의 성능을 평가할 수 있는 아주 중요한 지표이다. 하지만 많은 경우 가치 함수를 직접 계산하는 것은 불가능 (intractable)하다. 따라서 우리는 가치 함수를 추정 (estimate)하게 될 것인데, 이때 벨만 방정식이 유용하게 사용된다. 
+
+<br>
+
+미리 스포를 하자면, 실제 가치 함수이면 벨만 방정식을 만족해야 한다는 성질을 이용해서 벨만 방정식의 좌변과 우변의 차이가 0이 되도록 가치 네트워크 $V_{\theta}(s)$나 $Q_{\theta}(s, a)$를 학습시킨다. 이에 대한 근거가 되는 방법론인 stochastic approximation 다음 장에서 알아보자.
+
 
 ```{raw} html
 <script
