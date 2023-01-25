@@ -84,6 +84,8 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="shortcut icon" href="../../_static/HDBG.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -437,17 +439,104 @@ title="Print to PDF"
                 
   <section class="tex2jax_ignore mathjax_ignore" id="stochastic-approximation">
 <h1><span class="section-number">5. </span>가치 함수 근사하기: Stochastic approximation<a class="headerlink" href="#stochastic-approximation" title="Permalink to this headline">#</a></h1>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Stochastic_approximation">Sthochastic approximation</a>은 강화학습 용어는 아니고, 기댓값의 형태로 나타나는 함수 <span class="math notranslate nohighlight">\(f(\theta)=\mathbb{E} \left[ F(\theta, \xi ) \right]\)</span>를 반복적으로 (iteratively) 근사시키는 방법론이다. 강화학습에서는 가치 함수를 추정할 때 stochastic approximation을 사용한다.</p>
+<br>
+<p>Stochastic approximation이 실제 기댓값으로 수렴한다는 것을 증명하는 것은 무진장 어렵다. 미분 방정식과 대학원 수준의 확률론 (확률과 통계 아님)이 필요하다. 필자는 아직 확률론을 수강하지 못했기 때문에 stochastic approximation의 수렴성에 대한 증명을 본 포스팅에 포함시키지 못했다. 하지만, 아이디어는 정말 간단하고 쉽다. 그리고 이번 장에서 나온 업데이트 식이 심층 강화 학습에도 계속 사용되기 때문에 유심히 봐두면 좋을 것이다.</p>
+<br>
+<hr class="docutils" />
 <section id="id1">
 <h2><span class="section-number">5.1. </span>Stochastic Approximation<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
-<p>Coming soon!</p>
+<p>어떤 확률 변수 <span class="math notranslate nohighlight">\(X\)</span>의 기댓값 <span class="math notranslate nohighlight">\(\mathbb{E}\left[ X \right]\)</span>을 알 수 없을 때, 우리는 주로 표본 평균을 이용하여 실제 평균을 추정한다.</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E} \left[ X \right] \approx \frac{1}{N}\sum\limits_{i=1}^{N} X_i,
+\]</div>
+<br>
+<p>이때, <span class="math notranslate nohighlight">\(X_i\)</span>는 우리의 관측 데이터, <span class="math notranslate nohighlight">\(N\)</span>은 데이터 개수이다. 데이터의 개수가 굉장히 많을 때 모든 <span class="math notranslate nohighlight">\(X_i\)</span>를 저장하고 있는 것은 비효율적일 수 있다. 특히, 데이터가 추가될 때마다 평균을 구하는 상황에서는 기존 데이터의 덧셈 계산이 중복되기 때문에 위의 방식으로 표본 평균을 계산하는 것은 비효율적이다. 위 식에서 <span class="math notranslate nohighlight">\(X_N\)</span>만 시그마 밖으로 빼내서 식을 조작해보자.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{matrix}
+S_N  &amp; = &amp; \frac{1}{N} \sum\limits_{i=1}^{N} X_i \\
+&amp; = &amp; \frac{1}{N} \sum\limits_{i=1}^{N-1} X_i + \frac{1}{N}X_N \\
+&amp; = &amp; \frac{N-1}{N} \frac{1}{N-1} \sum\limits_{i=1}^{N-1} X_i + \frac{1}{N}X_N \\
+&amp;=&amp;(1-\frac{1}{N})S_{N-1} + \frac{1}{N}X_N \\
+&amp; = &amp; S_{N-1} + \frac{1}{N}(X_N-S_{N-1}).
+\end{matrix}
+\end{split}\]</div>
+<br>
+<p>위 식은 데이터 <span class="math notranslate nohighlight">\(X_N\)</span>이 추가되었을 때, 표본 평균 <span class="math notranslate nohighlight">\(S_N\)</span>을 완전히 다시 계산할 필요 없이 현재 평균 <span class="math notranslate nohighlight">\(S_{N-1}\)</span>과 <span class="math notranslate nohighlight">\(X_N\)</span> 그리고 <span class="math notranslate nohighlight">\(N\)</span>을 통해 계산할 수 있다는 것을 보여준다. 이처럼 표본 평균을 구하는 방법을 <strong>incremental mean</strong>이라고 부른다. 어떻게 보면 <span class="math notranslate nohighlight">\(X_i\)</span>를 샘플링하면서 점점 <span class="math notranslate nohighlight">\(\mathbb{E} \left[ X \right]\)</span>에 근사시키는 관점에서 <strong>stochastic approximation</strong>으로 부르기도 한다.</p>
+<br>
+<p>다음 관계를 유심히 기억하면 Monte Carlo와 TD(0)는 물론 TD(1), TD(2), 모두 유도해낼 수 있다.</p>
+<div class="math notranslate nohighlight" id="equation-incremental-mean">
+<span class="eqno">(5.1)<a class="headerlink" href="#equation-incremental-mean" title="Permalink to this equation">#</a></span>\[
+\mathbb{E} \left[ X \right] \approx S_{N}=S_{N-1} + \frac{1}{N}\left( X_{N} - S_{N-1} \right).
+\]</div>
+<br>
+<p>식 <a class="reference internal" href="#equation-incremental-mean">(5.1)</a>에는 크게 세 가지 요소가 있다.</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(X\)</span>    : <strong>확률 변수 (random variable)</strong></p></li>
+<li><p><span class="math notranslate nohighlight">\(X_N\)</span> : 샘플링 또는 관측을 통해 실제 값으로 나타난 확률 변수 <span class="math notranslate nohighlight">\(X\)</span>의 <strong>실현값 (realization)</strong> 또는 <strong>관측값 (observation)</strong> 이라고도 부름.</p></li>
+<li><p><span class="math notranslate nohighlight">\(S_N\)</span>  : 기댓값에 대한 <strong>추정값 (estimate</strong>)</p></li>
+</ul>
+<p>강화학습을 공부할 땐, 항상 수식에서 확률 변수와 실현값을 잘 구별할 수 있어야 한다.</p>
+<br>
 </section>
+<hr class="docutils" />
 <section id="monte-carlo-evaluation">
 <h2><span class="section-number">5.2. </span>Monte Carlo Evaluation<a class="headerlink" href="#monte-carlo-evaluation" title="Permalink to this headline">#</a></h2>
-<p>Coming soon!</p>
+<p>정책 <span class="math notranslate nohighlight">\(\pi\)</span>에 대한 상태 <span class="math notranslate nohighlight">\(s\)</span>의 상태 가치 함수가 다음과 같이 정의된다.</p>
+<div class="math notranslate nohighlight">
+\[
+V^{\pi}(s)=\mathbb{E} \left[ G_t |S_t =s \right].
+\]</div>
+<br>
+<p>식 <a class="reference internal" href="#equation-incremental-mean">(5.1)</a>에 그대로 적용해보자.</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(X\)</span>    :  기댓값 안에 있는 <span class="math notranslate nohighlight">\(G_t\)</span>는 확률 변수 <span class="math notranslate nohighlight">\(X\)</span>에 해당한다.</p></li>
+<li><p><span class="math notranslate nohighlight">\(X_N\)</span> :  <span class="math notranslate nohighlight">\(G_t\)</span>의 관측값은 <span class="math notranslate nohighlight">\(i\)</span> 번째 에피소드에서 상태 <span class="math notranslate nohighlight">\(s\)</span>에서의 return 값인 <span class="math notranslate nohighlight">\(G_{t}^{(i)}\)</span>이다.</p></li>
+<li><p><span class="math notranslate nohighlight">\(S_N\)</span>  :  이전 상태 가치 함수 추정값 <span class="math notranslate nohighlight">\(V_{N-1}(s)\)</span>은 <span class="math notranslate nohighlight">\(S_{N-1}\)</span>에 해당한다.</p></li>
+</ul>
+<br>
+<p>이를 식 <a class="reference internal" href="#equation-incremental-mean">(5.1)</a>에 그대로 대체해서 적어보면 다음과 같이 Monte Carlo evaluation 업데이트 식이 나온다.</p>
+<div class="math notranslate nohighlight">
+\[
+V_{N}(s) \leftarrow V_{N-1}(s) + \frac{1}{N}\left( G_{t}^{(i)} - V_{N-1}(s)\right).
+\]</div>
+<br>
+<p>위 식은 업데이트식이기 때문에 보통 <span class="math notranslate nohighlight">\(N\)</span>을 제외하고 적어준다. 또한 <span class="math notranslate nohighlight">\(\frac{1}{N}\)</span>대신 점점 작아지는 작은 값 <span class="math notranslate nohighlight">\(\alpha_{N}\)</span>을 적는 경우가 많다. 점점 작아지는 상수이어야 수렴성이 증명되지만, 구현에서는 크냥 충분히 작은 상수 하나로 고정하여 사용해도 된다.</p>
+<div class="math notranslate nohighlight">
+\[
+V(s) \leftarrow V(s) + \alpha\left( G_{t}^{(i)} - V(s)\right).
+\]</div>
+<br>
 </section>
+<hr class="docutils" />
 <section id="temporal-difference-evaluation">
 <h2><span class="section-number">5.3. </span>Temporal Difference Evaluation<a class="headerlink" href="#temporal-difference-evaluation" title="Permalink to this headline">#</a></h2>
-<p>Coming soon!</p>
+<p>이전 장의 식 <a class="reference internal" href="4-bellman-equation.html#equation-1step-state-value-function">(4.2)</a>의 <span class="math notranslate nohighlight">\((**)\)</span>를 다시 적어주면 다음과 같다.</p>
+<div class="math notranslate nohighlight">
+\[
+V^{\pi}(s) = \mathbb{E}_{\pi} \left[ R_t + \gamma V^{\pi}(S_{t+1}) | S_t = s \right].
+\]</div>
+<br>    
+<p>무튼 위 식도 결국 기댓값의 형태로 표현되어 있기 때문에 stochastic approximation을 사용할 수 있다.</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(X\)</span>    :  기댓값 안에 있는 <span class="math notranslate nohighlight">\(R_{t+1} + \gamma V^{\pi}(S_{t+1})\)</span>이 확률 변수 <span class="math notranslate nohighlight">\(X\)</span>에 대응한다.</p></li>
+<li><p><span class="math notranslate nohighlight">\(X_{N}\)</span> :  <span class="math notranslate nohighlight">\(R_{t} + \gamma V^{\pi}(S_{t+1})\)</span>의 관측값은 <span class="math notranslate nohighlight">\(r_t + \gamma V_{k-1}(s_{t+1})\)</span>이다.</p></li>
+<li><p><span class="math notranslate nohighlight">\(S_N\)</span>  :  이전 상태 가치 함수 추정값 <span class="math notranslate nohighlight">\(V_{N-1}(s_t)\)</span></p></li>
+</ul>
+<br>
+<p>이를 식 <a class="reference internal" href="#equation-incremental-mean">(5.1)</a>에 대체해서 적어보면 다음과 같이 TD learning의 업데이트 식이 나온다.</p>
+<div class="math notranslate nohighlight">
+\[
+V_N(s_t) \leftarrow  V_{N-1}(s_t) + \frac{1}{N} \left( \left[ r_{t+1} + \gamma V_{N-1}(s_{t+1}) \right] - V_{N-1}(s_t) \right).
+\]</div>
+<br>
+<p>Monte Carlo 때와 마찬가지로 <span class="math notranslate nohighlight">\(N\)</span>을 생략해주고, <span class="math notranslate nohighlight">\(\frac{1}{N}\)</span>을 <span class="math notranslate nohighlight">\(\alpha\)</span>로 적어주면 다음과 같아진다.</p>
+<div class="math notranslate nohighlight">
+\[
+V(s_t) \leftarrow V(s_t) + \alpha \left( \left[ r_{t+1} + \gamma V(s_{t+1}) \right] - V(s_t) \right).
+\]</div>
 <script
    type="text/javascript"
    src="https://utteranc.es/client.js"
