@@ -1,8 +1,8 @@
 # REINFORCE
 
-Policy gradient theorem을 다시 한번 적어보자
+Policy gradient theorem을 다시 한번 적어보자.
 
-$$\nabla_{\theta} J(\theta) = \mathbb{E}_{\pi_{\theta}} \left[ Q^{\pi_{\theta}}(s, a) \cdot \nabla_{\theta} \log \pi_{\theta}(a|s) \right]. $$
+$$\nabla_{\theta} J(\theta) \propto \mathbb{E}_{\pi_{\theta}} \left[ Q^{\pi_{\theta}}(s, a) \cdot \nabla_{\theta} \log \pi_{\theta}(a|s) \right]. $$
 
 <br>
 
@@ -19,4 +19,36 @@ $$\nabla_{\theta} J(\theta) = \mathbb{E}_{\pi_{\theta}} \left[ Q^{\pi_{\theta}}(
 
 $$\nabla_{\theta} J(\theta) \approx \hat{g} := \frac{1}{T} \sum\limits_{t=0}^{T} G_t \nabla_{\theta}\log\pi_{\theta}(a_t | s_t),$$
 
-이때, $G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t} r_T$이다.
+이때, $G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t} r_T$이다. REINFORCE의 알고리즘 다음과 같다.
+
+```{prf:algorithm} REINFORCE
+:label: REINFORCE
+
+1. 정책 네트워크 $\pi_{\theta}$의 파라미터 $\theta$ 초기화
+2. for _ in range(n_episodes):
+3. $\qquad$ $\pi_{\theta}$를 따라 에피소드를 진행하여 $\tau=(s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T, a_T, r_T)$ 수집
+4. $\qquad$ for $t=0, 1, 2, \ldots, T$:
+5. $\qquad\qquad$ $G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t} r_{T}$
+6. $\qquad\qquad$ $\hat{g}_t = G_t \nabla_{\theta} \log \pi_{\theta} (a_t|s_t)$
+7. $\qquad$ $\hat{g} = \frac{1}{T}\sum\limits_{t=0}^{T}\hat{g}_{t}$
+8. $\qquad$ $\theta \leftarrow \theta + \eta \hat{g}$  $\quad$ # Gradient ascent
+```
+
+<br>
+
+필자는 심층강화학습을 책으로 공부하면서 {prf:ref}`REINFORCE`의 $\nabla_{\theta} \log \pi_{\theta} (a_t|s_t)$이 어떻게 코드로 구현되는지 정말 궁금했다. 다음 장에서 이산 행동 공간과 연속 행동 공간에서 어떻게 REINFORCE가 어떻게 구현되는지 실습을 통해 알아보자.
+
+<br>
+
+```{raw} html
+<script
+   type="text/javascript"
+   src="https://utteranc.es/client.js"
+   async="async"
+   repo="HiddenBeginner/Deep-Reinforcement-Learnings"
+   issue-term="pathname"
+   theme="github-light"
+   label="💬 comment"
+   crossorigin="anonymous"
+/>
+```

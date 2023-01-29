@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>5. 가치 함수 근사하기: Stochastic approximation &#8212; 심층강화학습</title>
+    <title>8. REINFORCE &#8212; 심층강화학습</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -90,8 +90,8 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="shortcut icon" href="../../_static/HDBG.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="6. Policy Gradient Theorem" href="../Chapter2/1-policy-gradient-theorem.html" />
-    <link rel="prev" title="4. 벨만 방정식: 가치 함수의 재귀적 성질" href="4-bellman-equation.html" />
+    <link rel="next" title="참고문헌" href="../Reference.html" />
+    <link rel="prev" title="7. REINFORCE" href="2-reinforce.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -164,29 +164,29 @@ const thebe_selector_output = ".output, .cell_output"
   Markov Decision Process
  </span>
 </p>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
  <li class="toctree-l1">
-  <a class="reference internal" href="1-sequential-decision-making-problems.html">
+  <a class="reference internal" href="../Chapter1/1-sequential-decision-making-problems.html">
    1. 순차적 의사 결정 문제, 에이전트, 환경
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="2-markov-decision-processes.html">
+  <a class="reference internal" href="../Chapter1/2-markov-decision-processes.html">
    2. Markov Decision Process (MDP)
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="3-policy-return-value.html">
+  <a class="reference internal" href="../Chapter1/3-policy-return-value.html">
    3. 정책, Return, 가치 함수
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="4-bellman-equation.html">
+  <a class="reference internal" href="../Chapter1/4-bellman-equation.html">
    4. 벨만 방정식: 가치 함수의 재귀적 성질
   </a>
  </li>
- <li class="toctree-l1 current active">
-  <a class="current reference internal" href="#">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../Chapter1/5-stochastic-approximation.html">
    5. 가치 함수 근사하기: Stochastic approximation
   </a>
  </li>
@@ -196,15 +196,20 @@ const thebe_selector_output = ".output, .cell_output"
   Policy gradient methods
  </span>
 </p>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
  <li class="toctree-l1">
-  <a class="reference internal" href="../Chapter2/1-policy-gradient-theorem.html">
+  <a class="reference internal" href="1-policy-gradient-theorem.html">
    6. Policy Gradient Theorem
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="../Chapter2/2-reinforce.html">
+  <a class="reference internal" href="2-reinforce.html">
    7. REINFORCE
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   8. REINFORCE
   </a>
  </li>
 </ul>
@@ -270,6 +275,35 @@ title="Toggle navigation"
         
     </div>
     <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/hiddenbeginner/Deep-Reinforcement-Learnings/gh-pages?urlpath=tree/book/Chapter2/3-rein.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
 <button onclick="toggleFullScreen()"
   class="headerbtn"
   data-toggle="tooltip"
@@ -309,7 +343,7 @@ title="Source repository"
       </li>
       
       <li>
-        <a href="https://github.com/hiddenbeginner/Deep-Reinforcement-Learnings/issues/new?title=Issue%20on%20page%20%2Fbook/Chapter1/5-stochastic-approximation.html&body=Your%20issue%20content%20here."
+        <a href="https://github.com/hiddenbeginner/Deep-Reinforcement-Learnings/issues/new?title=Issue%20on%20page%20%2Fbook/Chapter2/3-rein.html&body=Your%20issue%20content%20here."
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -337,7 +371,7 @@ title="Open an issue"
   <div class="menu-dropdown__content">
     <ul>
       <li>
-        <a href="../../_sources/book/Chapter1/5-stochastic-approximation.md"
+        <a href="../../_sources/book/Chapter2/3-rein.ipynb"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -348,7 +382,7 @@ title="Download source file"
 <span class="headerbtn__icon-container">
   <i class="fas fa-file"></i>
   </span>
-<span class="headerbtn__text-container">.md</span>
+<span class="headerbtn__text-container">.ipynb</span>
 </a>
 
       </li>
@@ -397,18 +431,12 @@ title="Print to PDF"
     <nav id="bd-toc-nav" aria-label="Page">
         <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#id1">
-   5.1. Stochastic Approximation
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#monte-carlo-evaluation">
-   5.2. Monte Carlo Evaluation
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#temporal-difference-evaluation">
-   5.3. Temporal Difference Evaluation
+  <a class="reference internal nav-link" href="#reinforce-q-pi-theta-s-a-return">
+   8.1. REINFORCE:
+   <span class="math notranslate nohighlight">
+    \(Q^{\pi_{\theta}}(s, a)\)
+   </span>
+   대신 return 사용
   </a>
  </li>
 </ul>
@@ -420,7 +448,7 @@ title="Print to PDF"
         <div class="col pl-md-3 pl-lg-5 content-container">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>가치 함수 근사하기: Stochastic approximation</h1>
+                <h1>REINFORCE</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -431,18 +459,12 @@ title="Print to PDF"
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#id1">
-   5.1. Stochastic Approximation
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#monte-carlo-evaluation">
-   5.2. Monte Carlo Evaluation
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#temporal-difference-evaluation">
-   5.3. Temporal Difference Evaluation
+  <a class="reference internal nav-link" href="#reinforce-q-pi-theta-s-a-return">
+   8.1. REINFORCE:
+   <span class="math notranslate nohighlight">
+    \(Q^{\pi_{\theta}}(s, a)\)
+   </span>
+   대신 return 사용
   </a>
  </li>
 </ul>
@@ -455,116 +477,39 @@ title="Print to PDF"
                 
               <div>
                 
-  <section class="tex2jax_ignore mathjax_ignore" id="stochastic-approximation">
-<h1><span class="section-number">5. </span>가치 함수 근사하기: Stochastic approximation<a class="headerlink" href="#stochastic-approximation" title="Permalink to this headline">#</a></h1>
-<p><a class="reference external" href="https://en.wikipedia.org/wiki/Stochastic_approximation">Sthochastic approximation</a>은 강화학습 용어는 아니고, 기댓값의 형태로 나타나는 함수 <span class="math notranslate nohighlight">\(f(\theta)=\mathbb{E} \left[ F(\theta, \xi ) \right]\)</span>를 반복적으로 (iteratively) 근사시키는 방법론이다. 강화학습에서는 가치 함수를 추정할 때 stochastic approximation을 사용한다.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="reinforce">
+<h1><span class="section-number">8. </span>REINFORCE<a class="headerlink" href="#reinforce" title="Permalink to this headline">#</a></h1>
+<p>Policy gradient theorem을 다시 한번 적어보자.</p>
+<div class="math notranslate nohighlight">
+\[\nabla_{\theta} J(\theta) \propto \mathbb{E}_{\pi_{\theta}} \left[ Q^{\pi_{\theta}}(s, a) \cdot \nabla_{\theta} \log \pi_{\theta}(a|s) \right]. \]</div>
 <br>
-<p>Stochastic approximation이 실제 기댓값으로 수렴한다는 것을 증명하는 것은 무진장 어렵다. 미분 방정식과 대학원 수준의 확률론 (확률과 통계 아님)이 필요하다. 필자는 아직 확률론을 수강하지 못했기 때문에 stochastic approximation의 수렴성에 대한 증명을 본 포스팅에 포함시키지 못했다. 하지만, 아이디어는 정말 간단하고 쉽다. 그리고 이번 장에서 나온 업데이트 식이 심층 강화 학습에도 계속 사용되기 때문에 유심히 봐두면 좋을 것이다.</p>
+<p>예상했겠지만, 위 그레디언트를 정확히 구하는 것은 불가능하다. 기댓값이야 Monte Carlo 기법으로 근사시킬 수 있다. 정책 <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>로 환경과 상호작용을 엄청나게 많이 해서 trajectory <span class="math notranslate nohighlight">\(\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T, a_T, r_T)\)</span>를 많이 생성한다. 그리고 trajectory에 있는 각 <span class="math notranslate nohighlight">\((s_t, a_t)\)</span>마다 <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s_t, a_t) \cdot \nabla_{\theta} \log \pi_{\theta}(a_t|s_t)\)</span>을 계산해서 표본 평균을 구하면 되기 때문이다. <span class="math notranslate nohighlight">\(\nabla_{\theta} \log \pi_{\theta}(a_t|s_t)\)</span> 계산은 딥러닝 프레임워크에서 알아서 해준다. 그런데 여전히 <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s_t, a_t)\)</span>를 계산하기가 어렵다. 그래서 우리는 <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s_t, a_t)\)</span> 대신 다른 것으로 대체해야 한다. 이 <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s_t, a_t)\)</span>을 어떤 것으로 대체하느냐에 따라서 알고리즘의 이름이 달라지고 성능도 크게 달라진다. 이번 장에서는 가장 쉽고 간단한 방법인 REINFORCE 알고리즘에 대해 알아본다.</p>
 <br>
 <hr class="docutils" />
-<section id="id1">
-<h2><span class="section-number">5.1. </span>Stochastic Approximation<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
-<p>어떤 확률 변수 <span class="math notranslate nohighlight">\(X\)</span>의 기댓값 <span class="math notranslate nohighlight">\(\mathbb{E}\left[ X \right]\)</span>을 알 수 없을 때, 우리는 주로 표본 평균을 이용하여 실제 평균을 추정한다.</p>
+<section id="reinforce-q-pi-theta-s-a-return">
+<h2><span class="section-number">8.1. </span>REINFORCE: <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s, a)\)</span> 대신 return 사용<a class="headerlink" href="#reinforce-q-pi-theta-s-a-return" title="Permalink to this headline">#</a></h2>
+<p>제목이 곧 내용이다. REINFORCE는 한 에피소드를 진행하여 하나의 trajectory <span class="math notranslate nohighlight">\(\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T, a_T, r_T)\)</span>를 생성하고, 다음의 policy gradient의 추정치를 사용하여 경사하강법을 진행한다.
+아래 식에서 실제 그레디언트 <span class="math notranslate nohighlight">\(\nabla_{\theta} J(\theta)\)</span>의 추정치를 <span class="math notranslate nohighlight">\(\hat{g}\)</span>로 표시하였다.</p>
 <div class="math notranslate nohighlight">
-\[
-\mathbb{E} \left[ X \right] \approx \frac{1}{N}\sum\limits_{i=1}^{N} X_i,
-\]</div>
-<br>
-<p>이때, <span class="math notranslate nohighlight">\(X_i\)</span>는 우리의 관측 데이터, <span class="math notranslate nohighlight">\(N\)</span>은 데이터 개수이다. 데이터의 개수가 굉장히 많을 때 모든 <span class="math notranslate nohighlight">\(X_i\)</span>를 저장하고 있는 것은 비효율적일 수 있다. 특히, 데이터가 추가될 때마다 평균을 구하는 상황에서는 기존 데이터의 덧셈 계산이 중복되기 때문에 위의 방식으로 표본 평균을 계산하는 것은 비효율적이다. 위 식에서 <span class="math notranslate nohighlight">\(X_N\)</span>만 시그마 밖으로 빼내서 식을 조작해보자.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{matrix}
-S_N  &amp; = &amp; \frac{1}{N} \sum\limits_{i=1}^{N} X_i \\
-&amp; = &amp; \frac{1}{N} \sum\limits_{i=1}^{N-1} X_i + \frac{1}{N}X_N \\
-&amp; = &amp; \frac{N-1}{N} \frac{1}{N-1} \sum\limits_{i=1}^{N-1} X_i + \frac{1}{N}X_N \\
-&amp;=&amp;(1-\frac{1}{N})S_{N-1} + \frac{1}{N}X_N \\
-&amp; = &amp; S_{N-1} + \frac{1}{N}(X_N-S_{N-1}).
-\end{matrix}
-\end{split}\]</div>
-<br>
-<p>위 식은 데이터 <span class="math notranslate nohighlight">\(X_N\)</span>이 추가되었을 때, 표본 평균 <span class="math notranslate nohighlight">\(S_N\)</span>을 완전히 다시 계산할 필요 없이 현재 평균 <span class="math notranslate nohighlight">\(S_{N-1}\)</span>과 <span class="math notranslate nohighlight">\(X_N\)</span> 그리고 <span class="math notranslate nohighlight">\(N\)</span>을 통해 계산할 수 있다는 것을 보여준다. 이처럼 표본 평균을 구하는 방법을 <strong>incremental mean</strong>이라고 부른다. 어떻게 보면 <span class="math notranslate nohighlight">\(X_i\)</span>를 샘플링하면서 점점 <span class="math notranslate nohighlight">\(\mathbb{E} \left[ X \right]\)</span>에 근사시키는 관점에서 <strong>stochastic approximation</strong>으로 부르기도 한다.</p>
-<br>
-<p>다음 관계를 유심히 기억하면 Monte Carlo와 TD(0)는 물론 TD(1), TD(2), 모두 유도해낼 수 있다.</p>
-<div class="math notranslate nohighlight" id="equation-incremental-mean">
-<span class="eqno">(5.1)<a class="headerlink" href="#equation-incremental-mean" title="Permalink to this equation">#</a></span>\[
-\mathbb{E} \left[ X \right] \approx S_{N}=S_{N-1} + \frac{1}{N}\left( X_{N} - S_{N-1} \right).
-\]</div>
-<br>
-<p>식 <a class="reference internal" href="#equation-incremental-mean">(5.1)</a>에는 크게 세 가지 요소가 있다.</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(X\)</span>    : <strong>확률 변수 (random variable)</strong></p></li>
-<li><p><span class="math notranslate nohighlight">\(X_N\)</span> : 샘플링 또는 관측을 통해 실제 값으로 나타난 확률 변수 <span class="math notranslate nohighlight">\(X\)</span>의 <strong>실현값 (realization)</strong> 또는 <strong>관측값 (observation)</strong> 이라고도 부름.</p></li>
-<li><p><span class="math notranslate nohighlight">\(S_N\)</span>  : 기댓값에 대한 <strong>추정값 (estimate</strong>)</p></li>
-</ul>
-<p>강화학습을 공부할 땐, 항상 수식에서 확률 변수와 실현값을 잘 구별할 수 있어야 한다.</p>
-<br>
+\[\nabla_{\theta} J(\theta) \approx \hat{g} := \frac{1}{T} \sum\limits_{t=0}^{T} G_t \nabla_{\theta}\log\pi_{\theta}(a_t | s_t),\]</div>
+<p>이때, <span class="math notranslate nohighlight">\(G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t} r_T\)</span>이다. REINFORCE의 알고리즘 다음과 같다.</p>
+<div class="proof algorithm admonition" id="REINFORCE">
+<p class="admonition-title"><span class="caption-number">Algorithm 8.1 </span> (REINFORCE)</p>
+<section class="algorithm-content" id="proof-content">
+<ol class="simple">
+<li><p>정책 네트워크 <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>의 파라미터 <span class="math notranslate nohighlight">\(\theta\)</span> 초기화</p></li>
+<li><p>for _ in range(n_episodes):</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>를 따라 에피소드를 진행하여 <span class="math notranslate nohighlight">\(\tau=(s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T, a_T, r_T)\)</span> 수집</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> for <span class="math notranslate nohighlight">\(t=0, 1, 2, \ldots, T\)</span>:</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t} r_{T}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g}_t = G_t \nabla_{\theta} \log \pi_{\theta} (a_t|s_t)\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g} = \frac{1}{T}\sum\limits_{t=0}^{T}\hat{g}_{t}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\theta \leftarrow \theta + \eta \hat{g}\)</span>  <span class="math notranslate nohighlight">\(\quad\)</span> # Gradient ascent</p></li>
+</ol>
 </section>
-<hr class="docutils" />
-<section id="monte-carlo-evaluation">
-<h2><span class="section-number">5.2. </span>Monte Carlo Evaluation<a class="headerlink" href="#monte-carlo-evaluation" title="Permalink to this headline">#</a></h2>
-<p>정책 <span class="math notranslate nohighlight">\(\pi\)</span>에 대한 상태 <span class="math notranslate nohighlight">\(s\)</span>의 상태 가치 함수가 다음과 같이 정의된다.</p>
-<div class="math notranslate nohighlight">
-\[
-V^{\pi}(s)=\mathbb{E} \left[ G_t |S_t =s \right].
-\]</div>
-<br>
-<p>식 <a class="reference internal" href="#equation-incremental-mean">(5.1)</a>에 그대로 적용해보자.</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(X\)</span>    :  기댓값 안에 있는 <span class="math notranslate nohighlight">\(G_t\)</span>는 확률 변수 <span class="math notranslate nohighlight">\(X\)</span>에 해당한다.</p></li>
-<li><p><span class="math notranslate nohighlight">\(X_N\)</span> :  <span class="math notranslate nohighlight">\(G_t\)</span>의 관측값은 <span class="math notranslate nohighlight">\(i\)</span> 번째 에피소드에서 상태 <span class="math notranslate nohighlight">\(s\)</span>에서의 return 값인 <span class="math notranslate nohighlight">\(G_{t}^{(i)}\)</span>이다.</p></li>
-<li><p><span class="math notranslate nohighlight">\(S_N\)</span>  :  이전 상태 가치 함수 추정값 <span class="math notranslate nohighlight">\(V_{N-1}(s)\)</span>은 <span class="math notranslate nohighlight">\(S_{N-1}\)</span>에 해당한다.</p></li>
-</ul>
-<br>
-<p>이를 식 <a class="reference internal" href="#equation-incremental-mean">(5.1)</a>에 그대로 대체해서 적어보면 다음과 같이 Monte Carlo evaluation 업데이트 식이 나온다.</p>
-<div class="math notranslate nohighlight">
-\[
-V_{N}(s) \leftarrow V_{N-1}(s) + \frac{1}{N}\left( G_{t}^{(i)} - V_{N-1}(s)\right).
-\]</div>
-<br>
-<p>위 식은 업데이트식이기 때문에 보통 <span class="math notranslate nohighlight">\(N\)</span>을 제외하고 적어준다. 또한 <span class="math notranslate nohighlight">\(\frac{1}{N}\)</span>대신 점점 작아지는 작은 값 <span class="math notranslate nohighlight">\(\alpha_{N}\)</span>을 적는 경우가 많다. 점점 작아지는 상수이어야 수렴성이 증명되지만, 구현에서는 크냥 충분히 작은 상수 하나로 고정하여 사용해도 된다.</p>
-<div class="math notranslate nohighlight">
-\[
-V(s) \leftarrow V(s) + \alpha\left( G_{t}^{(i)} - V(s)\right).
-\]</div>
-<br>
+</div><br>
+<p>필자는 심층강화학습을 책으로 공부하면서 <a class="reference internal" href="#REINFORCE">Algorithm 8.1</a>의 <span class="math notranslate nohighlight">\(\nabla_{\theta} \log \pi_{\theta} (a_t|s_t)\)</span>이 어떻게 코드로 구현되는지 정말 궁금했다.</p>
 </section>
-<hr class="docutils" />
-<section id="temporal-difference-evaluation">
-<h2><span class="section-number">5.3. </span>Temporal Difference Evaluation<a class="headerlink" href="#temporal-difference-evaluation" title="Permalink to this headline">#</a></h2>
-<p>이전 장의 식 <a class="reference internal" href="4-bellman-equation.html#equation-1step-state-value-function">(4.2)</a>의 <span class="math notranslate nohighlight">\((**)\)</span>를 다시 적어주면 다음과 같다.</p>
-<div class="math notranslate nohighlight">
-\[
-V^{\pi}(s) = \mathbb{E}_{\pi} \left[ R_t + \gamma V^{\pi}(S_{t+1}) | S_t = s \right].
-\]</div>
-<br>    
-<p>무튼 위 식도 결국 기댓값의 형태로 표현되어 있기 때문에 stochastic approximation을 사용할 수 있다.</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(X\)</span>    :  기댓값 안에 있는 <span class="math notranslate nohighlight">\(R_{t+1} + \gamma V^{\pi}(S_{t+1})\)</span>이 확률 변수 <span class="math notranslate nohighlight">\(X\)</span>에 대응한다.</p></li>
-<li><p><span class="math notranslate nohighlight">\(X_{N}\)</span> :  <span class="math notranslate nohighlight">\(R_{t} + \gamma V^{\pi}(S_{t+1})\)</span>의 관측값은 <span class="math notranslate nohighlight">\(r_t + \gamma V_{k-1}(s_{t+1})\)</span>이다.</p></li>
-<li><p><span class="math notranslate nohighlight">\(S_N\)</span>  :  이전 상태 가치 함수 추정값 <span class="math notranslate nohighlight">\(V_{N-1}(s_t)\)</span></p></li>
-</ul>
-<br>
-<p>이를 식 <a class="reference internal" href="#equation-incremental-mean">(5.1)</a>에 대체해서 적어보면 다음과 같이 TD learning의 업데이트 식이 나온다.</p>
-<div class="math notranslate nohighlight">
-\[
-V_N(s_t) \leftarrow  V_{N-1}(s_t) + \frac{1}{N} \left( \left[ r_{t+1} + \gamma V_{N-1}(s_{t+1}) \right] - V_{N-1}(s_t) \right).
-\]</div>
-<br>
-<p>Monte Carlo 때와 마찬가지로 <span class="math notranslate nohighlight">\(N\)</span>을 생략해주고, <span class="math notranslate nohighlight">\(\frac{1}{N}\)</span>을 <span class="math notranslate nohighlight">\(\alpha\)</span>로 적어주면 다음과 같아진다.</p>
-<div class="math notranslate nohighlight">
-\[
-V(s_t) \leftarrow V(s_t) + \alpha \left( \left[ r_{t+1} + \gamma V(s_{t+1}) \right] - V(s_t) \right).
-\]</div>
-<script
-   type="text/javascript"
-   src="https://utteranc.es/client.js"
-   async="async"
-   repo="HiddenBeginner/Deep-Reinforcement-Learnings"
-   issue-term="pathname"
-   theme="github-light"
-   label="💬 comment"
-   crossorigin="anonymous"
-/></section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -580,7 +525,7 @@ V(s_t) \leftarrow V(s_t) + \alpha \left( \left[ r_{t+1} + \gamma V(s_{t+1}) \rig
         },
         kernelOptions: {
             kernelName: "python3",
-            path: "./book/Chapter1"
+            path: "./book/Chapter2"
         },
         predefinedOutput: true
     }
@@ -594,17 +539,17 @@ V(s_t) \leftarrow V(s_t) + \alpha \left( \left[ r_{t+1} + \gamma V(s_{t+1}) \rig
                 
     <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="4-bellman-equation.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="2-reinforce.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">4. </span>벨만 방정식: 가치 함수의 재귀적 성질</p>
+            <p class="prev-next-title"><span class="section-number">7. </span>REINFORCE</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="../Chapter2/1-policy-gradient-theorem.html" title="next page">
+    <a class='right-next' id="next-link" href="../Reference.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">6. </span>Policy Gradient Theorem</p>
+        <p class="prev-next-title">참고문헌</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
