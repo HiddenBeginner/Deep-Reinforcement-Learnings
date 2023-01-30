@@ -26,6 +26,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
     <link rel="stylesheet" type="text/css" href="../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -84,6 +85,7 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="shortcut icon" href="../_static/HDBG.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="1. 순차적 의사 결정 문제, 에이전트, 환경" href="Chapter1/1-sequential-decision-making-problems.html" />
@@ -178,6 +180,33 @@ const thebe_selector_output = ".output, .cell_output"
  <li class="toctree-l1">
   <a class="reference internal" href="Chapter1/4-bellman-equation.html">
    4. 벨만 방정식: 가치 함수의 재귀적 성질
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Chapter1/5-stochastic-approximation.html">
+   5. 가치 함수 근사하기: Stochastic approximation
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Policy gradient methods
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Chapter2/1-policy-gradient-theorem.html">
+   6. Policy Gradient Theorem
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Chapter2/2-reinforce.html">
+   7. REINFORCE
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Chapter2/3-implementation-reinforce.html">
+   8. REINFORCE 구현
   </a>
  </li>
 </ul>
@@ -389,6 +418,10 @@ title="Print to PDF"
 이 책의 목표는 딥러닝을 잘 이해하고 있는 분들이 심층강화학습 분야를 빠르게 입문할 수 있도록 도와주는 것이다.</p>
 <br>
 <p>이 책은 출판을 목적으로 작성된 것이 아니기 때문에 독자의 원활한 이해를 위해서라면 용어를 번역하지 않고 영문 그대로 사용한다거나, 최신 인터넷 밈을 사용하는 등 아주 케주얼하게 내용을 전개해 나갈 것이다. 책을 읽다가 오류를 발견하거나 질문이 생기면 페이지마다 댓글을 남겨주면 감사드리겠다 (문어체와 예의차림 어딘가). 댓글은 깃헙 아이디만 있으면 쉽게 남길 수 있으니 주저하지 말고 남겨주시면 감사드리겠다.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>현재 댓글 서비스 Utterances를 임베딩할 경우 각주가 나오지 않는 문제가 있다. 따라서 각주가 있는 페이지의 경우 Utterances를 임베딩시키지 않았다. 댓글 기능이 없는 페이지에 코멘트를 남기고 싶은 경우 페이지 상단의 Github 로고 버튼을 누르고 <code class="docutils literal notranslate"><span class="pre">open</span> <span class="pre">issue</span></code>를 누르면 페이지를 참조하며 Github issue를 남길 수 있다. 많은 이용 부탁드린다.</p>
+</div>
 <br>
 <p>부디 나의 설명이 여러분들에게 작은 도움이 되었으면 좋겠다.</p>
 <br>
@@ -408,6 +441,8 @@ title="Print to PDF"
 <dd><p>State of the art의 줄임말. 해당 분야에서 성능이 제일 좋은 논문을 의미한다.</p>
 </dd>
 </dl>
+<div class="toctree-wrapper compound">
+</div>
 <div class="toctree-wrapper compound">
 </div>
 <div class="toctree-wrapper compound">

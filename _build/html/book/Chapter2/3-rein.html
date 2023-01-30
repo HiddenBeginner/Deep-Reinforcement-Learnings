@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>1. 순차적 의사 결정 문제, 에이전트, 환경 &#8212; 심층강화학습</title>
+    <title>8. REINFORCE &#8212; 심층강화학습</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -85,11 +85,13 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="shortcut icon" href="../../_static/HDBG.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="2. Markov Decision Process (MDP)" href="2-markov-decision-processes.html" />
-    <link rel="prev" title="심층강화학습 (Deep Reinforcement Learnings)" href="../intro.html" />
+    <link rel="next" title="참고문헌" href="../Reference.html" />
+    <link rel="prev" title="7. REINFORCE" href="2-reinforce.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -162,29 +164,29 @@ const thebe_selector_output = ".output, .cell_output"
   Markov Decision Process
  </span>
 </p>
-<ul class="current nav bd-sidenav">
- <li class="toctree-l1 current active">
-  <a class="current reference internal" href="#">
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../Chapter1/1-sequential-decision-making-problems.html">
    1. 순차적 의사 결정 문제, 에이전트, 환경
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="2-markov-decision-processes.html">
+  <a class="reference internal" href="../Chapter1/2-markov-decision-processes.html">
    2. Markov Decision Process (MDP)
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="3-policy-return-value.html">
+  <a class="reference internal" href="../Chapter1/3-policy-return-value.html">
    3. 정책, Return, 가치 함수
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="4-bellman-equation.html">
+  <a class="reference internal" href="../Chapter1/4-bellman-equation.html">
    4. 벨만 방정식: 가치 함수의 재귀적 성질
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="5-stochastic-approximation.html">
+  <a class="reference internal" href="../Chapter1/5-stochastic-approximation.html">
    5. 가치 함수 근사하기: Stochastic approximation
   </a>
  </li>
@@ -194,15 +196,20 @@ const thebe_selector_output = ".output, .cell_output"
   Policy gradient methods
  </span>
 </p>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
  <li class="toctree-l1">
-  <a class="reference internal" href="../Chapter2/1-policy-gradient-theorem.html">
+  <a class="reference internal" href="1-policy-gradient-theorem.html">
    6. Policy Gradient Theorem
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="../Chapter2/2-reinforce.html">
+  <a class="reference internal" href="2-reinforce.html">
    7. REINFORCE
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   8. REINFORCE
   </a>
  </li>
 </ul>
@@ -268,6 +275,35 @@ title="Toggle navigation"
         
     </div>
     <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/hiddenbeginner/Deep-Reinforcement-Learnings/gh-pages?urlpath=tree/book/Chapter2/3-rein.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
 <button onclick="toggleFullScreen()"
   class="headerbtn"
   data-toggle="tooltip"
@@ -307,7 +343,7 @@ title="Source repository"
       </li>
       
       <li>
-        <a href="https://github.com/hiddenbeginner/Deep-Reinforcement-Learnings/issues/new?title=Issue%20on%20page%20%2Fbook/Chapter1/1-sequential-decision-making-problems.html&body=Your%20issue%20content%20here."
+        <a href="https://github.com/hiddenbeginner/Deep-Reinforcement-Learnings/issues/new?title=Issue%20on%20page%20%2Fbook/Chapter2/3-rein.html&body=Your%20issue%20content%20here."
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -335,7 +371,7 @@ title="Open an issue"
   <div class="menu-dropdown__content">
     <ul>
       <li>
-        <a href="../../_sources/book/Chapter1/1-sequential-decision-making-problems.md"
+        <a href="../../_sources/book/Chapter2/3-rein.ipynb"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -346,7 +382,7 @@ title="Download source file"
 <span class="headerbtn__icon-container">
   <i class="fas fa-file"></i>
   </span>
-<span class="headerbtn__text-container">.md</span>
+<span class="headerbtn__text-container">.ipynb</span>
 </a>
 
       </li>
@@ -372,23 +408,68 @@ title="Print to PDF"
     </ul>
   </div>
 </div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
 
     </div>
 </div>
 
 <!-- Table of contents -->
 <div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#reinforce-q-pi-theta-s-a-return">
+   8.1. REINFORCE:
+   <span class="math notranslate nohighlight">
+    \(Q^{\pi_{\theta}}(s, a)\)
+   </span>
+   대신 return 사용
+  </a>
+ </li>
+</ul>
+
+    </nav>
 </div>
     </div>
     <div class="article row">
         <div class="col pl-md-3 pl-lg-5 content-container">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>순차적 의사 결정 문제, 에이전트, 환경</h1>
+                <h1>REINFORCE</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#reinforce-q-pi-theta-s-a-return">
+   8.1. REINFORCE:
+   <span class="math notranslate nohighlight">
+    \(Q^{\pi_{\theta}}(s, a)\)
+   </span>
+   대신 return 사용
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -396,24 +477,40 @@ title="Print to PDF"
                 
               <div>
                 
-  <section class="tex2jax_ignore mathjax_ignore" id="id1">
-<h1><span class="section-number">1. </span>순차적 의사 결정 문제, 에이전트, 환경<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h1>
-<p>강화학습은 순차적 의사 결정 문제 (sequential decision-making problem)을 해결하기 위한 방법론이다. 순차적 의사 결정 문제는 그 이름에서 알 수 있는 것처럼 순차적으로 의사 결정을 하는 문제이다. 순차적 의사 결정 문제를 수행하는 주인공을 에이전트 (agent)라고 부른다. 에이전트가 풀어내고자 하는 또는 통제하고자 하는 대상을 환경 (environment)이라고 부른다.</p>
-<p>순차적 의사 결정 문제에서 에이전트는 매 시점 환경의 상태 (state)를 관측하고 의사 결정을 하여 행동 (action)을 취한다.
-행동을 받은 환경은 상태가 바뀌게 되고 에이전트에게 보상 (reward)을 부여한다.
-그럼 에이전트는 환경의 바뀐 다음 상태를 관측하고 또 다시 행동을 취하며, 환경은 상태가 바뀌고 에이전트에게 보상을 부여한다.
-이 과정을 정해진 횟수나 조건만큼 반복하거나 또는 무한히 반복하는 것을 순차적 의사 결정 문제라고 한다.</p>
-<p>에이전트의 목표는 이 과정을 반복하여 얻게 되는 보상들의 총합을 최대화하는 것이다. 에이전트가 환경의 상태에 적절하지 못한 행동을 취했다면 보상을 적게 받았을테고, 환경의 상태에 딱 좋은 행동을 취했다면 보상을 많이 받았을 것이다.</p>
-<script
-   type="text/javascript"
-   src="https://utteranc.es/client.js"
-   async="async"
-   repo="HiddenBeginner/Deep-Reinforcement-Learnings"
-   issue-term="pathname"
-   theme="github-light"
-   label="💬 comment"
-   crossorigin="anonymous"
-/></section>
+  <section class="tex2jax_ignore mathjax_ignore" id="reinforce">
+<h1><span class="section-number">8. </span>REINFORCE<a class="headerlink" href="#reinforce" title="Permalink to this headline">#</a></h1>
+<p>Policy gradient theorem을 다시 한번 적어보자.</p>
+<div class="math notranslate nohighlight">
+\[\nabla_{\theta} J(\theta) \propto \mathbb{E}_{\pi_{\theta}} \left[ Q^{\pi_{\theta}}(s, a) \cdot \nabla_{\theta} \log \pi_{\theta}(a|s) \right]. \]</div>
+<br>
+<p>예상했겠지만, 위 그레디언트를 정확히 구하는 것은 불가능하다. 기댓값이야 Monte Carlo 기법으로 근사시킬 수 있다. 정책 <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>로 환경과 상호작용을 엄청나게 많이 해서 trajectory <span class="math notranslate nohighlight">\(\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T, a_T, r_T)\)</span>를 많이 생성한다. 그리고 trajectory에 있는 각 <span class="math notranslate nohighlight">\((s_t, a_t)\)</span>마다 <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s_t, a_t) \cdot \nabla_{\theta} \log \pi_{\theta}(a_t|s_t)\)</span>을 계산해서 표본 평균을 구하면 되기 때문이다. <span class="math notranslate nohighlight">\(\nabla_{\theta} \log \pi_{\theta}(a_t|s_t)\)</span> 계산은 딥러닝 프레임워크에서 알아서 해준다. 그런데 여전히 <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s_t, a_t)\)</span>를 계산하기가 어렵다. 그래서 우리는 <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s_t, a_t)\)</span> 대신 다른 것으로 대체해야 한다. 이 <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s_t, a_t)\)</span>을 어떤 것으로 대체하느냐에 따라서 알고리즘의 이름이 달라지고 성능도 크게 달라진다. 이번 장에서는 가장 쉽고 간단한 방법인 REINFORCE 알고리즘에 대해 알아본다.</p>
+<br>
+<hr class="docutils" />
+<section id="reinforce-q-pi-theta-s-a-return">
+<h2><span class="section-number">8.1. </span>REINFORCE: <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s, a)\)</span> 대신 return 사용<a class="headerlink" href="#reinforce-q-pi-theta-s-a-return" title="Permalink to this headline">#</a></h2>
+<p>제목이 곧 내용이다. REINFORCE는 한 에피소드를 진행하여 하나의 trajectory <span class="math notranslate nohighlight">\(\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T, a_T, r_T)\)</span>를 생성하고, 다음의 policy gradient의 추정치를 사용하여 경사하강법을 진행한다.
+아래 식에서 실제 그레디언트 <span class="math notranslate nohighlight">\(\nabla_{\theta} J(\theta)\)</span>의 추정치를 <span class="math notranslate nohighlight">\(\hat{g}\)</span>로 표시하였다.</p>
+<div class="math notranslate nohighlight">
+\[\nabla_{\theta} J(\theta) \approx \hat{g} := \frac{1}{T} \sum\limits_{t=0}^{T} G_t \nabla_{\theta}\log\pi_{\theta}(a_t | s_t),\]</div>
+<p>이때, <span class="math notranslate nohighlight">\(G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t} r_T\)</span>이다. REINFORCE의 알고리즘 다음과 같다.</p>
+<div class="proof algorithm admonition" id="REINFORCE">
+<p class="admonition-title"><span class="caption-number">Algorithm 8.1 </span> (REINFORCE)</p>
+<section class="algorithm-content" id="proof-content">
+<ol class="simple">
+<li><p>정책 네트워크 <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>의 파라미터 <span class="math notranslate nohighlight">\(\theta\)</span> 초기화</p></li>
+<li><p>for _ in range(n_episodes):</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>를 따라 에피소드를 진행하여 <span class="math notranslate nohighlight">\(\tau=(s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T, a_T, r_T)\)</span> 수집</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> for <span class="math notranslate nohighlight">\(t=0, 1, 2, \ldots, T\)</span>:</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t} r_{T}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g}_t = G_t \nabla_{\theta} \log \pi_{\theta} (a_t|s_t)\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g} = \frac{1}{T}\sum\limits_{t=0}^{T}\hat{g}_{t}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\theta \leftarrow \theta + \eta \hat{g}\)</span>  <span class="math notranslate nohighlight">\(\quad\)</span> # Gradient ascent</p></li>
+</ol>
+</section>
+</div><br>
+<p>필자는 심층강화학습을 책으로 공부하면서 <a class="reference internal" href="#REINFORCE">Algorithm 8.1</a>의 <span class="math notranslate nohighlight">\(\nabla_{\theta} \log \pi_{\theta} (a_t|s_t)\)</span>이 어떻게 코드로 구현되는지 정말 궁금했다.</p>
+</section>
+</section>
 
     <script type="text/x-thebe-config">
     {
@@ -428,7 +525,7 @@ title="Print to PDF"
         },
         kernelOptions: {
             kernelName: "python3",
-            path: "./book/Chapter1"
+            path: "./book/Chapter2"
         },
         predefinedOutput: true
     }
@@ -442,17 +539,17 @@ title="Print to PDF"
                 
     <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="../intro.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="2-reinforce.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">심층강화학습 (Deep Reinforcement Learnings)</p>
+            <p class="prev-next-title"><span class="section-number">7. </span>REINFORCE</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="2-markov-decision-processes.html" title="next page">
+    <a class='right-next' id="next-link" href="../Reference.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">2. </span>Markov Decision Process (MDP)</p>
+        <p class="prev-next-title">참고문헌</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
