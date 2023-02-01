@@ -85,6 +85,8 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="shortcut icon" href="../../_static/HDBG.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -429,13 +431,24 @@ title="Print to PDF"
     <nav id="bd-toc-nav" aria-label="Page">
         <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#gymnaisum">
+   8.1.
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Gymnaisum
+    </span>
+   </code>
+   사용법
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id1">
-   8.1. 이산 행동 공간
+   8.2. 이산 행동 공간
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id2">
-   8.2. 연속 행동 공간
+   8.3. 연속 행동 공간
   </a>
  </li>
 </ul>
@@ -458,13 +471,24 @@ title="Print to PDF"
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#gymnaisum">
+   8.1.
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Gymnaisum
+    </span>
+   </code>
+   사용법
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id1">
-   8.1. 이산 행동 공간
+   8.2. 이산 행동 공간
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id2">
-   8.2. 연속 행동 공간
+   8.3. 연속 행동 공간
   </a>
  </li>
 </ul>
@@ -479,12 +503,338 @@ title="Print to PDF"
                 
   <section class="tex2jax_ignore mathjax_ignore" id="reinforce">
 <h1><span class="section-number">8. </span>REINFORCE 구현<a class="headerlink" href="#reinforce" title="Permalink to this headline">#</a></h1>
-<section id="id1">
-<h2><span class="section-number">8.1. </span>이산 행동 공간<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
-<p>Coming soon!</p>
+<section id="gymnaisum">
+<h2><span class="section-number">8.1. </span><code class="docutils literal notranslate"><span class="pre">Gymnaisum</span></code> 사용법<a class="headerlink" href="#gymnaisum" title="Permalink to this headline">#</a></h2>
+<p>먼저 강화학습 코딩이 처음인 분들에게는 에이전트가 환경과 상호작용하는 것부터 어떻게 구현해야 할지 막막할 것이다. <code class="docutils literal notranslate"><span class="pre">Gymnaisum</span></code>은 다양한 연습용 환경을 제공하고 있으며, 강화학습 연구자들에게 환경을 구현하기 위한 일종의 약속 (convention)을 제공하고 있다. 이번 절에서 <code class="docutils literal notranslate"><span class="pre">Gymnaisum</span></code>에서 제공하고 있는 CartPole 환경을 사용해볼 것이다.</p>
+<br>
+<p>먼저 실습에 사용할 라이브러리들을 모두 임포트 하자.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+</div>
+<br>
+<p><code class="docutils literal notranslate"><span class="pre">gymnasium.make('환경이름')</span></code>을 통해 환경을 불러올 수 있다. <code class="docutils literal notranslate"><span class="pre">Gymnasium</span></code>에서 제공하는 환경의 목록은 <code class="docutils literal notranslate"><span class="pre">Gymnasium</span></code>의 <a class="reference external" href="https://gymnasium.farama.org/environments/classic_control/">공식 문서</a>에 잘 나와 있다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;CartPole-v1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<br>
+<p>환경 초기화는 <code class="docutils literal notranslate"><span class="pre">env.reset()</span></code> 메서드를 사용하여 할 수 있다. 초기 상태 <span class="math notranslate nohighlight">\(s_0 \sim \rho_0\)</span>에 대응하는 코드이다. 이 메서드를 호출하면 환경의 초기 상태와 주로 학습에 사용되지는 않지만 사용자가 알면 좋은 추가 정보를 반환해준다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initial state is: &quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Information: &quot;</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial state is:  [ 0.04483376 -0.00665065 -0.0137544  -0.02688403]
+Information:  {}
+</pre></div>
+</div>
+</div>
+</div>
+<br>
+<p>환경의 상태를 관찰하였으니, 아무 행동을 뽑아서 환경에 행동을 취해보자. <code class="docutils literal notranslate"><span class="pre">env.action_space.sample()</span></code>은 행동 공간에서 임의의 행동 하나를 반환해주는 메서드이다. 다음으로 <code class="docutils literal notranslate"><span class="pre">env.step(action)</span></code>을 통해 환경에 행동을 취할 수 있다. <code class="docutils literal notranslate"><span class="pre">env.step(action)</span></code>은 5-tuple인 <code class="docutils literal notranslate"><span class="pre">(s_prime,</span> <span class="pre">r,</span> <span class="pre">terminated,</span> <span class="pre">truncated,</span> <span class="pre">info)</span></code>을 반환해준다.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">s_prime</span></code>: 다음 상태</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r</span></code>: 보상</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">terminated</span></code>: 환경이 종료 조건에 의해 종료되었는지 여부</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">truncated</span></code>: 환경이 최대 상호작용 횟수에 도달하여 종료되었는지 여부</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">info</span></code>: 추가 정보</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Choose a random action</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>  
+
+<span class="c1"># Take the action</span>
+<span class="n">s_prime</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span>  <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Next state: &quot;</span><span class="p">,</span> <span class="n">s_prime</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reward: &quot;</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Is terminated? &quot;</span><span class="p">,</span> <span class="n">terminated</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Is truncated? &quot;</span><span class="p">,</span> <span class="n">truncated</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Information: &quot;</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Next state:  [ 0.04470074 -0.20157267 -0.01429208  0.2614277 ]
+Reward:  1.0
+Is terminated?  False
+Is truncated?  False
+Information:  {}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">terminated</span></code>와 <code class="docutils literal notranslate"><span class="pre">truncated</span></code>은 둘 다 환경이 종료되었는지 여부를 반환해준다. 단, <code class="docutils literal notranslate"><span class="pre">terminated</span></code>은 종료 조건에 의해 환경이 종료되었을 때 <code class="docutils literal notranslate"><span class="pre">True</span></code>를 반환한다. 종료 조건의 예시는 주로 에이전트가 목적을 달성했거나, 사망이나 붕괴 등 돌이킬 수 없는 상태에 빠졌을 경우를 의미한다. <code class="docutils literal notranslate"><span class="pre">truncated</span></code>은 주로 환경의 종료 조건이 따로 없는 경우에만 의미가 있다. 로봇 통제와 같은 무한히 상호작용할 수 있는 환경의 경우, 실제 구현에서는 평생 상호작용할 수 없으니 1000회 정도 상호작용 후 환경을 마친다. 이처럼 최대 상호작용 횟수에 도달하여 환경이 종료된 경우 <code class="docutils literal notranslate"><span class="pre">truncated</span></code>와 <code class="docutils literal notranslate"><span class="pre">True</span></code>를 반환한다</p>
+</div>
+<br>
+<p>위의 내용을 종합하면, 한 에피소드 진행은 다음과 같이 구현한다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span>
+<span class="k">while</span> <span class="ow">not</span> <span class="p">(</span><span class="n">terminated</span> <span class="ow">or</span> <span class="n">truncated</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>
+    <span class="n">s_prime</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    
+    <span class="n">ret</span> <span class="o">+=</span> <span class="n">r</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s_prime</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Return: &quot;</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Return:  29.0
+</pre></div>
+</div>
+</div>
+</div>
+<br>
 </section>
+<hr class="docutils" />
+<section id="id1">
+<h2><span class="section-number">8.2. </span>이산 행동 공간<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
+<p>다음으로 정책 네트워크를 정의해보자. 정책은 주어진 상태 <span class="math notranslate nohighlight">\(s\)</span>에서 행동 <span class="math notranslate nohighlight">\(a\)</span>를 취한 조건부 확률 <span class="math notranslate nohighlight">\(\text{Pr}\left[A=a|S=s \right]\)</span>이다.
+각 상태 <span class="math notranslate nohighlight">\(s\)</span>마다 조건부 확률 분포가 정의되어야 하므로 정책 네트워크는 상태를 입력 받는다. 그리고 행동에 대한 확률 분포이기 때문에 각 행동에 확률을 부여해야 한다.</p>
+<p>CartPole 환경은 4차원 행동을 입력 받고 2가지 행동 중 선택하는 이산 행동 공간을 가지기 때문에 4차원 벡터를 입력 받고 2차원 벡터를 출력하는 다층퍼셉트론 (MLP)로 정의하되, 출력이 확률 분포로 해석할 수 있도록 출력에 softmax 함수를 씌울 것이다. 이 MLP 나중에 다양한 실험을 위해서 다소 일반적으로 코드를 짰다. 일반적이라는 의미는 사용자의 수요에 맞게 히든레이어 개수 및 노드 수를 조정할 수 있고 활성화 함수도 설정할 수 있도록 만들었다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MLPDiscretePolicy</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim_state</span><span class="p">,</span> <span class="n">dim_action</span><span class="p">,</span> <span class="n">dim_hiddens</span><span class="o">=</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="p">),</span> <span class="n">activation_fn</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MLPDiscretePolicy</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">dim_state</span><span class="p">,</span> <span class="n">dim_hiddens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dim_hiddens</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">hidden_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">dim_hiddens</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">dim_hiddens</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hidden_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hidden_layer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">dim_hiddens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dim_action</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation_fn</span> <span class="o">=</span> <span class="n">activation_fn</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_fn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_layer</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">hidden_layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_layers</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_fn</span><span class="p">(</span><span class="n">hidden_layer</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_layer</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">prob</span>
+</pre></div>
+</div>
+</div>
+</div>
+<br>
+<p>정책 네트워크를 다음과 같이 선언할 수 있다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;CartPole-v1&#39;</span><span class="p">)</span>
+
+<span class="n">dim_state</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">dim_action</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">n</span>
+<span class="n">dim_hiddens</span> <span class="o">=</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="n">activation_fn</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span>
+
+<span class="n">policy</span> <span class="o">=</span> <span class="n">MLPDiscretePolicy</span><span class="p">(</span><span class="n">dim_state</span><span class="p">,</span> <span class="n">dim_action</span><span class="p">,</span> <span class="n">dim_hiddens</span><span class="p">,</span> <span class="n">activation_fn</span><span class="p">)</span>
+<span class="n">policy</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>MLPDiscretePolicy(
+  (input_layer): Linear(in_features=4, out_features=128, bias=True)
+  (hidden_layers): ModuleList(
+    (0): Linear(in_features=128, out_features=128, bias=True)
+  )
+  (output_layer): Linear(in_features=128, out_features=2, bias=True)
+)
+</pre></div>
+</div>
+</div>
+</div>
+<br>
+<p>정책 네트워크에 상태 하나를 입력하면 다음과 같이 출력된다. 결과로 나온 벡터의 각 원소는 각 행동을 취할 확률로 해석할 수 있다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+
+<span class="n">policy</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([0.4787, 0.5213], grad_fn=&lt;SoftmaxBackward0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<br>
+<p>정책 네트워크로 만든 확률 분포에서 행동을 샘플링은 다음과 같이 할 수 있다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">prob</span> <span class="o">=</span> <span class="n">policy</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Selected action : &quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Selected action :  1
+</pre></div>
+</div>
+</div>
+</div>
+<br>
+<p>정책 네트워크가 준비되었으니 REINFORCE 에이전트를 만들어보자. REINFORCE 에이전트는 총 4개 메서드가 있다.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">__init__()</span></code>: 에이전트 클래스가 입력 받을 하이퍼파라미터를 입력 받고 여러가지 초기화를 수행한다.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">act()</span></code>: 환경과의 상호작용을 위한 메서드로서 상태 하나를 입력 받아 행동을 출력한다.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">learn()</span></code>: 에이전트가 갖고 있는 네트워크들을 업데이트해준다.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">process()</span></code>: 환경과의 매 상호작용마다 수행할 메서드이다. 주로 transition을 버퍼에 저장하고, 특정 주기로 <code class="docutils literal notranslate"><span class="pre">learn()</span></code> 메서드를 호출한다.</p></li>
+</ul>
+<p>이 메서드 구성은 카카오 엔터프라이즈의 강화학습 라이브러리 <a class="reference external" href="https://github.com/kakaoenterprise/JORLDY">JORLDY</a>를 참고하여 만들었다. 이후 구현할 알고리즘들도 동일한 메서드 구성을 갖고 있다. 알고리즘마다 각 메서드가 어떻게 구현되는지에 초점을 맞춰 비교하면 좋을 것 같다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">REINFORCE</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy</span> <span class="o">=</span> <span class="n">policy</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">=</span> <span class="n">gamma</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="p">[]</span>
+        
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">act</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">training</span><span class="p">)</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">training</span> <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">a</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">learn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+        <span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">,</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">))</span>
+        <span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span> <span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">r</span><span class="p">])</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)):</span>
+            <span class="n">ret</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">ret</span><span class="p">[</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            
+        <span class="n">probs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">log_probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">probs</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">long</span><span class="p">()))</span>
+        
+        <span class="n">policy_loss</span> <span class="o">=</span> <span class="o">-</span> <span class="p">(</span><span class="n">ret</span> <span class="o">*</span> <span class="n">log_probs</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">policy_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;policy_loss&#39;</span><span class="p">:</span> <span class="n">policy_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()}</span>
+        
+        <span class="k">return</span> <span class="n">result</span>
+        
+    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transition</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">transition</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">transition</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="n">transition</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learn</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+</div>
+</div>
+<br>
+<p>REINFORCE 클래스 작성을 마쳤으니 이제 환경과 상호작용을 하면서 정책 네트워크를 훈련시킬 차례이다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">eval_iterations</span><span class="p">):</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">env_name</span><span class="p">)</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">eval_iterations</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10000</span><span class="p">)),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="p">(</span><span class="n">terminated</span> <span class="ow">or</span> <span class="n">truncated</span><span class="p">):</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">s_prime</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">score</span> <span class="o">+=</span> <span class="n">r</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">s_prime</span>
+        <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+    <span class="n">env</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">env_name</span> <span class="o">=</span> <span class="s1">&#39;CartPole-v1&#39;</span>
+
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">max_iterations</span> <span class="o">=</span> <span class="mi">100000</span>
+<span class="n">eval_intervals</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">eval_iterations</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">gamma</span> <span class="o">=</span> <span class="mf">0.99</span>
+<span class="n">lr</span> <span class="o">=</span> <span class="mf">0.001</span>
+
+<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">env_name</span><span class="p">)</span>
+<span class="n">policy</span> <span class="o">=</span> <span class="n">MLPDiscretePolicy</span><span class="p">(</span><span class="n">dim_state</span><span class="p">,</span> <span class="n">dim_action</span><span class="p">)</span>
+<span class="n">agent</span> <span class="o">=</span> <span class="n">REINFORCE</span><span class="p">(</span><span class="n">policy</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">lr</span><span class="p">)</span>
+
+<span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iterations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">s_prime</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">process</span><span class="p">((</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s_prime</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">))</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s_prime</span>
+    
+    <span class="k">if</span> <span class="n">terminated</span> <span class="ow">or</span> <span class="n">truncated</span><span class="p">:</span>
+        <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+        
+    <span class="k">if</span> <span class="n">t</span> <span class="o">%</span> <span class="n">eval_intervals</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">eval_iterations</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Steps </span><span class="si">{</span><span class="n">t</span><span class="si">:</span><span class="s2">6</span><span class="si">}</span><span class="s2">] Avg return: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.5</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[Steps  10000] Avg return: 477.5
+[Steps  20000] Avg return: 263.2
+[Steps  30000] Avg return: 333.7
+[Steps  40000] Avg return: 500.0
+[Steps  50000] Avg return: 500.0
+[Steps  60000] Avg return: 500.0
+[Steps  70000] Avg return: 500.0
+[Steps  80000] Avg return: 500.0
+[Steps  90000] Avg return: 153.1
+[Steps 100000] Avg return: 500.0
+</pre></div>
+</div>
+</div>
+</div>
+<br>
+</section>
+<hr class="docutils" />
 <section id="id2">
-<h2><span class="section-number">8.2. </span>연속 행동 공간<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h2>
+<h2><span class="section-number">8.3. </span>연속 행동 공간<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h2>
 <p>Coming soon!</p>
 </section>
 </section>
