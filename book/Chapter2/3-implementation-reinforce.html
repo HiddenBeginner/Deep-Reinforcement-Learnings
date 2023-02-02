@@ -90,7 +90,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="shortcut icon" href="../../_static/HDBG.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="참고문헌" href="../Reference.html" />
+    <link rel="next" title="9. REINFORCE with baseline" href="4-reinforce-with-baseline.html" />
     <link rel="prev" title="7. REINFORCE" href="2-reinforce.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -210,6 +210,11 @@ const thebe_selector_output = ".output, .cell_output"
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    8. REINFORCE 구현
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="4-reinforce-with-baseline.html">
+   9. REINFORCE with baseline
   </a>
  </li>
 </ul>
@@ -445,11 +450,45 @@ title="Print to PDF"
   <a class="reference internal nav-link" href="#id1">
    8.2. 이산 행동 공간
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id2">
+     8.2.1. 정책 네트워크 구현
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id3">
+     8.2.2. 에이전트 구현
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id4">
+     8.2.3. 에이전트 훈련
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#id2">
+  <a class="reference internal nav-link" href="#id5">
    8.3. 연속 행동 공간
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id6">
+     8.3.1. 환경 알아보기
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id7">
+     8.3.2. 정책 네트워크 구현
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id8">
+     8.3.3. 에이전트 구현
+    </a>
+   </li>
+  </ul>
  </li>
 </ul>
 
@@ -485,11 +524,45 @@ title="Print to PDF"
   <a class="reference internal nav-link" href="#id1">
    8.2. 이산 행동 공간
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id2">
+     8.2.1. 정책 네트워크 구현
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id3">
+     8.2.2. 에이전트 구현
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id4">
+     8.2.3. 에이전트 훈련
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#id2">
+  <a class="reference internal nav-link" href="#id5">
    8.3. 연속 행동 공간
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id6">
+     8.3.1. 환경 알아보기
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id7">
+     8.3.2. 정책 네트워크 구현
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id8">
+     8.3.3. 에이전트 구현
+    </a>
+   </li>
+  </ul>
  </li>
 </ul>
 
@@ -511,6 +584,7 @@ title="Print to PDF"
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
@@ -541,7 +615,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial state is:  [ 0.04483376 -0.00665065 -0.0137544  -0.02688403]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial state is:  [ 0.04633059 -0.03320619 -0.01661573  0.00945998]
 Information:  {}
 </pre></div>
 </div>
@@ -573,7 +647,7 @@ Information:  {}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Next state:  [ 0.04470074 -0.20157267 -0.01429208  0.2614277 ]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Next state:  [ 0.04566646 -0.22808596 -0.01642654  0.29685447]
 Reward:  1.0
 Is terminated?  False
 Is truncated?  False
@@ -602,7 +676,7 @@ Information:  {}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Return:  29.0
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Return:  18.0
 </pre></div>
 </div>
 </div>
@@ -612,6 +686,8 @@ Information:  {}
 <hr class="docutils" />
 <section id="id1">
 <h2><span class="section-number">8.2. </span>이산 행동 공간<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
+<section id="id2">
+<h3><span class="section-number">8.2.1. </span>정책 네트워크 구현<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h3>
 <p>다음으로 정책 네트워크를 정의해보자. 정책은 주어진 상태 <span class="math notranslate nohighlight">\(s\)</span>에서 행동 <span class="math notranslate nohighlight">\(a\)</span>를 취한 조건부 확률 <span class="math notranslate nohighlight">\(\text{Pr}\left[A=a|S=s \right]\)</span>이다.
 각 상태 <span class="math notranslate nohighlight">\(s\)</span>마다 조건부 확률 분포가 정의되어야 하므로 정책 네트워크는 상태를 입력 받는다. 그리고 행동에 대한 확률 분포이기 때문에 각 행동에 확률을 부여해야 한다.</p>
 <p>CartPole 환경은 4차원 행동을 입력 받고 2가지 행동 중 선택하는 이산 행동 공간을 가지기 때문에 4차원 벡터를 입력 받고 2차원 벡터를 출력하는 다층퍼셉트론 (MLP)로 정의하되, 출력이 확률 분포로 해석할 수 있도록 출력에 softmax 함수를 씌울 것이다. 이 MLP 나중에 다양한 실험을 위해서 다소 일반적으로 코드를 짰다. 일반적이라는 의미는 사용자의 수요에 맞게 히든레이어 개수 및 노드 수를 조정할 수 있고 활성화 함수도 설정할 수 있도록 만들었다.</p>
@@ -679,7 +755,7 @@ Information:  {}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([0.4787, 0.5213], grad_fn=&lt;SoftmaxBackward0&gt;)
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([0.5454, 0.4546], grad_fn=&lt;SoftmaxBackward0&gt;)
 </pre></div>
 </div>
 </div>
@@ -701,6 +777,9 @@ Information:  {}
 </div>
 </div>
 <br>
+</section>
+<section id="id3">
+<h3><span class="section-number">8.2.2. </span>에이전트 구현<a class="headerlink" href="#id3" title="Permalink to this headline">#</a></h3>
 <p>정책 네트워크가 준비되었으니 REINFORCE 에이전트를 만들어보자. REINFORCE 에이전트는 총 4개 메서드가 있다.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">__init__()</span></code>: 에이전트 클래스가 입력 받을 하이퍼파라미터를 입력 받고 여러가지 초기화를 수행한다.</p></li>
@@ -764,6 +843,9 @@ Information:  {}
 </div>
 </div>
 <br>
+</section>
+<section id="id4">
+<h3><span class="section-number">8.2.3. </span>에이전트 훈련<a class="headerlink" href="#id4" title="Permalink to this headline">#</a></h3>
 <p>REINFORCE 클래스 작성을 마쳤으니 이제 환경과 상호작용을 하면서 정책 네트워크를 훈련시킬 차례이다.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -790,7 +872,7 @@ Information:  {}
 
 <span class="n">seed</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">max_iterations</span> <span class="o">=</span> <span class="mi">100000</span>
-<span class="n">eval_intervals</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">eval_intervals</span> <span class="o">=</span> <span class="mi">5000</span>
 <span class="n">eval_iterations</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">gamma</span> <span class="o">=</span> <span class="mf">0.99</span>
 <span class="n">lr</span> <span class="o">=</span> <span class="mf">0.001</span>
@@ -799,6 +881,7 @@ Information:  {}
 <span class="n">policy</span> <span class="o">=</span> <span class="n">MLPDiscretePolicy</span><span class="p">(</span><span class="n">dim_state</span><span class="p">,</span> <span class="n">dim_action</span><span class="p">)</span>
 <span class="n">agent</span> <span class="o">=</span> <span class="n">REINFORCE</span><span class="p">(</span><span class="n">policy</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">lr</span><span class="p">)</span>
 
+<span class="n">logger</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iterations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
@@ -806,36 +889,209 @@ Information:  {}
     <span class="n">result</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">process</span><span class="p">((</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s_prime</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">))</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">s_prime</span>
     
+    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;policy_loss&#39;</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;policy_loss&#39;</span><span class="p">]])</span>
+    
     <span class="k">if</span> <span class="n">terminated</span> <span class="ow">or</span> <span class="n">truncated</span><span class="p">:</span>
         <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
         
     <span class="k">if</span> <span class="n">t</span> <span class="o">%</span> <span class="n">eval_intervals</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">score</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">eval_iterations</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;Avg return&#39;</span><span class="p">,</span> <span class="n">score</span><span class="p">])</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Steps </span><span class="si">{</span><span class="n">t</span><span class="si">:</span><span class="s2">6</span><span class="si">}</span><span class="s2">] Avg return: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.5</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[Steps  10000] Avg return: 477.5
-[Steps  20000] Avg return: 263.2
-[Steps  30000] Avg return: 333.7
-[Steps  40000] Avg return: 500.0
-[Steps  50000] Avg return: 500.0
-[Steps  60000] Avg return: 500.0
-[Steps  70000] Avg return: 500.0
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[Steps   5000] Avg return: 21.3
+[Steps  10000] Avg return: 101.1
+[Steps  15000] Avg return: 121.1
+[Steps  20000] Avg return: 130.0
+[Steps  25000] Avg return: 121.5
+[Steps  30000] Avg return: 103.5
+[Steps  35000] Avg return: 500.0
+[Steps  40000] Avg return: 372.8
+[Steps  45000] Avg return: 284.1
+[Steps  50000] Avg return: 167.5
+[Steps  55000] Avg return: 123.5
+[Steps  60000] Avg return: 47.7
+[Steps  65000] Avg return: 130.3
+[Steps  70000] Avg return: 401.5
+[Steps  75000] Avg return: 484.9
 [Steps  80000] Avg return: 500.0
-[Steps  90000] Avg return: 153.1
+[Steps  85000] Avg return: 500.0
+[Steps  90000] Avg return: 500.0
+[Steps  95000] Avg return: 500.0
 [Steps 100000] Avg return: 500.0
 </pre></div>
 </div>
 </div>
 </div>
 <br>
+<p>훈련 로그를 시각화해보면 다음과 같다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">]</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;Avg return&#39;</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;step&#39;</span><span class="p">],</span> <span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="s1">&#39;bo-&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Average return over 10 episodes&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Step&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Avg return&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;policy_loss&#39;</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;step&#39;</span><span class="p">],</span> <span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="s1">&#39;b-&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Policy loss&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Step&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Policy loss&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/3-implementation-reinforce_25_0.png" src="../../_images/3-implementation-reinforce_25_0.png" />
+</div>
+</div>
+<br>
+</section>
 </section>
 <hr class="docutils" />
-<section id="id2">
-<h2><span class="section-number">8.3. </span>연속 행동 공간<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h2>
+<section id="id5">
+<h2><span class="section-number">8.3. </span>연속 행동 공간<a class="headerlink" href="#id5" title="Permalink to this headline">#</a></h2>
+<section id="id6">
+<h3><span class="section-number">8.3.1. </span>환경 알아보기<a class="headerlink" href="#id6" title="Permalink to this headline">#</a></h3>
+<p>이번 절에서는 Pendulum 환경을 통해 연속 행동 공간에서 REINFORCE가 어떻게 구현되는지 알아볼 것이다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;Pendulum-v1&#39;</span><span class="p">)</span>
+<span class="n">s</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The dimension of state space: &quot;</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The dimension of action space: &quot;</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initial state: &quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The dimension of state space:  3
+The dimension of action space:  1
+Initial state:  [ 0.9398887  -0.34148082  0.49119028]
+</pre></div>
+</div>
+</div>
+</div>
+<br>
+</section>
+<section id="id7">
+<h3><span class="section-number">8.3.2. </span>정책 네트워크 구현<a class="headerlink" href="#id7" title="Permalink to this headline">#</a></h3>
+<p>먼저, 정책 네트워크를 구현할 것이다. 정책 네트워크는 각 상태를 입력 받아서 행동 공간 내 모든 행동에 확률을 부여할 수 있어야 한다. 하지만, 연속 행동 공간의 경우 행동이 무수히 많아서 특정 행동에 확률을 부여할 수 없다. 연속 공간의 경우 확률 대신 확률 밀도 함수 (probability density function)를 사용한다. 우리는 상태에 따른 행동의 분포가 정규분포를 따른다고 가정할 것이다. 따라서 상태를 입력 받아 평균과 표준편차를 출력하는 정책 네트워크를 만들고, 출력된 평균과 표준편차를 따르는 정규 분포로부터 행동을 샘플링할 것이다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MLPGaussianPolicy</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim_state</span><span class="p">,</span> <span class="n">dim_action</span><span class="p">,</span> <span class="n">dim_hiddens</span><span class="o">=</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="p">),</span> <span class="n">activation_fn</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MLPGaussianPolicy</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">dim_state</span><span class="p">,</span> <span class="n">dim_hiddens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dim_hiddens</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">hidden_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">dim_hiddens</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">dim_hiddens</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hidden_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hidden_layer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mu_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">dim_hiddens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dim_action</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_std_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">dim_hiddens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dim_action</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation_fn</span> <span class="o">=</span> <span class="n">activation_fn</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_fn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_layer</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">hidden_layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_layers</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_fn</span><span class="p">(</span><span class="n">hidden_layer</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+            
+        <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu_layer</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">log_std</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_std_layer</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+        
+        <span class="k">return</span> <span class="n">mu</span><span class="p">,</span> <span class="n">log_std</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<br>
+<p>구현한 정책 네트워크를 선언하는 방법은 다음과 같다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;Pendulum-v1&#39;</span><span class="p">)</span>
+
+<span class="n">dim_state</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">dim_action</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">dim_hiddens</span> <span class="o">=</span> <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="p">)</span>
+<span class="n">activation_fn</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span>
+
+<span class="n">policy</span> <span class="o">=</span> <span class="n">MLPGaussianPolicy</span><span class="p">(</span><span class="n">dim_state</span><span class="p">,</span> <span class="n">dim_action</span><span class="p">,</span> <span class="n">dim_hiddens</span><span class="p">,</span> <span class="n">activation_fn</span><span class="p">)</span>
+<span class="n">policy</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>MLPGaussianPolicy(
+  (input_layer): Linear(in_features=3, out_features=512, bias=True)
+  (hidden_layers): ModuleList()
+  (mu_layer): Linear(in_features=512, out_features=1, bias=True)
+  (log_std_layer): Linear(in_features=512, out_features=1, bias=True)
+)
+</pre></div>
+</div>
+</div>
+</div>
+<br>
+<p>정책 네트워크로 만든 확률 분포에서 행동을 샘플링은 다음과 같이 할 수 있다.
+가장 마지막에 hyperbolic tangent (<code class="docutils literal notranslate"><span class="pre">torch.tanh</span></code>)는 뽑힌 행동이 -1과 1사이의 값을 갖게 만들어준다.
+환경마다 선택할 수 있는 행동의 최소값과 최대값이 다른데, 행동을 먼저 -1과 1사이의 값으로 만들어 준 후 행동의 범위를 알맞게 조절하는 것이 편하다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+
+<span class="n">mu</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="n">policy</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">std</span><span class="p">)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+<span class="n">max_action</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">high</span>
+<span class="n">min_action</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">low</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_action</span> <span class="o">-</span> <span class="n">min_action</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">min_action</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Selected action: &quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Selected action:  [-0.35109997]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>닫힌 구간 <span class="math notranslate nohighlight">\([m, M]\)</span>에서 샘플링된 행동 <span class="math notranslate nohighlight">\(x\)</span>를 <span class="math notranslate nohighlight">\([-1, 1]\)</span> 안의 값으로 바꾸는 방법은 먼저 min-max normalization을 사용해서 <span class="math notranslate nohighlight">\([0, 1]\)</span>의 값으로 변환한 후 2를 하고 -1을 빼주는 방식으로 진행된다. 즉,</p>
+<div class="math notranslate nohighlight">
+\[x_{\text{norm}} = 2\frac{(x - m)}{(M - m)} - 1\]</div>
+<p>그럼 <span class="math notranslate nohighlight">\([-1, 1]\)</span>으로 normalize된 값 <span class="math notranslate nohighlight">\(x_{\text{norm}}\)</span>을 다시 원래의 범위 <span class="math notranslate nohighlight">\([m, M]\)</span>로 돌리기 위해서는 다음과 같은 연산이 필요하다.</p>
+<div class="math notranslate nohighlight">
+\[x = 0.5 \times \left( x_{\text{norm}} + 1 \right) \times (M - m) + m\]</div>
+</div>
+<br>
+</section>
+<section id="id8">
+<h3><span class="section-number">8.3.3. </span>에이전트 구현<a class="headerlink" href="#id8" title="Permalink to this headline">#</a></h3>
 <p>Coming soon!</p>
+</section>
 </section>
 </section>
 
@@ -873,10 +1129,10 @@ Information:  {}
             <p class="prev-next-title"><span class="section-number">7. </span>REINFORCE</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="../Reference.html" title="next page">
+    <a class='right-next' id="next-link" href="4-reinforce-with-baseline.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">참고문헌</p>
+        <p class="prev-next-title"><span class="section-number">9. </span>REINFORCE with baseline</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
