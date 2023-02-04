@@ -212,6 +212,11 @@ const thebe_selector_output = ".output, .cell_output"
    8. REINFORCE 구현
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../Chapter2/4-reinforce-with-baseline.html">
+   9. REINFORCE with baseline
+  </a>
+ </li>
 </ul>
 <p aria-level="2" class="caption" role="heading">
  <span class="caption-text">
@@ -469,7 +474,7 @@ title="Print to PDF"
 <div class="math notranslate nohighlight">
 \[G_t = R_t + \gamma R_{t+1} + \gamma^2 R_{t+2} + \ldots,\]</div>
 <br>
-<p>이때, <span class="math notranslate nohighlight">\(R_{t'} = r(S_{t'}, A_{t'}) \; \forall \; t'=t, t+1, \ldots\)</span>으로 계산된다. 두 번째 텀부터 <span class="math notranslate nohighlight">\(\gamma\)</span>를 공통적으로 갖고 있기 때문에 <span class="math notranslate nohighlight">\(\gamma\)</span>로 묶어주자.</p>
+<p>이때, <span class="math notranslate nohighlight">\(R_{k} = r(S_{k}, A_{k}) \; \forall \; k=t, t+1, \ldots\)</span>으로 계산된다. 두 번째 텀부터 <span class="math notranslate nohighlight">\(\gamma\)</span>를 공통적으로 갖고 있기 때문에 <span class="math notranslate nohighlight">\(\gamma\)</span>로 묶어주자.</p>
 <div class="math notranslate nohighlight" id="equation-1step-return">
 <span class="eqno">(4.1)<a class="headerlink" href="#equation-1step-return" title="Permalink to this equation">#</a></span>\[\begin{split}
    \begin{matrix}

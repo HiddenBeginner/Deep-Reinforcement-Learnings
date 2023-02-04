@@ -10,7 +10,7 @@ $$G_t = R_t + \gamma R_{t+1} + \gamma^2 R_{t+2} + \ldots,$$
 
 <br>
 
-이때, $R_{t'} = r(S_{t'}, A_{t'}) \; \forall \; t'=t, t+1, \ldots$으로 계산된다. 두 번째 텀부터 $\gamma$를 공통적으로 갖고 있기 때문에 $\gamma$로 묶어주자.
+이때, $R_{k} = r(S_{k}, A_{k}) \; \forall \; k=t, t+1, \ldots$으로 계산된다. 두 번째 텀부터 $\gamma$를 공통적으로 갖고 있기 때문에 $\gamma$로 묶어주자.
 
 $$
    \begin{matrix}
