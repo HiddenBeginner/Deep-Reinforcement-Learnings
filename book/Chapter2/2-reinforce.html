@@ -212,6 +212,11 @@ const thebe_selector_output = ".output, .cell_output"
    8. REINFORCE 구현
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="4-reinforce-with-baseline.html">
+   9. REINFORCE with baseline
+  </a>
+ </li>
 </ul>
 <p aria-level="2" class="caption" role="heading">
  <span class="caption-text">
@@ -461,8 +466,10 @@ title="Print to PDF"
 <h2><span class="section-number">7.1. </span>REINFORCE: <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s, a)\)</span> 대신 return 사용<a class="headerlink" href="#reinforce-q-pi-theta-s-a-return" title="Permalink to this headline">#</a></h2>
 <p>제목이 곧 내용이다. REINFORCE는 한 에피소드를 진행하여 하나의 trajectory <span class="math notranslate nohighlight">\(\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T, a_T, r_T)\)</span>를 생성하고, 다음의 policy gradient의 추정치를 사용하여 경사하강법을 진행한다.
 아래 식에서 실제 그레디언트 <span class="math notranslate nohighlight">\(\nabla_{\theta} J(\theta)\)</span>의 추정치를 <span class="math notranslate nohighlight">\(\hat{g}\)</span>로 표시하였다.</p>
-<div class="math notranslate nohighlight">
-\[\nabla_{\theta} J(\theta) \approx \hat{g} := \frac{1}{T} \sum\limits_{t=0}^{T} G_t \nabla_{\theta}\log\pi_{\theta}(a_t | s_t),\]</div>
+<div class="math notranslate nohighlight" id="equation-reinforce-policy-gradient">
+<span class="eqno">(7.1)<a class="headerlink" href="#equation-reinforce-policy-gradient" title="Permalink to this equation">#</a></span>\[
+\nabla_{\theta} J(\theta) \approx \hat{g} := \frac{1}{T+1} \sum\limits_{t=0}^{T} G_t \nabla_{\theta}\log\pi_{\theta}(a_t | s_t),
+\]</div>
 <p>이때, <span class="math notranslate nohighlight">\(G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t} r_T\)</span>이다. REINFORCE의 알고리즘 다음과 같다.</p>
 <div class="proof algorithm admonition" id="REINFORCE">
 <p class="admonition-title"><span class="caption-number">Algorithm 7.1 </span> (REINFORCE)</p>
@@ -474,7 +481,7 @@ title="Print to PDF"
 <li><p><span class="math notranslate nohighlight">\(\qquad\)</span> for <span class="math notranslate nohighlight">\(t=0, 1, 2, \ldots, T\)</span>:</p></li>
 <li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t} r_{T}\)</span></p></li>
 <li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g}_t = G_t \nabla_{\theta} \log \pi_{\theta} (a_t|s_t)\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g} = \frac{1}{T}\sum\limits_{t=0}^{T}\hat{g}_{t}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g} = \frac{1}{T+1}\sum\limits_{t=0}^{T}\hat{g}_{t}\)</span></p></li>
 <li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\theta \leftarrow \theta + \eta \hat{g}\)</span>  <span class="math notranslate nohighlight">\(\quad\)</span> # Gradient ascent</p></li>
 </ol>
 </section>

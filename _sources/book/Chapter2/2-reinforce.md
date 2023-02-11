@@ -17,7 +17,9 @@ $$\nabla_{\theta} J(\theta) \propto \mathbb{E}_{\pi_{\theta}} \left[ Q^{\pi_{\th
 제목이 곧 내용이다. REINFORCE는 한 에피소드를 진행하여 하나의 trajectory $\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T, a_T, r_T)$를 생성하고, 다음의 policy gradient의 추정치를 사용하여 경사하강법을 진행한다.
 아래 식에서 실제 그레디언트 $\nabla_{\theta} J(\theta)$의 추정치를 $\hat{g}$로 표시하였다. 
 
-$$\nabla_{\theta} J(\theta) \approx \hat{g} := \frac{1}{T} \sum\limits_{t=0}^{T} G_t \nabla_{\theta}\log\pi_{\theta}(a_t | s_t),$$
+$$
+\nabla_{\theta} J(\theta) \approx \hat{g} := \frac{1}{T+1} \sum\limits_{t=0}^{T} G_t \nabla_{\theta}\log\pi_{\theta}(a_t | s_t),
+$$ (reinforce-policy-gradient)
 
 이때, $G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t} r_T$이다. REINFORCE의 알고리즘 다음과 같다.
 
@@ -30,7 +32,7 @@ $$\nabla_{\theta} J(\theta) \approx \hat{g} := \frac{1}{T} \sum\limits_{t=0}^{T}
 4. $\qquad$ for $t=0, 1, 2, \ldots, T$:
 5. $\qquad\qquad$ $G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t} r_{T}$
 6. $\qquad\qquad$ $\hat{g}_t = G_t \nabla_{\theta} \log \pi_{\theta} (a_t|s_t)$
-7. $\qquad$ $\hat{g} = \frac{1}{T}\sum\limits_{t=0}^{T}\hat{g}_{t}$
+7. $\qquad$ $\hat{g} = \frac{1}{T+1}\sum\limits_{t=0}^{T}\hat{g}_{t}$
 8. $\qquad$ $\theta \leftarrow \theta + \eta \hat{g}$  $\quad$ # Gradient ascent
 ```
 
