@@ -27,7 +27,7 @@
 $$\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T, a_T),$$
 
 이때, 
-- 초기 상태는 초기 상태 확률 분포로부터 샘플링되었고 $s_0 \sim \rho_0$,
+- 초기 상태는 초기 상태 확률 분포로부터 샘플링되었고 $s_0 \sim d_0$,
 - $t$ 시점의 행동은 정책을 따라 선택되었으며 $a_t \sim \pi(\cdot| s_t)$,
 - $t+1$ 시점의 상태는 전이 확률 분포에 따라 바뀌었고 $s_{t+1} \sim p(\cdot|s_t, a_t)$,
 - $t$ 시점의 보상은 보상 함수에 의해 결정되었다 $r_t=r(s_t, a_t)$.
@@ -133,7 +133,7 @@ $$A_{t} \sim \pi(\cdot|s), \; S_{k+1} \sim p(\cdot | S_{k}, A_{k}), \; A_k \sim 
 
 그리고 심층 강화 학습에서 정책을 뉴럴 네트워크로 학습시킬 때 사용하는 목적 함수 중 하나는 초기 상태에 대한 가치 함수의 기댓값이다. 즉,
 
-$$J(\theta) := \mathbb{E}_{S_0 \sim \rho_0, \pi_\theta} \left[ V^{\pi}(S_0) \right].$$
+$$J(\theta) := \mathbb{E}_{S_0 \sim d_0, \pi_\theta} \left[ V^{\pi}(S_0) \right].$$
 
 <br>
 
