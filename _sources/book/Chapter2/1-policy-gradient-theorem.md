@@ -1,6 +1,67 @@
 # Policy Gradient Theorem
 
-Coming soon!
+강화학습에서 정책 (policy)은 주어진 상태에서 어떤 행동을 취할지를 알려주는 일종의 지침서 같은 것이다. 보다 더 일반적으로는, 정책 $\pi$는 주어진 상태 $s \in \mathcal{S}$에서 어떤 행동 $a \in \mathcal{A}$을 선택할 조건부 확률이다. 즉, $\pi(a | s) = \text{Pr} \left[ A_t = a | S_t = s \right]$ 이다. 만약 상태의 개수와 행동의 개수가 적다면 사람이 직접 각 $(s, a)$마다 확률을 부여하여 정책을 만들 수 있을 것이다. 하지만, 대부분의 환경은 가능한 상태와 행동의 개수가 굉장히 많으며, 심지어 부여할 수 있는 확률 값도 정말 무수히 많을 것이다. 이런 고생을 덜고자 매개변수화된 함수로 정책을 모델링하여 좋은 정책을 찾는 방법을 **policy-based** 방법이라고 한다. 매개변수를 $\theta \in \mathbb{R}^{d}$이라고 하면, 이제 매개변수화된 정책은 다음과 같이 적어줄 수 있다.
+
+$$\pi_\theta(a | s) = \text{Pr} \left[ A_t = a | S_t =s,\theta_t=\theta \right].$$
+
+<br>
+
+매개변수의 값에 따라 정책의 성능이 좋을 수도 있고 나쁠 수도 있을 것이다. 우리의 목표는 좋은 정책을 만드는 매개변수를 찾는 것이다. 그러기 위해선 정책의 성능을 평가하는 성능 지표 (performance measure)가 필요하다. 매개변수에 따라 정책의 성능이 달라지므로 성능 지표는 매개변수 값에 의해 결정된다. 따라서 성능 지표를 매개변수에 대한 함수 $J(\theta)$로 적어준다. 
+
+<br>
+
+우리는 성능 지표를 크게 만들어주는 매개변수를 찾기 위해 매개변수에 대한 성능 지표의 그레디언트를 사용할 것이다. 
+
+$$\theta_{\text{new}}=\theta_{\text{old}}+\alpha\widehat{\nabla}_{\theta}{J(\theta_{\text{old}})}$$
+
+<br>
+
+실제 그레디언트 $\nabla_{\theta} J(\theta\_{\text{old}})$을 찾을 수 있으면 베스트이지만, 일반적으로는 그레디언트에 대한 stochastic 추정치 $\widehat{\nabla}_{\theta}{J(\theta_{\text{old}})}$를 사용한다. $\widehat{\nabla}_{\theta}{J(\theta_{\text{old}})}$의 기댓값이 실제 그레디언트 $\nabla_{\theta}{J(\theta_{\text{old}})}$에 근사하는 추정량을 사용해야 할 것이다. 이와 같이 그레디언트를 사용하여 좋은 정책을 학습하는 방법을 **policy gradient** 방법이라고 부른다. 
+
+<br>
+
+---
+
+## Policy Gradient Theorem
+우리는 정책의 성능을 평가하는 지표 $J(\theta)$의 그레디언트를 사용하여 점점 더 좋은 정책을 찾아나갈 것이다. 그럼, 가장 먼저 성능 지표 $J(\theta)$를 정의해야 한다. 이 성능 지표는 주어진 MDP의 설정에 따라 달라질 수 있다. 성능 지표가 달라지면, 그레디언트도 달라질 것이다. 그럼 우리는 성능 지표를 정의할 때마다 그레디언트를 해석적으로 (analytically, 직접 식을 전개하여 푸는 것을 의미) 계산을 해야 하는가? 정말 다행히도 policy gradient theorem은 다양한 성능 지표에 대해서 그레디언트들이 서로 비례한다는 것을 보였다.
+
+<br>
+
+Policy gradient theorem을 조금 더 쉽게 기술하기 위해 주어진 MDP가 유한 상태 공간, 유한 행동 공간 갖는다고 가정할 것이다. 생각해볼 수 있는 가장 자연스러운 정책 평가 지표는 에피소드 동안 받은 보상의 총합의 기댓값일 것이다. 즉, 초기 상태의 가치 함수이다. 초기 상태 확률 분포에 따라 초기 상태가 다양하게 있을 수 있으므로 기댓값을 취하는 것이 좋을 것이다.
+
+$$J(\theta):= \mathbb{E}_{S_0 \sim d_0} \left[ V^{\pi_{\theta}}(S_0) \right].$$ (objective)
+
+<br>
+
+자, 이제 식 {eq}`objective`의 그레디언트를 계산해보자. 사실, 썩 쉬워보이지 않는다. 우선, $J(\theta)$는 정책이 취하는 행동에 따라 달라질 수 있다. 그리고, 정책을 따랐을 때 방문하는 상태들에 따라서도 달라질 수 있다. 그래, 정책은 $\theta$에 대한 함수니깐 그레디언트를 구할 수 있을 것이다. 하지만 정책이 방문한 상태들의 분포는 정책 뿐만 아니라 환경의 transition 모델에 따라 달라질 수 있기 때문에 그레디언트를 계산하는 것이 만만치 않을 것이다. 파라미터 $\theta$와 성능 지표 $J(\theta)$의 관계를 도식화해보면 다음과 같을 것이다. 
+
+<br>
+
+정말 다행히도 식 {eq}`1step_state_value_function`의 그레디언트를 다음과 같이 쉽게 구할 수 있다는 이론이 **policy gradient theorem**이다. 
+
+$$\nabla_{\theta} J(\theta) \propto \sum_s d_{\pi_{\theta}}(s) \sum_{a} Q^{\pi_{\theta}}(s,a) \nabla_{\theta} \pi_{\theta}(a|s),$$ (policy-gradient-theorem)
+
+<br>
+
+여기서 $d_{\pi_{\theta}}(s)$는 정책 $\pi_{\theta}$를 따랐을 때 상태 $s$에 머무를 확률로 이해하면 된다 (증명에 더 상세히 정의된다). 식 {eq}`policy-gradient-theorem`는 여전히 복잡해 보이지만, 우려와 다르게 방문한 상태들의 분포 $d_{\pi_{\theta}}(s)$ 를 미분하는 일은 발생하지 않았다. $d_{\pi_{\theta}}(s)$는 에피소드를 굉장히 많이 진행해보는 방식으로 얼추 구할 수 있을테니깐 말이다. 책에는 나와있지 않지만 식 {eq}`policy-gradient-theorem`을 다음과 같이도 나타낼 수 있다.
+
+$$
+\begin{matrix}
+\nabla_{\theta} J(\theta) & \propto & \sum_s d_{\pi_{\theta}}(s) \sum_{a} Q^{\pi_{\theta}}(s,a) \nabla_{\theta} \pi_{\theta}(a|s) & \\
+& = & \sum_s d_{\pi_{\theta}}(s) \sum_{a} \pi(a|s) Q^{\pi_{\theta}}(s,a) \frac{\nabla_{\theta} \pi_{\theta}(a|s)}{\pi_{\theta}(a|s)}  & \quad (a) \\
+& = & \sum_s d_{\pi_{\theta}}(s) \sum_{a} \pi(a|s) Q^{\pi_{\theta}}(s,a) \nabla_{\theta} \log \pi_{\theta}(a|s)  & \quad (b) \\
+& = & \mathbb{E}_{\pi_{\theta}} \left[  Q^{\pi_{\theta}}(S_t, A_t) \nabla_{\theta} \log \pi_{\theta}(A_t|S_t) \right]  & \quad (c) \\
+\end{matrix}
+$$
+
+<br>
+
+$(a)$은 그냥 $\frac{\pi_{\theta}(a|s)}{\pi_{\theta}(a|s)}$를 곱해주고 위치만 바꾼 것이다. $(b)$는 $\frac{d}{dx} \log f(x)=\frac{f'(x)}{f(x)}$임을 사용한 것이다. 
+마지막으로 $(c)$는 $\mathbb{E}\left[ X \right] = \sum_{x}x\;p(x)$임을 사용한 것인데, 확률 $p(x)$에 해당하는 부분은 $d_{\pi_{\theta}}(s)\pi_{\theta}(a|s)$이고, 확률변수 $X$에 해당하는 부분이 $Q^{\pi_{\theta}}(S_t,A_t) \nabla \log \pi_{\theta}(A_t|S_t)$이다. 확률변수 (random variable)은 대문자, 결과 (outcome)은 소문자로 표기해주었다. 식 $(c)$처럼 적어주면 좋은 이유는, 실제 기댓값은 구하기 어렵겠지만, 에피소드를 많이 반복하여  $Q^{\pi_{\theta}}(s,a) \nabla \log \pi_{\theta}(a|s)$를 얻고 표본 평균을 내어 실제 기댓값에 근사할 수 있다는 것이다. 그리고 식 $(c)으$로 보는 것이 이후 REINFORCE나 Actor-Crtic 알고리즘을 설명할 때 더 용이하다. 
+
+<br>
+
+---
 
 ## 증명
 
@@ -126,7 +187,7 @@ $$
 
 <br>
 
-규칙성이 잘 보일지 모르겠다. $\nabla_\theta V^{\pi_\theta}(s)$를 한번 전개 할때마다, 상태 $s_t$까지 도달할 확률을 곱해주고 $\sum\limits_{a \in \mathcal{A}}\nabla_\theta \pi_\theta(a|s)Q^{\pi_\theta}(s, a)$과 $\nabla_\theta V^{\pi_\theta}(s')$ 항이 추가된다. 그리고 후자의 경우 다시 같은 원리로 전개할 수 있다. 이 전개 과정을 무한히 많이 수행한다고 하면  $\sum\limits_{a \in \mathcal{A}}\nabla_\theta \pi_\theta(a|s)Q^{\pi_\theta}(s, a)$ 텀이 무한히 많아질 것이다. 이를 적어보면 다음과 같다.
+규칙성이 잘 보일지 모르겠다. $\nabla_\theta V^{\pi_\theta}(s_t)$를 한번 전개 할때마다, 상태 $s_t$까지 도달할 확률을 곱해주고 각 상태 $a_t$에 대한 $\nabla_\theta \pi_\theta(a_t|s_t) Q^{\pi_\theta}(s_t, a_t)$와 $\nabla_\theta V^{\pi_\theta}(s_{t+1})$ 항이 추가된다. 그리고 후자의 경우 다시 같은 원리로 전개할 수 있다. 이 전개 과정을 무한히 많이 수행한다고 하면  $\sum\limits_{a \in \mathcal{A}}\nabla_\theta \pi_\theta(a|s)Q^{\pi_\theta}(s, a)$ 텀이 무한히 많아질 것이다. 이를 적어보면 다음과 같다.
 
 $$
 \nabla_\theta J(\theta) = \sum_{t=0}^{\infty} \gamma^{t} \text{Pr}(s_t =s|\pi_\theta) \sum_{a \in \mathcal{A}} Q^{\pi_\theta}(s,a)\nabla_\theta \pi_\theta(a|s) ,
@@ -134,7 +195,7 @@ $$
 
 <br>
 
-여기서 $\text{Pr}(s_t=s | \pi_\theta)$은 정책 $\pi_\theta$를 따랐을 때 $t$ 시점에서의 상태가 $s$ 일 확률이다. 위 식을 깔끔하게 기댓값 표현으로 나타내고 싶다. 만약 각 상태 $s$에서 다음과 같은 함수를 정의하면 probability distribution일까?
+여기서 $\text{Pr}(s_t=s | \pi_\theta)$은 정책 $\pi_\theta$를 따랐을 때 $t$ 시점에서의 상태가 $s$일 확률이다. 위 식을 깔끔하게 기댓값 표현으로 나타내고 싶다. 만약 각 상태 $s$에서 다음과 같은 함수를 정의하면 probability distribution일까?
 
 $$
 d_\pi(s):= \sum_{t=0}^{\infty} \gamma^t \text{Pr}(s_t=s | \pi_\theta),
@@ -145,9 +206,9 @@ $$
 아쉽게도 아니다. 모든 $s$ 에 대해서 $d_{\pi_\theta}(s)$를 더해보면 다음과 같다.
 
 $$
-\sum_{s \in \mathcal{s}} \sum_{t=0}^{\infty} \gamma^t \text{Pr} (s_t = s | \pi_\theta) = 
+\sum_{s \in \mathcal{S}} \sum_{t=0}^{\infty} \gamma^t \text{Pr} (s_t = s | \pi_\theta) = 
 \sum_{t=0}^{\infty} \gamma^t
-\sum_{s \in \mathcal{s}}  \text{Pr} (s_t = s | \pi_\theta) = \sum_{t=0}^{\infty} \gamma^t =\frac{1}{1-\gamma}
+\sum_{s \in \mathcal{S}}  \text{Pr} (s_t = s | \pi_\theta) = \sum_{t=0}^{\infty} \gamma^t =\frac{1}{1-\gamma}
 $$
 
 <br>
