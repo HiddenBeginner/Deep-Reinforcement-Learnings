@@ -413,7 +413,7 @@ title="Print to PDF"
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id2">
-   6.2. 증명
+   6.2. Policy Gradient Theorem 증명
   </a>
  </li>
 </ul>
@@ -442,7 +442,7 @@ title="Print to PDF"
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id2">
-   6.2. 증명
+   6.2. Policy Gradient Theorem 증명
   </a>
  </li>
 </ul>
@@ -463,11 +463,11 @@ title="Print to PDF"
 <br>
 <p>매개변수의 값에 따라 정책의 성능이 좋을 수도 있고 나쁠 수도 있을 것이다. 우리의 목표는 좋은 정책을 만드는 매개변수를 찾는 것이다. 그러기 위해선 정책의 성능을 평가하는 성능 지표 (performance measure)가 필요하다. 매개변수에 따라 정책의 성능이 달라지므로 성능 지표는 매개변수 값에 의해 결정된다. 따라서 성능 지표를 매개변수에 대한 함수 <span class="math notranslate nohighlight">\(J(\theta)\)</span>로 적어준다.</p>
 <br>
-<p>우리는 성능 지표를 크게 만들어주는 매개변수를 찾기 위해 매개변수에 대한 성능 지표의 그레디언트를 사용할 것이다.</p>
+<p>우리는 성능 지표를 크게 만들어주는 매개변수를 찾기 위하여 매개변수에 대한 성능 지표의 그레디언트를 계산하고 경사하강법을 사용할 것이다.</p>
 <div class="math notranslate nohighlight">
 \[\theta_{\text{new}}=\theta_{\text{old}}+\alpha\widehat{\nabla}_{\theta}{J(\theta_{\text{old}})}\]</div>
 <br>
-<p>실제 그레디언트 <span class="math notranslate nohighlight">\(\nabla_{\theta} J(\theta\_{\text{old}})\)</span>을 찾을 수 있으면 베스트이지만, 일반적으로는 그레디언트에 대한 stochastic 추정치 <span class="math notranslate nohighlight">\(\widehat{\nabla}_{\theta}{J(\theta_{\text{old}})}\)</span>를 사용한다. <span class="math notranslate nohighlight">\(\widehat{\nabla}_{\theta}{J(\theta_{\text{old}})}\)</span>의 기댓값이 실제 그레디언트 <span class="math notranslate nohighlight">\(\nabla_{\theta}{J(\theta_{\text{old}})}\)</span>에 근사하는 추정량을 사용해야 할 것이다. 이와 같이 그레디언트를 사용하여 좋은 정책을 학습하는 방법을 <strong>policy gradient</strong> 방법이라고 부른다.</p>
+<p>실제 그레디언트 <span class="math notranslate nohighlight">\(\nabla_{\theta} J(\theta_{\text{old}})\)</span>을 찾을 수 있으면 베스트이지만, 일반적으로는 그레디언트에 대한 stochastic 추정치 <span class="math notranslate nohighlight">\(\widehat{\nabla}_{\theta}{J(\theta_{\text{old}})}\)</span>를 사용한다. 이때 stochastic 추정량 <span class="math notranslate nohighlight">\(\widehat{\nabla}_{\theta}{J(\theta_{\text{old}})}\)</span>의 기댓값이 실제 그레디언트 <span class="math notranslate nohighlight">\(\nabla_{\theta}{J(\theta_{\text{old}})}\)</span>에 근사하는 추정량을 사용해야 할 것이다. 이와 같이 그레디언트를 사용하여 좋은 정책을 학습하는 방법을 <strong>policy gradient</strong> 방법이라고 부른다.</p>
 <br>
 <hr class="docutils" />
 <section id="id1">
@@ -478,13 +478,15 @@ title="Print to PDF"
 <div class="math notranslate nohighlight" id="equation-objective">
 <span class="eqno">(6.1)<a class="headerlink" href="#equation-objective" title="Permalink to this equation">#</a></span>\[J(\theta):= \mathbb{E}_{S_0 \sim d_0} \left[ V^{\pi_{\theta}}(S_0) \right].\]</div>
 <br>
-<p>자, 이제 식 <a class="reference internal" href="#equation-objective">(6.1)</a>의 그레디언트를 계산해보자. 사실, 썩 쉬워보이지 않는다. 우선, <span class="math notranslate nohighlight">\(J(\theta)\)</span>는 정책이 취하는 행동에 따라 달라질 수 있다. 그리고, 정책을 따랐을 때 방문하는 상태들에 따라서도 달라질 수 있다. 그래, 정책은 <span class="math notranslate nohighlight">\(\theta\)</span>에 대한 함수니깐 그레디언트를 구할 수 있을 것이다. 하지만 정책이 방문한 상태들의 분포는 정책 뿐만 아니라 환경의 transition 모델에 따라 달라질 수 있기 때문에 그레디언트를 계산하는 것이 만만치 않을 것이다. 파라미터 <span class="math notranslate nohighlight">\(\theta\)</span>와 성능 지표 <span class="math notranslate nohighlight">\(J(\theta)\)</span>의 관계를 도식화해보면 다음과 같을 것이다.</p>
+<p>자, 이제 식 <a class="reference internal" href="#equation-objective">(6.1)</a>의 그레디언트를 계산해보자. 사실, 썩 쉬워보이지 않는다. 우선, <span class="math notranslate nohighlight">\(J(\theta)\)</span>는 정책이 취하는 행동에 따라 달라질 수 있다. 그리고, 정책을 따랐을 때 방문하는 상태들에 따라서도 달라질 수 있다. 그래, 정책은 <span class="math notranslate nohighlight">\(\theta\)</span>에 대한 함수니깐 그레디언트를 구할 수 있을 것이다. 하지만 정책이 방문한 상태들의 분포는 정책 뿐만 아니라 환경의 transition 모델에 따라 달라질 수 있기 때문에 그레디언트를 계산하는 것이 만만치 않을 것이다.</p>
 <br>
-<p>정말 다행히도 식 <a class="reference internal" href="../Chapter1/4-bellman-equation.html#equation-1step-state-value-function">(4.2)</a>의 그레디언트를 다음과 같이 쉽게 구할 수 있다는 이론이 <strong>policy gradient theorem</strong>이다.</p>
+<p>정말 다행히도 식 <a class="reference internal" href="#equation-objective">(6.1)</a>의 그레디언트를 다음과 같이 쉽게 구할 수 있다는 이론이 <strong>policy gradient theorem</strong>이다.</p>
 <div class="math notranslate nohighlight" id="equation-policy-gradient-theorem">
-<span class="eqno">(6.2)<a class="headerlink" href="#equation-policy-gradient-theorem" title="Permalink to this equation">#</a></span>\[\nabla_{\theta} J(\theta) \propto \sum_s d_{\pi_{\theta}}(s) \sum_{a} Q^{\pi_{\theta}}(s,a) \nabla_{\theta} \pi_{\theta}(a|s),\]</div>
+<span class="eqno">(6.2)<a class="headerlink" href="#equation-policy-gradient-theorem" title="Permalink to this equation">#</a></span>\[\nabla_{\theta} J(\theta) \propto \sum_{s \in \mathcal{S}} d_{\pi_{\theta}}(s) \sum_{a \in \mathcal{A}} Q^{\pi_{\theta}}(s,a) \nabla_{\theta} \pi_{\theta}(a|s),\]</div>
 <br>
-<p>여기서 <span class="math notranslate nohighlight">\(d_{\pi_{\theta}}(s)\)</span>는 정책 <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>를 따랐을 때 상태 <span class="math notranslate nohighlight">\(s\)</span>에 머무를 확률로 이해하면 된다 (증명에 더 상세히 정의된다). 식 <a class="reference internal" href="#equation-policy-gradient-theorem">(6.2)</a>는 여전히 복잡해 보이지만, 우려와 다르게 방문한 상태들의 분포 <span class="math notranslate nohighlight">\(d_{\pi_{\theta}}(s)\)</span> 를 미분하는 일은 발생하지 않았다. <span class="math notranslate nohighlight">\(d_{\pi_{\theta}}(s)\)</span>는 에피소드를 굉장히 많이 진행해보는 방식으로 얼추 구할 수 있을테니깐 말이다. 책에는 나와있지 않지만 식 <a class="reference internal" href="#equation-policy-gradient-theorem">(6.2)</a>을 다음과 같이도 나타낼 수 있다.</p>
+<p>여기서 <span class="math notranslate nohighlight">\(d_{\pi_{\theta}}(s)\)</span>는 정책 <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>를 따랐을 때 상태 <span class="math notranslate nohighlight">\(s\)</span>에 머무를 확률로 이해하면 된다 (아래 증명에 더 상세히 정의된다). 식 <a class="reference internal" href="#equation-policy-gradient-theorem">(6.2)</a>는 여전히 복잡해 보이지만, 우려와 다르게 방문한 상태들의 분포 <span class="math notranslate nohighlight">\(d_{\pi_{\theta}}(s)\)</span> 를 미분하는 일은 발생하지 않았다.
+그리고 <span class="math notranslate nohighlight">\(d_{\pi_{\theta}}(s)\)</span>는 정책 <span class="math notranslate nohighlight">\(\pi_\theta\)</span>를 사용하여 에피소드를 굉장히 많이 진행하여 Monte-Carlo 방식으로 얼추 추정할 수 있을 것이다.
+한편, 책에는 나와있지 않지만 식 <a class="reference internal" href="#equation-policy-gradient-theorem">(6.2)</a>을 다음과 같이도 나타낼 수 있다.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{matrix}
@@ -501,20 +503,20 @@ title="Print to PDF"
 </section>
 <hr class="docutils" />
 <section id="id2">
-<h2><span class="section-number">6.2. </span>증명<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h2>
-<p>증명의 편의성을 위하여 유한 상태 공간 및 유한 행동 공간임을 가정하자. 연속일 경우 summation을 적분으로 바꿔주면 된다. 먼저, 우리의 목적함수는 다음과 같다.</p>
+<h2><span class="section-number">6.2. </span>Policy Gradient Theorem 증명<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h2>
+<p>증명의 편의성을 위하여 유한 상태 공간 및 유한 행동 공간임을 가정하자. 연속 공간일 경우 summation을 적분으로 바꿔주면 된다. 먼저, 우리의 목적 함수는 다음과 같다.</p>
 <div class="math notranslate nohighlight">
 \[
 J(\theta) := \mathbb{E}_{S_0 \sim d_0}\left[ V^{\pi_\theta}(S_0) \right]=\sum_{s_0 \in \mathcal{S}}d_0(s_0)V^{\pi_\theta}(s_0).
 \]</div>
 <br>
-<p>목적함수를 최대화하기 위하여 우리는 gradient ascent를 사용할 것이며, gradient ascent를 위해서는 목적함수의 그레디언트가 계산해야 한다. 양변에 그레디언트를 취해보자.</p>
+<p>목적함수를 최대화하기 위하여 우리는 gradient ascent를 사용할 것이며, gradient ascent를 위해서는 목적함수의 그레디언트를 계산해야 한다. 양변에 그레디언트를 취해보자.</p>
 <div class="math notranslate nohighlight">
 \[
 \nabla_\theta J(\theta) =  \nabla_{\theta} \sum_{s_0 \in \mathcal{S}}d_0(s_0)V^{\pi_\theta}(s_0) = \sum_{s_0 \in \mathcal{S}}d_0(s_0) \nabla_{\theta}V^{\pi_\theta}(s_0).
 \]</div>
 <br>
-<p>위 식에서 <span class="math notranslate nohighlight">\(d_0\)</span>에는 <span class="math notranslate nohighlight">\(\theta\)</span>가 없어서 상수 취급되고, <span class="math notranslate nohighlight">\(\theta\)</span>에 종속적인 <span class="math notranslate nohighlight">\(V^{\pi_\theta}(s_0)\)</span>만 그레디언트를 취해준 것이다. 먼저, 상태가치함수는 행동가치함수의 기댓값이라는 성질을 이용하자. 즉, 다음과 같은 등식이 모든 <span class="math notranslate nohighlight">\(s \in \mathcal{S}\)</span>, <span class="math notranslate nohighlight">\(a \in \mathcal{A}\)</span>에 대해 성립한다.</p>
+<p>위 식에서 <span class="math notranslate nohighlight">\(d_0\)</span>에는 <span class="math notranslate nohighlight">\(\theta\)</span>가 없어서 상수로 취급하고, <span class="math notranslate nohighlight">\(\theta\)</span>에 종속적인 <span class="math notranslate nohighlight">\(V^{\pi_\theta}(s_0)\)</span>만 그레디언트를 취해준 것이다. 먼저, 상태가치함수는 행동가치함수의 기댓값이라는 성질을 이용하자. 즉, 다음과 같은 등식이 모든 <span class="math notranslate nohighlight">\(s \in \mathcal{S}\)</span>, <span class="math notranslate nohighlight">\(a \in \mathcal{A}\)</span>에 대해 성립한다.</p>
 <div class="math notranslate nohighlight">
 \[
 V^{\pi} (s) = \sum_{a \in \mathcal{A}} \pi(a|s) Q^{\pi}(s, a).
@@ -550,7 +552,8 @@ Q^{\pi}(s, a) = r + \gamma \sum_{s'}p(s' | s, a) V^{\pi}(s'), \text{ where } r=r
 \nabla_\theta J(\theta) =   \sum_{s_0 \in \mathcal{S}}d_0(s_0) \sum_{a_0 \in \mathcal{A}} \left( \nabla_\theta \pi_\theta(a_0|s_0)Q^{\pi_\theta}(s_0, a_0) + \gamma  \pi_\theta(a_0|s_0) \sum_{s_1 \in \mathcal{S}} p(s_1 | s_0, a_0) \nabla_\theta V^{\pi_\theta}(s_1)\right).
 \]</div>
 <br>
-<p>잠시 짚고 넘어가자면, 우리는 처음에 <span class="math notranslate nohighlight">\(\nabla_\theta V^{\pi_\theta}(s_0)\)</span>부터 시작해서 가치함수의 성질을 이용하여 위 식까지 도달한 것이다. 즉,</p>
+<p>잠시 짚고 넘어가자면, 우리는 처음에 <span class="math notranslate nohighlight">\(\nabla_\theta V^{\pi_\theta}(s_0)\)</span>부터 시작해서 가치함수의 성질을 이용한 전개를 통해 위 식까지 도달한 것이다.
+즉, <span class="math notranslate nohighlight">\(\nabla_\theta V^{\pi_\theta}(s_0)\)</span>을 전개해보면 다음과 같다.</p>
 <div class="math notranslate nohighlight">
 \[
 \nabla_\theta V^{\pi_\theta}(s_0)=\sum_{a_0 \in \mathcal{A}} \left( \nabla_\theta \pi_\theta(a_0|s_0)Q^{\pi_\theta}(s_0, a_0) + \gamma  \pi_\theta(a_0|s_0) \sum_{s_1 \in \mathcal{S}} p(s_1 | s_0, a_0) \nabla_\theta V^{\pi_\theta}(s_1)\right),
@@ -567,7 +570,7 @@ Q^{\pi}(s, a) = r + \gamma \sum_{s'}p(s' | s, a) V^{\pi}(s'), \text{ where } r=r
 \gamma \sum_{s_0 \in \mathcal{S}}d_0(s_0) \sum_{a_0 \in \mathcal{A}}   \pi_\theta(a_0|s_0) \sum_{s_1 \in \mathcal{S}} p(s_1 | s_0, a_0) \nabla_\theta V^{\pi_\theta}(s_1).
 \]</div>
 <br>
-<p>두 번째 항에 <span class="math notranslate nohighlight">\(\nabla_\theta V^{\pi_\theta}(s_1)\)</span>이 있다. <span class="math notranslate nohighlight">\(\nabla_\theta V^{\pi_\theta}(s_0)\)</span>에 대해 했던 것을 그대로 해주면 다음과 같을 것이다.</p>
+<p>두 번째 항에 <span class="math notranslate nohighlight">\(\nabla_\theta V^{\pi_\theta}(s_1)\)</span>이 있다. <span class="math notranslate nohighlight">\(\nabla_\theta V^{\pi_\theta}(s_0)\)</span>에 대해 했던 것처럼 <span class="math notranslate nohighlight">\(\nabla_\theta V^{\pi_\theta}(s_1)\)</span>을 전개해보면 다음과 같을 것이다.</p>
 <div class="math notranslate nohighlight">
 \[
 \nabla_\theta V^{\pi_\theta}(s_1)=\sum_{a_1 \in \mathcal{A}} \left( \nabla_\theta \pi_\theta(a_1|s_1)Q^{\pi_\theta}(s_1, a_1) + \gamma  \pi_\theta(a_1|s_1) \sum_{s_2 \in \mathcal{S}} p(s_2 | s_1, a_1) \nabla_\theta V^{\pi_\theta}(s_2)\right),
@@ -641,7 +644,16 @@ d_\pi(s):= (1-\gamma) \sum_{t=0}^{\infty} \gamma^t \text{Pr}(s_t=s | \pi_\theta)
 \end{split}\]</div>
 <br>
 <p>이때, <span class="math notranslate nohighlight">\(\mathbb{E}_{\pi_\theta}\)</span>는 정책 <span class="math notranslate nohighlight">\(\pi_\theta\)</span>를 따랐을 때 얻게 되는 <span class="math notranslate nohighlight">\((s, a)\)</span>의 확률에 대한 기댓값을 의미한다. 이것으로 증명을 마친다.</p>
-</section>
+<script
+   type="text/javascript"
+   src="https://utteranc.es/client.js"
+   async="async"
+   repo="HiddenBeginner/Deep-Reinforcement-Learnings"
+   issue-term="pathname"
+   theme="github-light"
+   label="💬 comment"
+   crossorigin="anonymous"
+/></section>
 </section>
 
     <script type="text/x-thebe-config">
