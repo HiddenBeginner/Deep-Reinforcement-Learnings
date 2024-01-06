@@ -217,6 +217,11 @@ const thebe_selector_output = ".output, .cell_output"
    9. REINFORCE with baseline
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="5-actor-critic.html">
+   10. Actor-critic 알고리즘
+  </a>
+ </li>
 </ul>
 <p aria-level="2" class="caption" role="heading">
  <span class="caption-text">
@@ -858,7 +863,7 @@ Information:  {}
 </section>
 <section id="cartpole-reinforce">
 <span id="id4"></span><h3><span class="section-number">8.2.3. </span>에이전트 훈련<a class="headerlink" href="#cartpole-reinforce" title="Permalink to this headline">#</a></h3>
-<p>REINFORCE 클래스 작성을 마쳤으니 이제 환경과 상호작용을 하면서 정책 네트워크를 훈련시킬 차례이다.</p>
+<p>REINFORCE 클래스 작성을 마쳤으니 이제 환경과 상호작용을 하면서 정책 네트워크를 훈련시킬 차례이다. <a class="reference internal" href="2-reinforce.html#REINFORCE">Algorithm 7.1</a>에서는 <code class="docutils literal notranslate"><span class="pre">n_episodes</span></code>번 반복문을 수행하는 것으로 나와 있지만 코드 구현에서는 환경과의 최대 상호작용 횟수 <code class="docutils literal notranslate"><span class="pre">max_iterations</span></code>에 도달할 때까지 학습을 수행하는 것으로 구현했다. 이는 강화학습 분야에서 일반적으로 사용되는 관습이다.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">eval_iterations</span><span class="p">):</span>

@@ -417,8 +417,8 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#online-actor-critic">
-   10.2. Online actor-critic 알고리즘
+  <a class="reference internal nav-link" href="#online-actor-critic-batch-actor-critic">
+   10.2. Online actor-critic 및 batch actor-critic 알고리즘
   </a>
  </li>
 </ul>
@@ -446,8 +446,8 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#online-actor-critic">
-   10.2. Online actor-critic 알고리즘
+  <a class="reference internal nav-link" href="#online-actor-critic-batch-actor-critic">
+   10.2. Online actor-critic 및 batch actor-critic 알고리즘
   </a>
  </li>
 </ul>
@@ -475,8 +475,8 @@ title="Print to PDF"
 <br>
 </section>
 <hr class="docutils" />
-<section id="online-actor-critic">
-<h2><span class="section-number">10.2. </span>Online actor-critic 알고리즘<a class="headerlink" href="#online-actor-critic" title="Permalink to this headline">#</a></h2>
+<section id="online-actor-critic-batch-actor-critic">
+<h2><span class="section-number">10.2. </span>Online actor-critic 및 batch actor-critic 알고리즘<a class="headerlink" href="#online-actor-critic-batch-actor-critic" title="Permalink to this headline">#</a></h2>
 <p>Policy gradient theorem를 사용하는 방법론들 중 정책과 가치함수 모두를 뉴럴 네트워크로 모델링하는 방법론들을 Actor-critic 방법론이라고 부른다.
 여기서 actor (배우)는 정책 네트워크를 의미하며 critic (비평가)는 actor의 행동을 평가하는 가치 네트워크를 말한다.
 배우-비평가 방법론이라고 부르기에는 조금 오글거리기 때문에 앞으로 actor-critic 방법론으로 부를 것이다.
@@ -500,28 +500,98 @@ REINFORCE with baseline은 <span class="math notranslate nohighlight">\(Q^{\pi_{
 <br>
 <p>이제 식 <a class="reference internal" href="#equation-reinforce-baseline-gradient">(10.2)</a>에서 행동가치함수의 추정치로 사용된 <span class="math notranslate nohighlight">\(G_t\)</span> 대신 식 <a class="reference internal" href="#equation-actor-critic-td-target">(10.3)</a>을 대입해보자.</p>
 <div class="math notranslate nohighlight" id="equation-actor-critic-batch-gradient">
-<span class="eqno">(10.4)<a class="headerlink" href="#equation-actor-critic-batch-gradient" title="Permalink to this equation">#</a></span>\[\nabla_{\theta} J(\theta) \approx \hat{g}_{\text{batch}} := \frac{1}{T} \sum\limits_{t=0}^{T-1}\left( r_t + \gamma  V_{\theta}(s_{t+1}) - V_{\phi}(s_t)\right) \nabla_{\mathbf{\theta}} \log \pi_{\mathbf{\theta}}(a_t | s_t).\]</div>
+<span class="eqno">(10.4)<a class="headerlink" href="#equation-actor-critic-batch-gradient" title="Permalink to this equation">#</a></span>\[\nabla_{\theta} J(\theta) \approx \hat{g}^{\text{batch}} := \frac{1}{T} \sum\limits_{t=0}^{T-1}\Big( r_t + \gamma  V_{\theta}(s_{t+1}) - V_{\phi}(s_t)\Big) \nabla_{\mathbf{\theta}} \log \pi_{\mathbf{\theta}}(a_t | s_t).\]</div>
 <br>
 <p>식 <a class="reference internal" href="#equation-actor-critic-batch-gradient">(10.4)</a>의 그레디언트 추정치를 사용하는 것도 하나의 actor-critic 알고리즘으로 볼 수 있다.
 하지만 식 <a class="reference internal" href="#equation-actor-critic-batch-gradient">(10.4)</a>에는 REINFORCE 알고리즘의 잔재가 남아 있다.
 REINFORCE의 경우 return <span class="math notranslate nohighlight">\(G_t\)</span>을 계산하기 위하여 환경의 초기 상태부터 시작하여 상호작용이 종료될 때까지 trajectory <span class="math notranslate nohighlight">\((s_0, a_0, r_0, s_1, a_1, r_1,\ldots, s_T)\)</span>를 수집하고 네트워크 업데이트가 이뤄졌다. <span class="math notranslate nohighlight">\(G_t\)</span>를 계산할 때 <span class="math notranslate nohighlight">\(t\)</span>시점 이후로 받은 모든 보상을 더하기 때문이다.
-하지만, 식 <a class="reference internal" href="#equation-actor-critic-batch-gradient">(10.4)</a>은 환경이 종료될 때까지 기다릴 필요 없이 매 시점 <span class="math notranslate nohighlight">\(t\)</span>마다 환경과 상호작용하여 얻은 데이터 <span class="math notranslate nohighlight">\((s_t, a_t, r_t, s_{t+1})\)</span>만으로 바로 네트워크 업데이트가 가능하다. 즉, 매 스탭 <span class="math notranslate nohighlight">\(t\)</span>마다 policy gradient에 대한 추정치 하나가 생긴다.</p>
+현재 식 <a class="reference internal" href="#equation-actor-critic-batch-gradient">(10.4)</a>는 <span class="math notranslate nohighlight">\(T\)</span>개의 데이터 <span class="math notranslate nohighlight">\((s_t, a_t, r_t, s_{t+1})\)</span>을 모아서 그레디언트 추정치의 평균을 사용한다.
+데이터를 모아서 얻은 그레디언트 추정치라서 <span class="math notranslate nohighlight">\(\hat{g}^{\text{batch}}\)</span>란 표기를 사용했다.</p>
+<br>
+<p>하지만 가만히 생각해보면 환경이 종료될 때까지 기다릴 필요 없이 매 시점 <span class="math notranslate nohighlight">\(t\)</span>마다 환경과 상호작용하여 얻은 데이터 <span class="math notranslate nohighlight">\((s_t, a_t, r_t, s_{t+1})\)</span>만으로 바로 네트워크 업데이트가 가능하다. 즉, 매 스탭 <span class="math notranslate nohighlight">\(t\)</span>마다 policy gradient에 대한 추정치 하나를 계산하여 정책 네트워크를 업데이트할 수 있다.</p>
 <div class="math notranslate nohighlight">
 \[
-\nabla_{\theta} J(\theta) \approx \hat{g}_{\text{online}} := \left( r_t + \gamma  V_{\theta}(s_{t+1}) - V_{\phi}(s_t)\right) \nabla_{\mathbf{\theta}} \log \pi_{\mathbf{\theta}}(a_t | s_t).
+\nabla_{\theta} J(\theta) \approx \hat{g}^{\text{online}}_t := \Big( r_t + \gamma  V_{\theta}(s_{t+1}) - V_{\phi}(s_t)\Big) \nabla_{\mathbf{\theta}} \log \pi_{\mathbf{\theta}}(a_t | s_t).
 \]</div>
 <br>
-<p>매 스탭마다 실시간으로 구할 수 있는 그레디언트 추정치이기 때문에 <span class="math notranslate nohighlight">\(\hat{g}_{\text{online}}\)</span>라고 적어주었다. 이제 매 스탭마다 정책 네트워크를 업데이트시킬 수 있다.
-하지만 REINFORCE with base line의 경우 가치 네트워크 <span class="math notranslate nohighlight">\(V_{\phi}(s_t)\)</span>를 학습시키기 위해서 역시 return을 사용했기 때문에 환경과 상호작용이 종료되어야만 업데이트가 가능했다. 이를 보완하기 위하여 다음 실제 상태가치함수의 재귀적 성질을 이용할 것이다.</p>
+<p>매 스탭 <span class="math notranslate nohighlight">\(t\)</span>마다 실시간으로 구할 수 있는 그레디언트 추정치이기 때문에 <span class="math notranslate nohighlight">\(\hat{g}^{\text{online}}_t\)</span>라고 적어주었다. 이제 매 스탭마다 정책 네트워크를 업데이트시킬 수 있다.
+하지만 REINFORCE with baseline의 경우 가치 네트워크 <span class="math notranslate nohighlight">\(V_{\phi}(s_t)\)</span>도 학습시킬 때 return <span class="math notranslate nohighlight">\(G_t\)</span>를 레이블로 사용하기 때문에 환경과 상호작용이 종료되어야만 업데이트가 가능했다.</p>
+<div class="math notranslate nohighlight">
+\[J^{\text{batch}}(\phi) = \frac{1}{T} \sum_{t=0}^{T-1} \left(G_t - V_{\phi}(s_t) \right)^2.\]</div>
+<br>
+<p>따라서 정책과 함께 매 스탭마다 가치 네트워크를 업데이트시키기 위해서는 레이블을 바꿔줘야만 한다. 이를 위해 다음의 상태가치함수의 재귀적 성질을 이용할 것이다.</p>
 <div class="math notranslate nohighlight">
 \[V^{\pi}(s)= \mathbb{E}_{a \sim \pi(\cdot|s), s' \sim p(\cdot|s,a)} \left[ r(s, a) + \gamma  V^{\pi}(s')\right] \; \text{ for all } \; s \in \mathcal{S}.\]</div>
 <br>
-<p>역시나 실제 기댓값을 구할 수 없기 때문에 기댓값 대신 데이터 <span class="math notranslate nohighlight">\((s_t, a_t, r_t, s_{t+1})\)</span>을 이용하고 다음 상태의 상태가치함수를 네트워크를 사용하여 근사시키면 다음과 같은 실제 상태가치함수에 대한 추정치를 얻을 수 있다.</p>
+<p>실제 상태가치함수 대신 뉴럴 네트워크 <span class="math notranslate nohighlight">\(V_\phi\)</span>를 사용하고 기댓값에 대한 추정치로 데이터 <span class="math notranslate nohighlight">\((s_t, a_t, r_t, s_{t+1})\)</span>를 사용하면 다음과 같은 실제 상태가치함수에 대한 추정치를 얻을 수 있다.</p>
 <div class="math notranslate nohighlight">
 \[V^{\pi}(s_t) \approx r_t + \gamma  V_{\phi}(s_{t+1}).\]</div>
 <br>
-<p>이제 <span class="math notranslate nohighlight">\(G_t\)</span>를 레이블로 사용하여 가치 네트워크 <span class="math notranslate nohighlight">\(V_{\phi}(s_{t+1})\)</span>를 학습시키는 대신 <span class="math notranslate nohighlight">\(r_t + \gamma  V_{\phi}(s_{t+1})\)</span>을 레이블 <span class="math notranslate nohighlight">\(y_t\)</span>로 사용하여 <span class="math notranslate nohighlight">\(V_{\phi}(s_{t+1})\)</span>를 학습시킨다. 구현할 때 주의할 점은 레이블로 사용되는 <span class="math notranslate nohighlight">\(y_t=r_t + \gamma  V_{\phi}(s_{t+1})\)</span> 역시 파라미터 <span class="math notranslate nohighlight">\(\phi\)</span>를 포함하고 있다. <span class="math notranslate nohighlight">\(y_t\)</span>는 레이블로만 사용되기 때문에 실제 구현에서는 파이토치의 <code class="docutils literal notranslate"><span class="pre">detach()</span></code> 메서드를 사용하여 <span class="math notranslate nohighlight">\(y_t\)</span>를 상수 취급하고 <span class="math notranslate nohighlight">\(\phi\)</span>에 대한 그레디언트를 계산하지 않는다.</p>
+<p>이제 <span class="math notranslate nohighlight">\(G_t\)</span>를 레이블로 사용하여 가치 네트워크 <span class="math notranslate nohighlight">\(V_{\phi}(s_{t})\)</span>를 학습시키는 대신 <span class="math notranslate nohighlight">\(r_t + \gamma  V_{\phi}(s_{t+1})\)</span>을 레이블 <span class="math notranslate nohighlight">\(y_t\)</span>로 사용하여 <span class="math notranslate nohighlight">\(V_{\phi}(s_{t})\)</span>를 학습시킨다.</p>
+<div class="math notranslate nohighlight">
+\[J^{\text{online}}_t(\phi) = \Big(r_t + \gamma  V_{\phi}(s_{t+1}) - V_{\phi}(s_t) \Big)^2.\]</div>
+<br>
+<p>위 식을 코드로 구현할 때 주의할 점이 있다. 레이블로 사용되는 <span class="math notranslate nohighlight">\(y_t=r_t + \gamma  V_{\phi}(s_{t+1})\)</span> 역시 파라미터 <span class="math notranslate nohighlight">\(\phi\)</span>를 포함하고 있다는 점이다. <span class="math notranslate nohighlight">\(y_t\)</span>는 레이블로만 사용되기 때문에 실제 구현에서는 파이토치의 <code class="docutils literal notranslate"><span class="pre">detach()</span></code> 메서드를 사용하여 <span class="math notranslate nohighlight">\(y_t\)</span>를 상수 취급하고 <span class="math notranslate nohighlight">\(\phi\)</span>에 대한 그레디언트를 계산하지 않아야 한다. 모든 내용을 종합하여 online actor-critic 알고리즘을 적어보면 다음과 같다.
+사실 이제 trajectory <span class="math notranslate nohighlight">\(\tau\)</span>를 사용해서 네트워크를 업데이트하는 것이 아니기 때문에 밑첨자 <span class="math notranslate nohighlight">\(t\)</span>를 모두 제거해줬다.</p>
+<div class="proof algorithm admonition" id="OnlineActorCritic">
+<p class="admonition-title"><span class="caption-number">Algorithm 10.1 </span> (Online actor-critic)</p>
+<section class="algorithm-content" id="proof-content">
+<ol class="simple">
+<li><p>정책 네트워크 <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>의 파라미터 <span class="math notranslate nohighlight">\(\theta\)</span> 초기화, 가치 네트워크 <span class="math notranslate nohighlight">\(V_{\phi}\)</span>의 파라미터 <span class="math notranslate nohighlight">\(\phi\)</span> 초기화</p></li>
+<li><p><span class="math notranslate nohighlight">\(s \sim d_0(s)\)</span> <span class="math notranslate nohighlight">\(\quad\)</span> <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">환경</span> <span class="pre">초기화</span></code></p></li>
+<li><p>for <span class="math notranslate nohighlight">\(\text{t}\)</span> in range(<span class="math notranslate nohighlight">\(\text{max_iterations}\)</span>):</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(a \sim \pi_\theta(\cdot|s)\)</span> 행동 선택 및 보상과 다음 상태 <span class="math notranslate nohighlight">\((r, s')\)</span> 관측</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(y = r + \gamma V_{\phi}(s')\)</span> 계산</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\phi \leftarrow \phi - \eta_{\phi} \nabla_{\phi} \big(y - V_{\phi}(s) \big)^2\)</span>  <span class="math notranslate nohighlight">\(\quad\)</span> <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">가치</span> <span class="pre">네트워크</span> <span class="pre">업데이트</span></code></p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g}^{\text{online}} = \big(y - V_{\phi}(s)\big) \nabla_{\theta} \log \pi_{\theta} (a|s)\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\theta \leftarrow \theta + \eta_{\theta} \hat{g}^{\text{online}}\)</span>  <span class="math notranslate nohighlight">\(\quad\)</span> <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">Gradient</span> <span class="pre">ascent</span></code></p></li>
+<li></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(s \leftarrow s'\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> if <span class="math notranslate nohighlight">\(\text{terminated}\)</span>:</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad \qquad\)</span> <span class="math notranslate nohighlight">\(s \sim d_0(s)\)</span>  <span class="math notranslate nohighlight">\(\quad\)</span> <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">환경</span> <span class="pre">종료시</span> <span class="pre">환경</span> <span class="pre">초기화</span></code></p></li>
+</ol>
 </section>
+</div><br>
+<p>Online actor-critic의 경우 매 스탭마다 정책을 업데이트할 수 있다는 장점이 있다.
+하지만 데이터 하나로 그레디언트의 추정치를 만들기 때문에 그레디언트 추정치의 분산이 매우 크기 때문에 학습이 불안정하다.
+마치 샘플 하나마다 파라미터를 업데이트하는 stochastic gradient descent (SGD)로 뉴럴 네트워크를 학습시킬 때 학습 곡선의 변동성이 큰 것과 비슷한 이유이다.
+실제로 online actor-critic을 Pendulum 환경에 적용해보면 가치 함수가 틈만 나면 발산을 하는 것을 관찰할 수 있다.</p>
+<br>
+<p>따라서 매 스탭마다 네트워크들을 업데이트하는 대신 에피소드가 종료된 후 <span class="math notranslate nohighlight">\(T\)</span>개의 데이터로 네트워크를 업데이트하거나 환경과 상호작용하며 데이터가 <span class="math notranslate nohighlight">\(N\)</span>개 모일 때마다 네트워크를 업데이트하는 batch actor-critic이 더욱 안정적으로 학습이 된다.</p>
+<div class="proof algorithm admonition" id="BatchActorCritic">
+<p class="admonition-title"><span class="caption-number">Algorithm 10.2 </span> (Batch actor-critic)</p>
+<section class="algorithm-content" id="proof-content">
+<ol class="simple">
+<li><p>정책 네트워크 <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>의 파라미터 <span class="math notranslate nohighlight">\(\theta\)</span> 초기화, 가치 네트워크 <span class="math notranslate nohighlight">\(V_{\phi}\)</span>의 파라미터 <span class="math notranslate nohighlight">\(\phi\)</span> 초기화, <span class="math notranslate nohighlight">\(\mathcal{D}\)</span> 빈 리스트</p></li>
+<li><p><span class="math notranslate nohighlight">\(s \sim d_0(s)\)</span> <span class="math notranslate nohighlight">\(\quad\)</span> <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">환경</span> <span class="pre">초기화</span></code></p></li>
+<li><p>for <span class="math notranslate nohighlight">\(\text{t}\)</span> in range(<span class="math notranslate nohighlight">\(\text{max_iterations}\)</span>):</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(a \sim \pi_\theta(\cdot|s)\)</span> 행동 선택 및 보상과 다음 상태 <span class="math notranslate nohighlight">\((r, s')\)</span> 관측</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\mathcal{D} \leftarrow \mathcal{D} \cup \{ (s, a, r, s') \}\)</span> <span class="math notranslate nohighlight">\(\quad\)</span> <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">데이터</span> <span class="pre">저장</span></code></p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(s \leftarrow s'\)</span></p></li>
+<li></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> if <span class="math notranslate nohighlight">\(\text{len}(\mathcal{D}) == N\)</span>:</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(y_i = r_i + \gamma V_{\phi}(s_{i+1})\)</span> 계산 <span class="math notranslate nohighlight">\(\forall (s_i, a_i, r_i, s_{i+1}) \in \mathcal{D}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(\phi \leftarrow \phi - \eta_{\phi} \nabla_{\phi} \frac{1}{N}\sum_{i=1}^{N}\big(y_i - V_{\phi}(s_i) \big)^2\)</span>  <span class="math notranslate nohighlight">\(\quad\)</span> <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">가치</span> <span class="pre">네트워크</span> <span class="pre">업데이트</span></code></p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g}^{\text{batch}} = \frac{1}{N}\sum_{i=1}^{N}\big(y_i - V_{\phi}(s_i)\big) \nabla_{\theta} \log \pi_{\theta} (a_i|s_i)\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(\theta \leftarrow \theta + \eta_{\theta} \hat{g}^{\text{batch}}\)</span>  <span class="math notranslate nohighlight">\(\quad\)</span> <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">Gradient</span> <span class="pre">ascent</span></code></p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(\mathcal{D} \leftarrow \emptyset\)</span> <span class="math notranslate nohighlight">\(\quad\)</span> <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">리스트</span> <span class="pre">초기화</span></code></p></li>
+<li></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> if <span class="math notranslate nohighlight">\(\text{terminated}\)</span>:</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(s \sim d_0(s)\)</span>  <span class="math notranslate nohighlight">\(\quad\)</span> <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">환경</span> <span class="pre">종료시</span> <span class="pre">환경</span> <span class="pre">초기화</span> </code></p></li>
+</ol>
+</section>
+</div><br>
+<p>다음 장에서는 online actor-critic과 batch actor-critic을 구현해볼 것이다.</p>
+<br><script
+   type="text/javascript"
+   src="https://utteranc.es/client.js"
+   async="async"
+   repo="HiddenBeginner/Deep-Reinforcement-Learnings"
+   issue-term="pathname"
+   theme="github-light"
+   label="💬 comment"
+   crossorigin="anonymous"
+/></section>
 </section>
 
     <script type="text/x-thebe-config">

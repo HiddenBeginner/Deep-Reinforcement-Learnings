@@ -33,7 +33,7 @@ $$ (reinforce-policy-gradient)
 5. $\qquad\qquad$ $G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t-1} r_{T-1}$
 6. $\qquad\qquad$ $\hat{g}_t = G_t \nabla_{\theta} \log \pi_{\theta} (a_t|s_t)$
 7. $\qquad$ $\hat{g} = \frac{1}{T}\sum\limits_{t=0}^{T-1}\hat{g}_{t}$
-8. $\qquad$ $\theta \leftarrow \theta + \eta \hat{g}$  $\quad$ # Gradient ascent
+8. $\qquad$ $\theta \leftarrow \theta + \eta \hat{g}$  $\quad$ `# Gradient ascent`
 ```
 
 <br>

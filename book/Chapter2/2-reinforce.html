@@ -219,7 +219,7 @@ const thebe_selector_output = ".output, .cell_output"
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="5-actor-critic.html">
-   10. Actor-critic 방법론
+   10. Actor-critic 알고리즘
   </a>
  </li>
 </ul>
@@ -487,7 +487,7 @@ title="Print to PDF"
 <li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t-1} r_{T-1}\)</span></p></li>
 <li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g}_t = G_t \nabla_{\theta} \log \pi_{\theta} (a_t|s_t)\)</span></p></li>
 <li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g} = \frac{1}{T}\sum\limits_{t=0}^{T-1}\hat{g}_{t}\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\theta \leftarrow \theta + \eta \hat{g}\)</span>  <span class="math notranslate nohighlight">\(\quad\)</span> # Gradient ascent</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\theta \leftarrow \theta + \eta \hat{g}\)</span>  <span class="math notranslate nohighlight">\(\quad\)</span> <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">Gradient</span> <span class="pre">ascent</span></code></p></li>
 </ol>
 </section>
 </div><br>
