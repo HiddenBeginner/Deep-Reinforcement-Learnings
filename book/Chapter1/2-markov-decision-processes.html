@@ -217,6 +217,11 @@ const thebe_selector_output = ".output, .cell_output"
    9. REINFORCE with baseline
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../Chapter2/5-actor-critic.html">
+   10. Actor-critic 알고리즘
+  </a>
+ </li>
 </ul>
 <p aria-level="2" class="caption" role="heading">
  <span class="caption-text">
@@ -502,9 +507,10 @@ title="Print to PDF"
 <p>환경의 초기 상태 <span class="math notranslate nohighlight">\(s_0\)</span>에서 시작해서 에이전트는 행동을 취하기 시작한다. 에이전트가 <span class="math notranslate nohighlight">\(s_0\)</span>에 대해 취한 행동을 <span class="math notranslate nohighlight">\(a_0\)</span>, 받은 보상을 <span class="math notranslate nohighlight">\(r_0=r(s_0, a_0)\)</span>이라고 표기하자. 그리고 다음 시점인 <span class="math notranslate nohighlight">\(t=1\)</span>에서의 환경의 상태를 <span class="math notranslate nohighlight">\(s_1\)</span>, 대응하는 에이전트의 행동을 <span class="math notranslate nohighlight">\(a_1\)</span>, 받은 보상을 <span class="math notranslate nohighlight">\(r_1=r(s_1,a_1)\)</span>, … 으로 적어주면 우리는 이 일련의 과정의 다음과 같이 적어줄 수 있다.</p>
 <div class="math notranslate nohighlight">
 \[
-\tau=(s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T, a_T),
+\tau=(s_0, a_0, r_0, \, s_1, a_1, r_1, \ldots, \, s_{T-1}, a_{T-1}, r_{T-1}, \, s_T),
 \]</div>
-<p>여기서 <span class="math notranslate nohighlight">\(r_t = r(s_t, a_t)\)</span>이고, 이 일련의 과정 <span class="math notranslate nohighlight">\(\tau\)</span> (타우라고 읽음)을 trajectory라고 부른다. Trajectory를 직역하면 탄도, 궤도, 궤적인데 의미가 직접적으로 와닿지 않아서 trajectory라고 부를 것이다.</p>
+<p>여기서 <span class="math notranslate nohighlight">\(r_t = r(s_t, a_t)\)</span>이고, 이 일련의 과정 <span class="math notranslate nohighlight">\(\tau\)</span> (타우라고 읽음)을 trajectory라고 부른다. Trajectory를 직역하면 탄도, 궤도, 궤적인데 의미가 직접적으로 와닿지 않아서 trajectory라고 부를 것이다. 상태 <span class="math notranslate nohighlight">\(s_0\)</span>부터 시작하여 <span class="math notranslate nohighlight">\(T\)</span>번의 행동을 취하고 상태 <span class="math notranslate nohighlight">\(S_T\)</span>에 방문하며 하나의 trajectory가 완성된 것이다.
+환경과의 상호작용이 종료되는 조건은 여러 가지가 있을 수 있다. 예를 들어, 에이전트가 목표를 달성했거나 반대로 에이전트가 더 이상 환경과 상호작용 할 수는 상태가 되었을 때 환경과의 상호작용이 종료될 수 있다. 또는 그냥 사용자가 미리 정해놓은 상호작용 횟수에 도달하였기 때문이다.</p>
 <p><span class="math notranslate nohighlight">\(t\)</span> 시점에서의 환경의 상태 <span class="math notranslate nohighlight">\(s_t\)</span>는 초기 상태부터 시작해서 <span class="math notranslate nohighlight">\(t-1\)</span>번 째 행동까지가 만들어낸 산출물이다. 따라서 <span class="math notranslate nohighlight">\(t\)</span> 시점에서 어떤 상태가 발생할지 알고 싶으면 다음과 같은 조건부 확률 분포를 고려해야 한다.</p>
 <div class="math notranslate nohighlight">
 \[

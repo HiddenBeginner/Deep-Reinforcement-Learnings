@@ -90,7 +90,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="shortcut icon" href="../../_static/HDBG.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="참고문헌" href="../Reference.html" />
+    <link rel="next" title="10. Actor-critic 알고리즘" href="5-actor-critic.html" />
     <link rel="prev" title="8. REINFORCE 구현" href="3-implementation-reinforce.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -215,6 +215,11 @@ const thebe_selector_output = ".output, .cell_output"
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    9. REINFORCE with baseline
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="5-actor-critic.html">
+   10. Actor-critic 알고리즘
   </a>
  </li>
 </ul>
@@ -509,7 +514,7 @@ Return <span class="math notranslate nohighlight">\(G_t\)</span>의 분산이 �
 <p>강화학습에서는 그레디언트 추정량의 분산을 줄이기 위해 베이스라인 (baseline) 방법을 많이 사용한다. 분산이 큰 이유는 몇몇 있겠지만, 가장 단순한 이유는 기댓값 안의 확률변수가 갖는 값의 크기가 크기 때문이다. 베이스라인 방법을 사용하면 기댓값을 바꾸지 않으면서 확률변수가 갖는 값의 크기를 줄여줄 수 있다.</p>
 <div class="math notranslate nohighlight" id="equation-policy-gradient-with-baseline">
 <span class="eqno">(9.1)<a class="headerlink" href="#equation-policy-gradient-with-baseline" title="Permalink to this equation">#</a></span>\[
-\nabla_{\mathbf{\theta}} J(\mathbf{\theta}) \propto \sum_s \mu_{\pi_{\mathbf{\theta}}}(s) \sum_{a} \left( Q^{\pi_{\mathbf{\theta}}}(s,a) - b(s) \right) \nabla_{\mathbf{\theta}} \pi_{\mathbf{\theta}}(a|s),
+\nabla_{\mathbf{\theta}} J(\mathbf{\theta}) \propto \sum_{s \in \mathcal{S}} d_{\pi_{\mathbf{\theta}}}(s) \sum_{a \in \mathcal{A}} \left( Q^{\pi_{\mathbf{\theta}}}(s,a) - b(s) \right) \nabla_{\mathbf{\theta}} \pi_{\mathbf{\theta}}(a|s),
 \]</div>
 <br>
 <p>여기서 <span class="math notranslate nohighlight">\(b(s)\)</span> 행동에 의존적이지 않은 함수가 될 수 있으며, 보통 상태가치함수 <span class="math notranslate nohighlight">\(V^{\pi_{\theta}}(s)\)</span>이 많이 선택된다. <span class="math notranslate nohighlight">\(b(s)\)</span>를 빼줬는데도 여전히 비례 관계가 성립하는 이유는 다음과 같이 추가된 항들이 결국 0이기 때문이다.</p>
@@ -530,7 +535,7 @@ Return <span class="math notranslate nohighlight">\(G_t\)</span>의 분산이 �
 <p>이를 이용하여 <span class="math notranslate nohighlight">\(G_t\)</span> 대신 <span class="math notranslate nohighlight">\(G_t  - b(s_t)\)</span>를 업데이트식에 사용하는 방법을 REINFORCE with baseline이라고 한다.</p>
 <div class="math notranslate nohighlight" id="equation-reinforce-with-baseline">
 <span class="eqno">(9.2)<a class="headerlink" href="#equation-reinforce-with-baseline" title="Permalink to this equation">#</a></span>\[
-\mathbf{\theta}_{\text{new}}=\mathbf{\theta}_{\text{old}} + \eta \frac{1}{T+1} \sum\limits_{t=0}^{T}\left(  G_t - b(s_t)\right) \nabla_{\mathbf{\theta}} \log \pi_{\mathbf{\theta}_{\text{old}}}(a_t | s_t).
+\mathbf{\theta}_{\text{new}}=\mathbf{\theta}_{\text{old}} + \eta \frac{1}{T} \sum\limits_{t=0}^{T-1}\left(  G_t - b(s_t)\right) \nabla_{\mathbf{\theta}} \log \pi_{\mathbf{\theta}_{\text{old}}}(a_t | s_t).
 \]</div>
 <br>
 <p>잠시 언급한 것처럼 베이스라인으로 상태가치함수를 많이 사용한다. 하지만 상태가치함수를 직접 계산하기 어렵기 때문에 매개변수를 사용하여 상태가치함수를 모델링하게 된다. 즉, 식 <a class="reference internal" href="#equation-reinforce-with-baseline">(9.2)</a>에서 <span class="math notranslate nohighlight">\(b(s_t)\)</span> 대신 <span class="math notranslate nohighlight">\(V_{\phi}(s_t)\)</span>로 적어줄 수 있다.  이때 <span class="math notranslate nohighlight">\(\phi \in \mathbb{R}^{m}\)</span>은 상태가치함수 모델의 매개변수이다. 이제 상태가치함수 모델의 매개변수도 업데이트해줘야 하는데 상태가치함수의 정의를 사용하여 업데이트하게 된다.</p>
@@ -540,13 +545,13 @@ Return <span class="math notranslate nohighlight">\(G_t\)</span>의 분산이 �
 <ol class="simple">
 <li><p>정책 네트워크 <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>의 파라미터 <span class="math notranslate nohighlight">\(\theta\)</span> 초기화, 가치 네트워크 <span class="math notranslate nohighlight">\(V_{\phi}\)</span>의 파라미터 <span class="math notranslate nohighlight">\(\phi\)</span> 초기화</p></li>
 <li><p>for _ in range(n_episodes):</p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>를 따라 에피소드를 진행하여 <span class="math notranslate nohighlight">\(\tau=(s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T, a_T, r_T)\)</span> 수집</p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> for <span class="math notranslate nohighlight">\(t=0, 1, 2, \ldots, T\)</span>:</p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t} r_{T}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>를 따라 에피소드를 진행하여 <span class="math notranslate nohighlight">\(\tau=(s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T)\)</span> 수집</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> for <span class="math notranslate nohighlight">\(t=0, 1, 2, \ldots, T-1\)</span>:</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t-1} r_{T-1}\)</span></p></li>
 <li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g}_t = (G_t - V_{\phi}(s_t)) \nabla_{\theta} \log \pi_{\theta} (a_t|s_t)\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g} = \frac{1}{T+1}\sum\limits_{t=0}^{T}\hat{g}_{t}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g} = \frac{1}{T}\sum\limits_{t=0}^{T-1}\hat{g}_{t}\)</span></p></li>
 <li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\theta \leftarrow \theta + \eta_{\theta} \hat{g}\)</span>  <span class="math notranslate nohighlight">\(\quad\)</span> # Gradient ascent</p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\phi \leftarrow \phi - \eta_{\phi} \nabla_{\phi} \frac{1}{T+1} \sum\limits_{t=0}^{T} \left(V_{\phi}(s_t)-G_t \right)^2\)</span>  <span class="math notranslate nohighlight">\(\quad\)</span> # Gradient descent with MSE.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\phi \leftarrow \phi - \eta_{\phi} \nabla_{\phi} \frac{1}{T} \sum\limits_{t=0}^{T-1} \left(V_{\phi}(s_t)-G_t \right)^2\)</span>  <span class="math notranslate nohighlight">\(\quad\)</span> # Gradient descent with MSE.</p></li>
 </ol>
 </section>
 </div><p>여기서 주의할 점은 베이스라인을 사용할 경우 정책 <span class="math notranslate nohighlight">\(\pi_{\mathbf{\theta}}\)</span>와 상태가치함수 <span class="math notranslate nohighlight">\(V_{\phi}\)</span> 둘 다 학습하게 되는데, 그렇다고 이를 actor-critic 방법이라고 부르지는 않는다. 무슨 이유에서인지 모르겠지만, 가치함수 훈련을 위한 target 값을 bootstraping을 사용하여 얻을 경우에만 actor-critic이라고 부른다.
@@ -557,7 +562,7 @@ REINFORCE with baseline에서는 <span class="math notranslate nohighlight">\(V_
 <section id="id2">
 <h2><span class="section-number">9.3. </span>REINFORCE with baseline 구현<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h2>
 <p>지난 <a class="reference internal" href="3-implementation-reinforce.html#chapter2-reinforce-implementation-title"><span class="std std-ref">REINFORCE 구현</span></a>장에서 이산 행동 공간을 갖는 <code class="docutils literal notranslate"><span class="pre">CartPole-v1</span></code> 환경은 REINFORCE만으로도 잘 제어했으니,
-이번 장에서는 연속 행동 공간을 갖는 <code class="docutils literal notranslate"><span class="pre">Pendulum-v1</span></code> 환경을 REINFORCE with baseline으로 제어해볼 것이다. 사용할 패키지는 다음과 같다.</p>
+이번 장에서는 연속 행동 공간을 갖는 <code class="docutils literal notranslate"><span class="pre">Pendulum-v1</span></code> 환경만 REINFORCE with baseline으로 제어해보는 실습을 할 것이다. 사용할 패키지는 다음과 같다.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -789,6 +794,7 @@ REINFORCE with baseline에서는 <span class="math notranslate nohighlight">\(V_
 </div>
 </div>
 </div>
+<br>
 <p>REINFORCE로는 전혀 학습되지 않았던 것과 다르게 baseline을 추가해주니 잘 학습되는 것을 확인할 수 있다.
 랜덤성에 의해 훈련이 안 될 때도 있다. 이때는 커널에 마가 낀 것이니 당황하지 말고 커널 재시작 후 다시 실행하면 된다.</p>
 <div class="cell docutils container">
@@ -877,10 +883,10 @@ REINFORCE with baseline에서는 <span class="math notranslate nohighlight">\(V_
             <p class="prev-next-title"><span class="section-number">8. </span>REINFORCE 구현</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="../Reference.html" title="next page">
+    <a class='right-next' id="next-link" href="5-actor-critic.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">참고문헌</p>
+        <p class="prev-next-title"><span class="section-number">10. </span>Actor-critic 알고리즘</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

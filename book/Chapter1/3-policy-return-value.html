@@ -217,6 +217,11 @@ const thebe_selector_output = ".output, .cell_output"
    9. REINFORCE with baseline
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../Chapter2/5-actor-critic.html">
+   10. Actor-critic 방법론
+  </a>
+ </li>
 </ul>
 <p aria-level="2" class="caption" role="heading">
  <span class="caption-text">
@@ -517,7 +522,7 @@ title="Print to PDF"
 <h2><span class="section-number">3.2. </span>Return<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
 <p>초기 상태 <span class="math notranslate nohighlight">\(s_0\)</span>에서 시작하여 정책 <span class="math notranslate nohighlight">\(\pi\)</span>를 따르며 얻은 trajectory를 <span class="math notranslate nohighlight">\(\tau\)</span>라 하자.</p>
 <div class="math notranslate nohighlight">
-\[\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T, a_T),\]</div>
+\[\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots, s_T),\]</div>
 <p>이때,</p>
 <ul class="simple">
 <li><p>초기 상태는 초기 상태 확률 분포로부터 샘플링되었고 <span class="math notranslate nohighlight">\(s_0 \sim d_0\)</span>,</p></li>

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>7. REINFORCE &#8212; 심층강화학습</title>
+    <title>Generalized Advantage Estimation &#8212; 심층강화학습</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -85,13 +85,9 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
-    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="shortcut icon" href="../../_static/HDBG.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="8. REINFORCE 구현" href="3-implementation-reinforce.html" />
-    <link rel="prev" title="6. Policy Gradient Theorem" href="1-policy-gradient-theorem.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -196,14 +192,14 @@ const thebe_selector_output = ".output, .cell_output"
   Policy gradient methods
  </span>
 </p>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="1-policy-gradient-theorem.html">
    6. Policy Gradient Theorem
   </a>
  </li>
- <li class="toctree-l1 current active">
-  <a class="current reference internal" href="#">
+ <li class="toctree-l1">
+  <a class="reference internal" href="2-reinforce.html">
    7. REINFORCE
   </a>
  </li>
@@ -324,7 +320,7 @@ title="Source repository"
       </li>
       
       <li>
-        <a href="https://github.com/hiddenbeginner/Deep-Reinforcement-Learnings/issues/new?title=Issue%20on%20page%20%2Fbook/Chapter2/2-reinforce.html&body=Your%20issue%20content%20here."
+        <a href="https://github.com/hiddenbeginner/Deep-Reinforcement-Learnings/issues/new?title=Issue%20on%20page%20%2Fbook/Chapter2/6-gae.html&body=Your%20issue%20content%20here."
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -352,7 +348,7 @@ title="Open an issue"
   <div class="menu-dropdown__content">
     <ul>
       <li>
-        <a href="../../_sources/book/Chapter2/2-reinforce.md"
+        <a href="../../_sources/book/Chapter2/6-gae.ipynb"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -363,7 +359,7 @@ title="Download source file"
 <span class="headerbtn__icon-container">
   <i class="fas fa-file"></i>
   </span>
-<span class="headerbtn__text-container">.md</span>
+<span class="headerbtn__text-container">.ipynb</span>
 </a>
 
       </li>
@@ -412,12 +408,8 @@ title="Print to PDF"
     <nav id="bd-toc-nav" aria-label="Page">
         <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#reinforce-q-pi-theta-s-a-return">
-   7.1. REINFORCE:
-   <span class="math notranslate nohighlight">
-    \(Q^{\pi_{\theta}}(s, a)\)
-   </span>
-   대신 return 사용
+  <a class="reference internal nav-link" href="#policy-gradient-reinforce">
+   Policy Gradient 및 REINFORCE 복습
   </a>
  </li>
 </ul>
@@ -429,7 +421,7 @@ title="Print to PDF"
         <div class="col pl-md-3 pl-lg-5 content-container">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>REINFORCE</h1>
+                <h1>Generalized Advantage Estimation</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -440,12 +432,8 @@ title="Print to PDF"
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#reinforce-q-pi-theta-s-a-return">
-   7.1. REINFORCE:
-   <span class="math notranslate nohighlight">
-    \(Q^{\pi_{\theta}}(s, a)\)
-   </span>
-   대신 return 사용
+  <a class="reference internal nav-link" href="#policy-gradient-reinforce">
+   Policy Gradient 및 REINFORCE 복습
   </a>
  </li>
 </ul>
@@ -458,51 +446,25 @@ title="Print to PDF"
                 
               <div>
                 
-  <section class="tex2jax_ignore mathjax_ignore" id="reinforce">
-<h1><span class="section-number">7. </span>REINFORCE<a class="headerlink" href="#reinforce" title="Permalink to this headline">#</a></h1>
-<p>Policy gradient theorem을 다시 한번 적어보자.</p>
-<div class="math notranslate nohighlight">
-\[\nabla_{\theta} J(\theta) \propto \mathbb{E}_{\pi_{\theta}} \left[ Q^{\pi_{\theta}}(s, a) \cdot \nabla_{\theta} \log \pi_{\theta}(a|s) \right]. \]</div>
+  <section class="tex2jax_ignore mathjax_ignore" id="generalized-advantage-estimation">
+<h1>Generalized Advantage Estimation<a class="headerlink" href="#generalized-advantage-estimation" title="Permalink to this headline">#</a></h1>
+<p>REINFORCE까지는 대부분의 많은 강화학습 책이나 강화학습 강의에서 다룬다.
+하지만, REINFORCE까지만 공부한 상태로 심층강화학습 논문을 읽기 시작하면,
+자신이 공부한 내용이랑 많이 다르다는 것을 뼈저리게 느낄 수 있을 것이다.
+이제부터 슬슬 심층강화학습 논문들을 읽을 때 필요한 기술과 지식에 대해서 다뤄볼 예정이다.</p>
 <br>
-<p>예상했겠지만, 위 그레디언트를 정확히 구하는 것은 불가능하다. 기댓값이야 Monte Carlo 기법으로 근사시킬 수 있다. 정책 <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>로 환경과 상호작용을 엄청나게 많이 해서 trajectory <span class="math notranslate nohighlight">\(\tau = (s_0, a_0, r_0, s_1, a_1, r_1,\ldots, s_T)\)</span>를 많이 생성한다. 그리고 trajectory에 있는 각 <span class="math notranslate nohighlight">\((s_t, a_t)\)</span>마다 <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s_t, a_t) \cdot \nabla_{\theta} \log \pi_{\theta}(a_t|s_t)\)</span>을 계산해서 표본 평균을 구하면 되기 때문이다. <span class="math notranslate nohighlight">\(\nabla_{\theta} \log \pi_{\theta}(a_t|s_t)\)</span> 계산은 딥러닝 프레임워크에서 알아서 해준다. 그런데 여전히 <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s_t, a_t)\)</span>를 계산하기가 어렵다. 그래서 우리는 <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s_t, a_t)\)</span> 대신 다른 것으로 대체해야 한다. 이 <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s_t, a_t)\)</span>을 어떤 것으로 대체하느냐에 따라서 알고리즘의 이름이 달라지고 성능도 크게 달라진다. 이번 장에서는 가장 쉽고 간단한 방법인 REINFORCE 알고리즘에 대해 알아본다.</p>
+<p>그 중 가장 먼저 다룰 내용은 Ganeralized Advatange Estimation (GAE)이다. 참고할 논문의 정보는 다음과 같다.</p>
+<ul class="simple">
+<li><p>제목: High-Dimensional Continuous Control Using Generalized Advantage Estimation</p></li>
+<li><p>저자: Schulman, John, Philipp Moritz, Sergey Levine, Michael I. Jordan, and Pieter Abbeel, <em><strong>Berkeley</strong></em></p></li>
+<li><p>학회: ICLR 2016</p></li>
+<li><p>링크: <a class="reference external" href="http://arxiv.org/abs/1506.02438">http://arxiv.org/abs/1506.02438</a></p></li>
+</ul>
 <br>
 <hr class="docutils" />
-<section id="reinforce-q-pi-theta-s-a-return">
-<h2><span class="section-number">7.1. </span>REINFORCE: <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s, a)\)</span> 대신 return 사용<a class="headerlink" href="#reinforce-q-pi-theta-s-a-return" title="Permalink to this headline">#</a></h2>
-<p>제목이 곧 내용이다. REINFORCE는 한 에피소드를 진행하여 하나의 trajectory <span class="math notranslate nohighlight">\(\tau = (s_0, a_0, r_0, s_1, a_1, r_1,\ldots, s_T)\)</span>를 생성하고, 다음의 policy gradient의 추정치를 사용하여 경사하강법을 진행한다.
-아래 식에서 실제 그레디언트 <span class="math notranslate nohighlight">\(\nabla_{\theta} J(\theta)\)</span>의 추정치를 <span class="math notranslate nohighlight">\(\hat{g}\)</span>로 표시하였다.</p>
-<div class="math notranslate nohighlight" id="equation-reinforce-policy-gradient">
-<span class="eqno">(7.1)<a class="headerlink" href="#equation-reinforce-policy-gradient" title="Permalink to this equation">#</a></span>\[
-\nabla_{\theta} J(\theta) \approx \hat{g} := \frac{1}{T} \sum\limits_{t=0}^{T-1} G_t \nabla_{\theta}\log\pi_{\theta}(a_t | s_t),
-\]</div>
-<p>이때, <span class="math notranslate nohighlight">\(G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t-1} r_{T-1}\)</span>이다. REINFORCE의 알고리즘 다음과 같다.</p>
-<div class="proof algorithm admonition" id="REINFORCE">
-<p class="admonition-title"><span class="caption-number">Algorithm 7.1 </span> (REINFORCE)</p>
-<section class="algorithm-content" id="proof-content">
-<ol class="simple">
-<li><p>정책 네트워크 <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>의 파라미터 <span class="math notranslate nohighlight">\(\theta\)</span> 초기화</p></li>
-<li><p>for _ in range(n_episodes):</p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>를 따라 에피소드를 진행하여 <span class="math notranslate nohighlight">\(\tau = (s_0, a_0, r_0, s_1, a_1, r_1,\ldots, s_T)\)</span> 수집</p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> for <span class="math notranslate nohighlight">\(t=0, 1, 2, \ldots, T-1\)</span>:</p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t-1} r_{T-1}\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g}_t = G_t \nabla_{\theta} \log \pi_{\theta} (a_t|s_t)\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g} = \frac{1}{T}\sum\limits_{t=0}^{T-1}\hat{g}_{t}\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\theta \leftarrow \theta + \eta \hat{g}\)</span>  <span class="math notranslate nohighlight">\(\quad\)</span> # Gradient ascent</p></li>
-</ol>
+<section id="policy-gradient-reinforce">
+<h2>Policy Gradient 및 REINFORCE 복습<a class="headerlink" href="#policy-gradient-reinforce" title="Permalink to this headline">#</a></h2>
 </section>
-</div><br>
-<p>필자는 심층강화학습을 책으로 공부하면서 <a class="reference internal" href="#REINFORCE">Algorithm 7.1</a>의 <span class="math notranslate nohighlight">\(\nabla_{\theta} \log \pi_{\theta} (a_t|s_t)\)</span>이 어떻게 코드로 구현되는지 정말 궁금했다. 다음 장에서 이산 행동 공간과 연속 행동 공간에서 어떻게 REINFORCE가 어떻게 구현되는지 실습을 통해 알아보자.</p>
-<br>
-<script
-   type="text/javascript"
-   src="https://utteranc.es/client.js"
-   async="async"
-   repo="HiddenBeginner/Deep-Reinforcement-Learnings"
-   issue-term="pathname"
-   theme="github-light"
-   label="💬 comment"
-   crossorigin="anonymous"
-/></section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -532,20 +494,6 @@ title="Print to PDF"
                 
     <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="1-policy-gradient-theorem.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">6. </span>Policy Gradient Theorem</p>
-        </div>
-    </a>
-    <a class='right-next' id="next-link" href="3-implementation-reinforce.html" title="next page">
-    <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">8. </span>REINFORCE 구현</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
-    </a>
 </div>
             </footer>
         </div>

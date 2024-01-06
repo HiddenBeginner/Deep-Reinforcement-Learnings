@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>7. REINFORCE &#8212; 심층강화학습</title>
+    <title>10. Actor-critic 알고리즘 &#8212; 심층강화학습</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -90,8 +90,8 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="shortcut icon" href="../../_static/HDBG.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="8. REINFORCE 구현" href="3-implementation-reinforce.html" />
-    <link rel="prev" title="6. Policy Gradient Theorem" href="1-policy-gradient-theorem.html" />
+    <link rel="next" title="참고문헌" href="../Reference.html" />
+    <link rel="prev" title="9. REINFORCE with baseline" href="4-reinforce-with-baseline.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -202,8 +202,8 @@ const thebe_selector_output = ".output, .cell_output"
    6. Policy Gradient Theorem
   </a>
  </li>
- <li class="toctree-l1 current active">
-  <a class="current reference internal" href="#">
+ <li class="toctree-l1">
+  <a class="reference internal" href="2-reinforce.html">
    7. REINFORCE
   </a>
  </li>
@@ -217,9 +217,9 @@ const thebe_selector_output = ".output, .cell_output"
    9. REINFORCE with baseline
   </a>
  </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="5-actor-critic.html">
-   10. Actor-critic 방법론
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   10. Actor-critic 알고리즘
   </a>
  </li>
 </ul>
@@ -324,7 +324,7 @@ title="Source repository"
       </li>
       
       <li>
-        <a href="https://github.com/hiddenbeginner/Deep-Reinforcement-Learnings/issues/new?title=Issue%20on%20page%20%2Fbook/Chapter2/2-reinforce.html&body=Your%20issue%20content%20here."
+        <a href="https://github.com/hiddenbeginner/Deep-Reinforcement-Learnings/issues/new?title=Issue%20on%20page%20%2Fbook/Chapter2/5-actor-critic.html&body=Your%20issue%20content%20here."
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -352,7 +352,7 @@ title="Open an issue"
   <div class="menu-dropdown__content">
     <ul>
       <li>
-        <a href="../../_sources/book/Chapter2/2-reinforce.md"
+        <a href="../../_sources/book/Chapter2/5-actor-critic.ipynb"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -363,7 +363,7 @@ title="Download source file"
 <span class="headerbtn__icon-container">
   <i class="fas fa-file"></i>
   </span>
-<span class="headerbtn__text-container">.md</span>
+<span class="headerbtn__text-container">.ipynb</span>
 </a>
 
       </li>
@@ -412,12 +412,13 @@ title="Print to PDF"
     <nav id="bd-toc-nav" aria-label="Page">
         <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#reinforce-q-pi-theta-s-a-return">
-   7.1. REINFORCE:
-   <span class="math notranslate nohighlight">
-    \(Q^{\pi_{\theta}}(s, a)\)
-   </span>
-   대신 return 사용
+  <a class="reference internal nav-link" href="#reinforce-with-baseline">
+   10.1. REINFORCE with baseline 복습
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#online-actor-critic">
+   10.2. Online actor-critic 알고리즘
   </a>
  </li>
 </ul>
@@ -429,7 +430,7 @@ title="Print to PDF"
         <div class="col pl-md-3 pl-lg-5 content-container">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>REINFORCE</h1>
+                <h1>Actor-critic 알고리즘</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -440,12 +441,13 @@ title="Print to PDF"
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#reinforce-q-pi-theta-s-a-return">
-   7.1. REINFORCE:
-   <span class="math notranslate nohighlight">
-    \(Q^{\pi_{\theta}}(s, a)\)
-   </span>
-   대신 return 사용
+  <a class="reference internal nav-link" href="#reinforce-with-baseline">
+   10.1. REINFORCE with baseline 복습
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#online-actor-critic">
+   10.2. Online actor-critic 알고리즘
   </a>
  </li>
 </ul>
@@ -458,51 +460,68 @@ title="Print to PDF"
                 
               <div>
                 
-  <section class="tex2jax_ignore mathjax_ignore" id="reinforce">
-<h1><span class="section-number">7. </span>REINFORCE<a class="headerlink" href="#reinforce" title="Permalink to this headline">#</a></h1>
-<p>Policy gradient theorem을 다시 한번 적어보자.</p>
-<div class="math notranslate nohighlight">
-\[\nabla_{\theta} J(\theta) \propto \mathbb{E}_{\pi_{\theta}} \left[ Q^{\pi_{\theta}}(s, a) \cdot \nabla_{\theta} \log \pi_{\theta}(a|s) \right]. \]</div>
+  <section class="tex2jax_ignore mathjax_ignore" id="actor-critic">
+<h1><span class="section-number">10. </span>Actor-critic 알고리즘<a class="headerlink" href="#actor-critic" title="Permalink to this headline">#</a></h1>
+<section id="reinforce-with-baseline">
+<h2><span class="section-number">10.1. </span>REINFORCE with baseline 복습<a class="headerlink" href="#reinforce-with-baseline" title="Permalink to this headline">#</a></h2>
+<p>이전 장에서는 상태가치함수를 베이스라인으로 사용하여 policy gradient을 분산을 줄여주었다.</p>
+<div class="math notranslate nohighlight" id="equation-policy-gradient-baseline">
+<span class="eqno">(10.1)<a class="headerlink" href="#equation-policy-gradient-baseline" title="Permalink to this equation">#</a></span>\[\nabla_{\mathbf{\theta}} J(\mathbf{\theta}) \propto \sum_{s \in \mathcal{S}} d_{\pi_{\mathbf{\theta}}}(s) \sum_{a \in \mathcal{A}} \left( Q^{\pi_{\mathbf{\theta}}}(s,a) - V^{\pi_{\mathbf{\theta}}}(s) \right) \nabla_{\mathbf{\theta}} \pi_{\mathbf{\theta}}(a|s).\]</div>
 <br>
-<p>예상했겠지만, 위 그레디언트를 정확히 구하는 것은 불가능하다. 기댓값이야 Monte Carlo 기법으로 근사시킬 수 있다. 정책 <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>로 환경과 상호작용을 엄청나게 많이 해서 trajectory <span class="math notranslate nohighlight">\(\tau = (s_0, a_0, r_0, s_1, a_1, r_1,\ldots, s_T)\)</span>를 많이 생성한다. 그리고 trajectory에 있는 각 <span class="math notranslate nohighlight">\((s_t, a_t)\)</span>마다 <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s_t, a_t) \cdot \nabla_{\theta} \log \pi_{\theta}(a_t|s_t)\)</span>을 계산해서 표본 평균을 구하면 되기 때문이다. <span class="math notranslate nohighlight">\(\nabla_{\theta} \log \pi_{\theta}(a_t|s_t)\)</span> 계산은 딥러닝 프레임워크에서 알아서 해준다. 그런데 여전히 <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s_t, a_t)\)</span>를 계산하기가 어렵다. 그래서 우리는 <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s_t, a_t)\)</span> 대신 다른 것으로 대체해야 한다. 이 <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s_t, a_t)\)</span>을 어떤 것으로 대체하느냐에 따라서 알고리즘의 이름이 달라지고 성능도 크게 달라진다. 이번 장에서는 가장 쉽고 간단한 방법인 REINFORCE 알고리즘에 대해 알아본다.</p>
+<p>위에서 상태가치함수와 행동가치함수를 직접 구할 수 없기 때문에 행동가치함수를 대신하여 시뮬레이션을 통해 얻은 return <span class="math notranslate nohighlight">\(G_t\)</span>를 사용했고,
+상태가치함수는 뉴럴 네트워크 <span class="math notranslate nohighlight">\(V_\phi\)</span>를 사용하여 근사시켰다. 그래서 우리는 다음과 같은 policy gradient의 추정치를 얻었다.</p>
+<div class="math notranslate nohighlight" id="equation-reinforce-baseline-gradient">
+<span class="eqno">(10.2)<a class="headerlink" href="#equation-reinforce-baseline-gradient" title="Permalink to this equation">#</a></span>\[\nabla_{\theta} J(\theta) \approx \hat{g} := \frac{1}{T} \sum\limits_{t=0}^{T-1}\left( G_t - V_{\phi}(s_t)\right) \nabla_{\mathbf{\theta}} \log \pi_{\mathbf{\theta}}(a_t | s_t).\]</div>
 <br>
-<hr class="docutils" />
-<section id="reinforce-q-pi-theta-s-a-return">
-<h2><span class="section-number">7.1. </span>REINFORCE: <span class="math notranslate nohighlight">\(Q^{\pi_{\theta}}(s, a)\)</span> 대신 return 사용<a class="headerlink" href="#reinforce-q-pi-theta-s-a-return" title="Permalink to this headline">#</a></h2>
-<p>제목이 곧 내용이다. REINFORCE는 한 에피소드를 진행하여 하나의 trajectory <span class="math notranslate nohighlight">\(\tau = (s_0, a_0, r_0, s_1, a_1, r_1,\ldots, s_T)\)</span>를 생성하고, 다음의 policy gradient의 추정치를 사용하여 경사하강법을 진행한다.
-아래 식에서 실제 그레디언트 <span class="math notranslate nohighlight">\(\nabla_{\theta} J(\theta)\)</span>의 추정치를 <span class="math notranslate nohighlight">\(\hat{g}\)</span>로 표시하였다.</p>
-<div class="math notranslate nohighlight" id="equation-reinforce-policy-gradient">
-<span class="eqno">(7.1)<a class="headerlink" href="#equation-reinforce-policy-gradient" title="Permalink to this equation">#</a></span>\[
-\nabla_{\theta} J(\theta) \approx \hat{g} := \frac{1}{T} \sum\limits_{t=0}^{T-1} G_t \nabla_{\theta}\log\pi_{\theta}(a_t | s_t),
-\]</div>
-<p>이때, <span class="math notranslate nohighlight">\(G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t-1} r_{T-1}\)</span>이다. REINFORCE의 알고리즘 다음과 같다.</p>
-<div class="proof algorithm admonition" id="REINFORCE">
-<p class="admonition-title"><span class="caption-number">Algorithm 7.1 </span> (REINFORCE)</p>
-<section class="algorithm-content" id="proof-content">
-<ol class="simple">
-<li><p>정책 네트워크 <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>의 파라미터 <span class="math notranslate nohighlight">\(\theta\)</span> 초기화</p></li>
-<li><p>for _ in range(n_episodes):</p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\pi_{\theta}\)</span>를 따라 에피소드를 진행하여 <span class="math notranslate nohighlight">\(\tau = (s_0, a_0, r_0, s_1, a_1, r_1,\ldots, s_T)\)</span> 수집</p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> for <span class="math notranslate nohighlight">\(t=0, 1, 2, \ldots, T-1\)</span>:</p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(G_t = r_t + \gamma r_{t+1} + \ldots + \gamma^{T-t-1} r_{T-1}\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g}_t = G_t \nabla_{\theta} \log \pi_{\theta} (a_t|s_t)\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\hat{g} = \frac{1}{T}\sum\limits_{t=0}^{T-1}\hat{g}_{t}\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\qquad\)</span> <span class="math notranslate nohighlight">\(\theta \leftarrow \theta + \eta \hat{g}\)</span>  <span class="math notranslate nohighlight">\(\quad\)</span> # Gradient ascent</p></li>
-</ol>
 </section>
-</div><br>
-<p>필자는 심층강화학습을 책으로 공부하면서 <a class="reference internal" href="#REINFORCE">Algorithm 7.1</a>의 <span class="math notranslate nohighlight">\(\nabla_{\theta} \log \pi_{\theta} (a_t|s_t)\)</span>이 어떻게 코드로 구현되는지 정말 궁금했다. 다음 장에서 이산 행동 공간과 연속 행동 공간에서 어떻게 REINFORCE가 어떻게 구현되는지 실습을 통해 알아보자.</p>
+<hr class="docutils" />
+<section id="online-actor-critic">
+<h2><span class="section-number">10.2. </span>Online actor-critic 알고리즘<a class="headerlink" href="#online-actor-critic" title="Permalink to this headline">#</a></h2>
+<p>Policy gradient theorem를 사용하는 방법론들 중 정책과 가치함수 모두를 뉴럴 네트워크로 모델링하는 방법론들을 Actor-critic 방법론이라고 부른다.
+여기서 actor (배우)는 정책 네트워크를 의미하며 critic (비평가)는 actor의 행동을 평가하는 가치 네트워크를 말한다.
+배우-비평가 방법론이라고 부르기에는 조금 오글거리기 때문에 앞으로 actor-critic 방법론으로 부를 것이다.
+하지만 REINFORCE with baseline 알고리즘은 정책과 상태가치함수를 모두 뉴럴 네트워크로 근사시키지만 actor-critic 알고리즘이라고 부르지 않는다.
+그 이유에 대해서는 다양한 의견이 있지만,
+필자의 생각은 식 <a class="reference internal" href="#equation-policy-gradient-baseline">(10.1)</a>에서 베이스라인 부분이 아닌 <span class="math notranslate nohighlight">\(Q^{\pi_{\mathbf{\theta}}}(s,a)\)</span>를 추정하기 위하여 가치 네트워크가 사용될 때만 actor-critic 알고리즘이라고 부르는 것 같다.
+REINFORCE with baseline은 <span class="math notranslate nohighlight">\(Q^{\pi_{\mathbf{\theta}}}(s,a)\)</span>의 추정치로 return <span class="math notranslate nohighlight">\(G_t\)</span>를 사용했고, 가치 네트워크 <span class="math notranslate nohighlight">\(V_\phi\)</span>는 베이스라인으로만 사용되었기 때문에 actor-critic 방법론으로 분류되지 않는다.</p>
 <br>
-<script
-   type="text/javascript"
-   src="https://utteranc.es/client.js"
-   async="async"
-   repo="HiddenBeginner/Deep-Reinforcement-Learnings"
-   issue-term="pathname"
-   theme="github-light"
-   label="💬 comment"
-   crossorigin="anonymous"
-/></section>
+<p>그럼 <span class="math notranslate nohighlight">\(Q^{\pi_{\mathbf{\theta}}}(s,a)\)</span>를 추정하기 위해 뉴럴 네트워크를 사용하면 actor-critic 방법론이 될 것이다.
+하지만 베이스라인과 함께 사용한다고 하면 행동가치함수를 위한 네트워크 <span class="math notranslate nohighlight">\(Q_{\psi}(s, a)\)</span>와 상태가치함수를 위한 네트워크 <span class="math notranslate nohighlight">\(V_{\phi}(s)\)</span> 2개의 네트워크를 학습시켜야 하기 때문에 학습 안정성 측면에서 안 좋을 것이다. 그래서 우리는 다음과 같은 행동가치함수의 성질을 사용할 것이다. 아래 식은 실제 상태가치함수 및 행동가치함수에 대해서 성립한다. 증명은 식 <a class="reference internal" href="../Chapter1/4-bellman-equation.html#equation-action-bellman-equation1">(4.5)</a>에서 찾아볼 수 있다.</p>
+<div class="math notranslate nohighlight">
+\[Q^{\pi}(s, a)= r(s, a) + \gamma \mathbb{E}_{s' \sim p(\cdot|s,a)}\left[ V^{\pi}(s')\right] \; \text{ for all } \; s \in \mathcal{S}, a \in \mathcal{A}.\]</div>
+<br>
+<p>따라서 가치 네트워크 <span class="math notranslate nohighlight">\(V_\phi\)</span>를 사용해서 실제 행동가치함수를 추정할 수 있다.</p>
+<div class="math notranslate nohighlight">
+\[Q^{\pi}(s, a) \approx r(s, a) + \gamma \mathbb{E}_{s' \sim p(\cdot|s,a)}\left[ V_{\theta}(s') \right].\]</div>
+<br>
+<p>물론 정확한 기댓값을 구하기 어렵기 때문에 하나의 샘플로 기댓값을 대체할 것이다. 환경과 상호작용하여 얻은 <span class="math notranslate nohighlight">\(t\)</span> 시점의 데이터 (transition) <span class="math notranslate nohighlight">\((s_t, a_t, r_t, s_{t+1})\)</span>를 사용하여 행동가치함수를 근사시킨다. <span class="math notranslate nohighlight">\(s_{t+1}\)</span>가 전이 확률 분포 <span class="math notranslate nohighlight">\(p(\cdot|s_t, a_t)\)</span>로부터 샘플링되었기 때문에 기댓값에 대한 점 추정치로 사용될 수 있는 것이다.</p>
+<div class="math notranslate nohighlight" id="equation-actor-critic-td-target">
+<span class="eqno">(10.3)<a class="headerlink" href="#equation-actor-critic-td-target" title="Permalink to this equation">#</a></span>\[Q^{\pi}(s_t, a_t) \approx r_t + \gamma  V_{\theta}(s_{t+1}).\]</div>
+<br>
+<p>이제 식 <a class="reference internal" href="#equation-reinforce-baseline-gradient">(10.2)</a>에서 행동가치함수의 추정치로 사용된 <span class="math notranslate nohighlight">\(G_t\)</span> 대신 식 <a class="reference internal" href="#equation-actor-critic-td-target">(10.3)</a>을 대입해보자.</p>
+<div class="math notranslate nohighlight" id="equation-actor-critic-batch-gradient">
+<span class="eqno">(10.4)<a class="headerlink" href="#equation-actor-critic-batch-gradient" title="Permalink to this equation">#</a></span>\[\nabla_{\theta} J(\theta) \approx \hat{g}_{\text{batch}} := \frac{1}{T} \sum\limits_{t=0}^{T-1}\left( r_t + \gamma  V_{\theta}(s_{t+1}) - V_{\phi}(s_t)\right) \nabla_{\mathbf{\theta}} \log \pi_{\mathbf{\theta}}(a_t | s_t).\]</div>
+<br>
+<p>식 <a class="reference internal" href="#equation-actor-critic-batch-gradient">(10.4)</a>의 그레디언트 추정치를 사용하는 것도 하나의 actor-critic 알고리즘으로 볼 수 있다.
+하지만 식 <a class="reference internal" href="#equation-actor-critic-batch-gradient">(10.4)</a>에는 REINFORCE 알고리즘의 잔재가 남아 있다.
+REINFORCE의 경우 return <span class="math notranslate nohighlight">\(G_t\)</span>을 계산하기 위하여 환경의 초기 상태부터 시작하여 상호작용이 종료될 때까지 trajectory <span class="math notranslate nohighlight">\((s_0, a_0, r_0, s_1, a_1, r_1,\ldots, s_T)\)</span>를 수집하고 네트워크 업데이트가 이뤄졌다. <span class="math notranslate nohighlight">\(G_t\)</span>를 계산할 때 <span class="math notranslate nohighlight">\(t\)</span>시점 이후로 받은 모든 보상을 더하기 때문이다.
+하지만, 식 <a class="reference internal" href="#equation-actor-critic-batch-gradient">(10.4)</a>은 환경이 종료될 때까지 기다릴 필요 없이 매 시점 <span class="math notranslate nohighlight">\(t\)</span>마다 환경과 상호작용하여 얻은 데이터 <span class="math notranslate nohighlight">\((s_t, a_t, r_t, s_{t+1})\)</span>만으로 바로 네트워크 업데이트가 가능하다. 즉, 매 스탭 <span class="math notranslate nohighlight">\(t\)</span>마다 policy gradient에 대한 추정치 하나가 생긴다.</p>
+<div class="math notranslate nohighlight">
+\[
+\nabla_{\theta} J(\theta) \approx \hat{g}_{\text{online}} := \left( r_t + \gamma  V_{\theta}(s_{t+1}) - V_{\phi}(s_t)\right) \nabla_{\mathbf{\theta}} \log \pi_{\mathbf{\theta}}(a_t | s_t).
+\]</div>
+<br>
+<p>매 스탭마다 실시간으로 구할 수 있는 그레디언트 추정치이기 때문에 <span class="math notranslate nohighlight">\(\hat{g}_{\text{online}}\)</span>라고 적어주었다. 이제 매 스탭마다 정책 네트워크를 업데이트시킬 수 있다.
+하지만 REINFORCE with base line의 경우 가치 네트워크 <span class="math notranslate nohighlight">\(V_{\phi}(s_t)\)</span>를 학습시키기 위해서 역시 return을 사용했기 때문에 환경과 상호작용이 종료되어야만 업데이트가 가능했다. 이를 보완하기 위하여 다음 실제 상태가치함수의 재귀적 성질을 이용할 것이다.</p>
+<div class="math notranslate nohighlight">
+\[V^{\pi}(s)= \mathbb{E}_{a \sim \pi(\cdot|s), s' \sim p(\cdot|s,a)} \left[ r(s, a) + \gamma  V^{\pi}(s')\right] \; \text{ for all } \; s \in \mathcal{S}.\]</div>
+<br>
+<p>역시나 실제 기댓값을 구할 수 없기 때문에 기댓값 대신 데이터 <span class="math notranslate nohighlight">\((s_t, a_t, r_t, s_{t+1})\)</span>을 이용하고 다음 상태의 상태가치함수를 네트워크를 사용하여 근사시키면 다음과 같은 실제 상태가치함수에 대한 추정치를 얻을 수 있다.</p>
+<div class="math notranslate nohighlight">
+\[V^{\pi}(s_t) \approx r_t + \gamma  V_{\phi}(s_{t+1}).\]</div>
+<br>
+<p>이제 <span class="math notranslate nohighlight">\(G_t\)</span>를 레이블로 사용하여 가치 네트워크 <span class="math notranslate nohighlight">\(V_{\phi}(s_{t+1})\)</span>를 학습시키는 대신 <span class="math notranslate nohighlight">\(r_t + \gamma  V_{\phi}(s_{t+1})\)</span>을 레이블 <span class="math notranslate nohighlight">\(y_t\)</span>로 사용하여 <span class="math notranslate nohighlight">\(V_{\phi}(s_{t+1})\)</span>를 학습시킨다. 구현할 때 주의할 점은 레이블로 사용되는 <span class="math notranslate nohighlight">\(y_t=r_t + \gamma  V_{\phi}(s_{t+1})\)</span> 역시 파라미터 <span class="math notranslate nohighlight">\(\phi\)</span>를 포함하고 있다. <span class="math notranslate nohighlight">\(y_t\)</span>는 레이블로만 사용되기 때문에 실제 구현에서는 파이토치의 <code class="docutils literal notranslate"><span class="pre">detach()</span></code> 메서드를 사용하여 <span class="math notranslate nohighlight">\(y_t\)</span>를 상수 취급하고 <span class="math notranslate nohighlight">\(\phi\)</span>에 대한 그레디언트를 계산하지 않는다.</p>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -532,17 +551,17 @@ title="Print to PDF"
                 
     <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="1-policy-gradient-theorem.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="4-reinforce-with-baseline.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">6. </span>Policy Gradient Theorem</p>
+            <p class="prev-next-title"><span class="section-number">9. </span>REINFORCE with baseline</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="3-implementation-reinforce.html" title="next page">
+    <a class='right-next' id="next-link" href="../Reference.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">8. </span>REINFORCE 구현</p>
+        <p class="prev-next-title">참고문헌</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
