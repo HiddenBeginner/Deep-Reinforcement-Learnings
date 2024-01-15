@@ -90,7 +90,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="shortcut icon" href="../../_static/HDBG.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="참고문헌" href="../Reference.html" />
+    <link rel="next" title="11. Online/batch actor-critic 구현" href="6-implementation-actor-critic.html" />
     <link rel="prev" title="9. REINFORCE with baseline" href="4-reinforce-with-baseline.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -220,6 +220,11 @@ const thebe_selector_output = ".output, .cell_output"
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    10. Actor-critic 알고리즘
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="6-implementation-actor-critic.html">
+   11. Online/batch actor-critic 구현
   </a>
  </li>
 </ul>
@@ -421,6 +426,11 @@ title="Print to PDF"
    10.2. Online actor-critic 및 batch actor-critic 알고리즘
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#reinforce-actor-critic">
+   10.3. REINFORCE와 actor-critic의 차이점
+  </a>
+ </li>
 </ul>
 
     </nav>
@@ -448,6 +458,11 @@ title="Print to PDF"
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#online-actor-critic-batch-actor-critic">
    10.2. Online actor-critic 및 batch actor-critic 알고리즘
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#reinforce-actor-critic">
+   10.3. REINFORCE와 actor-critic의 차이점
   </a>
  </li>
 </ul>
@@ -581,6 +596,21 @@ REINFORCE의 경우 return <span class="math notranslate nohighlight">\(G_t\)</s
 </ol>
 </section>
 </div><br>
+</section>
+<hr class="docutils" />
+<section id="reinforce-actor-critic">
+<h2><span class="section-number">10.3. </span>REINFORCE와 actor-critic의 차이점<a class="headerlink" href="#reinforce-actor-critic" title="Permalink to this headline">#</a></h2>
+<p>네트워크를 업데이트할 때 타겟값으로 <span class="math notranslate nohighlight">\(G_t\)</span>를 사용하는 REINFORCE는 true policy gradient에 대한 추정량의 분산이 굉장히 크다.
+동일한 상태 <span class="math notranslate nohighlight">\(s_t\)</span>부터 시작하여 정책 <span class="math notranslate nohighlight">\(\pi_\theta\)</span>를 실행시켰을 때, 환경과 정책의 무작위성에 의하여 <span class="math notranslate nohighlight">\(G_t\)</span>가 가질 수 있는 값이 굉장히 다양하기 때문일 것이다.
+많은 책들에서 확률변수 <span class="math notranslate nohighlight">\(G_t = R_{t} + \gamma R_{t+1} + \gamma^2 R_{t+2} + \cdots\)</span>에 굉장히 많은 확률변수가 있고,
+각 확률변수들이 가질 수 있는 값이 다양하기 때문에 <span class="math notranslate nohighlight">\(G_t\)</span>를 하나의 샘플로 추정한 single estimation의 분산이 크다고 말하고 있다.
+<span class="math notranslate nohighlight">\(G_t\)</span>를 사용한 policy gradient의 추정량은 분산이 크기 때문에 학습이 불안정할 수 있지만 true policy gradient에 대한 unbiased estimation이라는 장점이 있다.</p>
+<br>
+<p>반면 actor-critic이 사용하는 타겟값인 <span class="math notranslate nohighlight">\(r_t + \gamma V_{\theta}(s_{t+1})\)</span>의 경우 확률변수가 <span class="math notranslate nohighlight">\(R_t\)</span>와 <span class="math notranslate nohighlight">\(S_{t+1}\)</span> 밖에 없다.
+따라서 single estimation이 갖는 값의 분산도 상대적으로 작을 것이다.
+<span class="math notranslate nohighlight">\(r_t + \gamma V_{\theta}(s_{t+1})\)</span>을 사용한 policy gradient의 추정량은 분산이 작아서 학습이 REINFORCE보다 안정적일 수 있지만,
+true policy gradient에 대한 biased estimation이라는 단점이 있다.</p>
+<br>
 <p>다음 장에서는 online actor-critic과 batch actor-critic을 구현해볼 것이다.</p>
 <br><script
    type="text/javascript"
@@ -628,10 +658,10 @@ REINFORCE의 경우 return <span class="math notranslate nohighlight">\(G_t\)</s
             <p class="prev-next-title"><span class="section-number">9. </span>REINFORCE with baseline</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="../Reference.html" title="next page">
+    <a class='right-next' id="next-link" href="6-implementation-actor-critic.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">참고문헌</p>
+        <p class="prev-next-title"><span class="section-number">11. </span>Online/batch actor-critic 구현</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
