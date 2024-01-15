@@ -495,16 +495,16 @@ title="Print to PDF"
      -step actor-critic 에이전트 구현
     </a>
    </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id4">
+     12.1.5.
+     <span class="math notranslate nohighlight">
+      \(n\)
+     </span>
+     -step actor-critic 에이전트 훈련
+    </a>
+   </li>
   </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#id4">
-   12.2.
-   <span class="math notranslate nohighlight">
-    \(n\)
-   </span>
-   -step actor-critic 에이전트 훈련
-  </a>
  </li>
 </ul>
 
@@ -566,16 +566,16 @@ title="Print to PDF"
      -step actor-critic 에이전트 구현
     </a>
    </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id4">
+     12.1.5.
+     <span class="math notranslate nohighlight">
+      \(n\)
+     </span>
+     -step actor-critic 에이전트 훈련
+    </a>
+   </li>
   </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#id4">
-   12.2.
-   <span class="math notranslate nohighlight">
-    \(n\)
-   </span>
-   -step actor-critic 에이전트 훈련
-  </a>
  </li>
 </ul>
 
@@ -589,20 +589,39 @@ title="Print to PDF"
                 
   <section class="tex2jax_ignore mathjax_ignore" id="n-step-return-actor-critic">
 <h1><span class="section-number">12. </span><span class="math notranslate nohighlight">\(n\)</span>-step return actor-critic<a class="headerlink" href="#n-step-return-actor-critic" title="Permalink to this headline">#</a></h1>
-<p>이전 장에서 online/batch actor-critic이 네트워크들을 업데이트할 때 <span class="math notranslate nohighlight">\(r_t + \gamma V_{\phi}(s_{t+1}) - V_{\phi}(s_{t})\)</span>를 사용한다는 것을 알게 되었다. 이는 상태가치함수의 다음과 같은 성질을 이용한 것이었다. 확률변수는 대문자로 표기해주었다.</p>
+<p>이전 장에서는 online/batch actor-critic이 네트워크를 업데이트할 때 타겟값으로 <span class="math notranslate nohighlight">\(r_t + \gamma V_{\phi}(s_{t+1}) - V_{\phi}(s_{t})\)</span>를 사용한다는 것을 알아보았다. 이는 상태가치함수의 다음과 같은 성질을 이용한 것이었다. 확률변수는 대문자로 표기해주었다.</p>
 <div class="math notranslate nohighlight">
-\[V^{\pi}(s_t)= \mathbb{E}_{A_t \sim \pi(\cdot|s_t), S_{t+1} \sim p(\cdot|s_t,A_t)} \left[ r(s_t, A_t) + \gamma  V^{\pi}(S_{t+1})\right] \; \text{ for all } \; s_t \in \mathcal{S}.\]</div>
+\[V^{\pi}(s_t)= \mathbb{E}_{A_t \sim \pi(\cdot|s_t), S_{t+1} \sim p(\cdot|s_t,A_t)} \left[ r(s_t, A_t) + \gamma  V^{\pi}(S_{t+1}) \mid S_t = s_t \right] \; \text{ for all } \; s_t \in \mathcal{S}.\]</div>
 <br>
-<p>위 식에서 우리는 재귀적 성질을 다시 한 번 이용하여 <span class="math notranslate nohighlight">\(V^{\pi}(s_{t+1})\)</span> 대신 <span class="math notranslate nohighlight">\(r_{t+1} + \gamma V^{\pi}(s_{t+2})\)</span>을 사용해줄 수 있다.</p>
+<p>그리고 위 식의 기댓값을 직접 구하는 대신 확률변수에 실제 데이터를 대입하여 상태가치함수의 추정치로 사용했다.</p>
 <div class="math notranslate nohighlight">
-\[V^{\pi}(s_t)= \mathbb{E}_{\pi_{\theta}} \left[ r(s_t, A_t) +  \gamma r(S_{t+1}, A_{t+1}) + \gamma^2  V^{\pi}(S_{t+2})\right] \; \text{ for all } \; s_t \in \mathcal{S}.\]</div>
+\[V^{\pi}(s_t) \approx  r_t + \gamma V^{\pi}(s_{t+1}).\]</div>
 <br>
-<p>(필자: 내용을 차차 추가하겠습니다아…)</p>
+<p>위 상태가치함수의 성질에서 재귀적 성질을 다시 한 번 이용하여 <span class="math notranslate nohighlight">\(V^{\pi}(s_{t+1})\)</span> 대신 <span class="math notranslate nohighlight">\(r_{t+1} + \gamma V^{\pi}(s_{t+2})\)</span>을 사용해줄 수 있다.</p>
+<div class="math notranslate nohighlight">
+\[V^{\pi}(s_t)= \mathbb{E}_{\pi_{\theta}} \left[ r(s_t, A_t) +  \gamma r(S_{t+1}, A_{t+1}) + \gamma^2  V^{\pi}(S_{t+2}) \mid S_t = s_t\right] \; \text{ for all } \; s_t \in \mathcal{S}.\]</div>
+<br>
+<p>마찬가지로 확률변수에 실제 데이터를 넣어서 상태가치함수에 대한 또 다른 추정치를 만들 수 있다.</p>
+<div class="math notranslate nohighlight">
+\[V^{\pi}(s_t) \approx  r_t + \gamma r_{t+1} + \gamma^2 V^{\pi}(s_{t+2}).\]</div>
+<br>
+<p>이런 식으로 상태가치함수의 재귀적 성질을 몇 번 적용하느냐에 따라서 상태가치함수에 대한 추정치들을 얻을 수 있다.
+일반적으로 재귀적 성질을 <span class="math notranslate nohighlight">\(n\)</span>번 적용하여 얻은 추정치를 <span class="math notranslate nohighlight">\(n\)</span>-step return이라고 부르며 <span class="math notranslate nohighlight">\(G_{t:t+n}\)</span>으로 표기해준다.</p>
+<div class="math notranslate nohighlight">
+\[V^{\pi}(s_t) \approx  G_{t:t+n} := r_t + \gamma r_{t+1} + \cdots + \gamma^{n-1} r_{t + n -1}  \gamma^{n} V^{\pi}(s_{t+n}).\]</div>
+<br>
+<p>이전 장에서는 <span class="math notranslate nohighlight">\(n=1\)</span>일 때의 추정치인 <span class="math notranslate nohighlight">\(G_{t:t+1} = r_t + \gamma V_{\phi}(s_{t+1})\)</span>을 사용하여 정책 및 가치 네트워크를 업데이트했던 것이다.
+REINFORCE와 비교하여 actor-critic 알고리즘은 policy gradient 추정량의 분산이 작은 대신 편향을 갖는다고 했었다.
+<span class="math notranslate nohighlight">\(n\)</span>-step return을 사용하면 이 분산과 편향의 trade-off를 다룰 수 있다.
+<span class="math notranslate nohighlight">\(n\)</span>이 증가하면 더 많은 확률변수를 고려하기 때문에 분산이 증가하는 대신 편향이 감소하게 된다. <span class="math notranslate nohighlight">\(n\)</span>이 무한대로 가면 일반적인 return <span class="math notranslate nohighlight">\(G_t\)</span>가 되어 REINFORCE 알고리즘이 된다.
+반대로 <span class="math notranslate nohighlight">\(n\)</span>이 감소하면 분산이 감소하는 대신 편향이 커진다. <span class="math notranslate nohighlight">\(n=1\)</span>일 때 우리가 일반적으로 말하는 actor-critic 알고리즘이 된다.</p>
+<br>
 <hr class="docutils" />
-<br>
 <section id="n-step-actor-critic">
 <h2><span class="section-number">12.1. </span><span class="math notranslate nohighlight">\(n\)</span>-step actor-critic 구현<a class="headerlink" href="#n-step-actor-critic" title="Permalink to this headline">#</a></h2>
-<p>이번 장에서는 online actor-critic과 batch actor-critic 알고리즘으로 <code class="docutils literal notranslate"><span class="pre">Pendulum-v1</span></code> 환경에 적용해볼 것이다. Batch actor-critic에서 batch_size <span class="math notranslate nohighlight">\(N=1\)</span>인 경우가 online actor-critic이기 때문에 우리는 batch actor-critic을 구현하고 <span class="math notranslate nohighlight">\(N=1\)</span>일 때와 <span class="math notranslate nohighlight">\(N=32\)</span>일 때를 비교해볼 것이다. 지난 구현들과 겹치는 코드들은 따로 설명하지 않을 것이다. 먼저 필요한 패키지의 모듈들을 불러오자</p>
+<p><span class="math notranslate nohighlight">\(n\)</span>-step return을 actor-critic 뿐만 아니라 다른 알고리즘에 일반적으로 적용하기 위해서는 buffer쪽에서 구현해주는 것이 좋다.
+지금까지는 파이썬 리스트로 정의된 buffer에 transition <span class="math notranslate nohighlight">\((s_t, a_t, r_t, s_{t+1}, d_t)\)</span>을 추가해주었다 (<span class="math notranslate nohighlight">\(d_t\)</span>는 <code class="docutils literal notranslate"><span class="pre">done</span></code>에 대응하는 것이다).
+<span class="math notranslate nohighlight">\(n\)</span>-step return을 사용해서 네트워크를 업데이트하는 것은 기존 transition 대신 <span class="math notranslate nohighlight">\((s_t, a_t, G_{t:t+n}, s_{t+n}, d_{t+n})\)</span>을 버퍼에 저장해주는 것만으로 구현해줄 수 있다. 먼저 필요한 패키지의 모듈들을 불러오자.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
@@ -624,9 +643,7 @@ title="Print to PDF"
 <br>
 <section id="n-step-return-buffer">
 <h3><span class="section-number">12.1.1. </span><span class="math notranslate nohighlight">\(n\)</span>-step return을 제공하는 buffer 구현<a class="headerlink" href="#n-step-return-buffer" title="Permalink to this headline">#</a></h3>
-<p><span class="math notranslate nohighlight">\(n\)</span>-step return을 actor-critic 뿐만 아니라 다른 알고리즘에 일반적으로 적용하기 위해서는 buffer쪽에서 구현해주는 것이 좋다.
-지금까지는 파이썬 리스트로 정의된 buffer에 transition <span class="math notranslate nohighlight">\((s_t, a_t, r_t, s_{t+1}, d_t)\)</span>을 추가해주었다 (<span class="math notranslate nohighlight">\(d_t\)</span>는 <code class="docutils literal notranslate"><span class="pre">done</span></code>에 대응하는 것이다).
-<span class="math notranslate nohighlight">\(n\)</span>-step return을 사용해서 네트워크를 업데이트하는 것은 기존 transition 대신 <span class="math notranslate nohighlight">\((s_t, a_t, G_{t:t+n}, s_{t+n}, d_{t+n})\)</span>을 버퍼에 저장해주는 것만으로 구현해줄 수 있다. 이제 파이썬 리스트에서 벗어나서 클래스로 buffer를 구현해보자. 바로 <span class="math notranslate nohighlight">\(n\)</span>-step return을 제공하는 buffer를 구현해도 좋지만 일반적인 코드를 추구하기 위해서 먼저 <span class="math notranslate nohighlight">\(n\)</span>-step return 기능이 없는 아주 평범한 buffer인 <code class="docutils literal notranslate"><span class="pre">RolloutBuffer</span></code>을 구현하고, 다음으로 이를 상속 받아서 <code class="docutils literal notranslate"><span class="pre">NStepRolloutBuffer</span></code>를 구현할 것이다. 다음은 <code class="docutils literal notranslate"><span class="pre">RolloutBuffer</span></code> 코드이다.</p>
+<p>이제 파이썬 리스트에서 벗어나서 클래스로 buffer를 구현해보자. 바로 <span class="math notranslate nohighlight">\(n\)</span>-step return을 제공하는 buffer를 구현해도 좋지만 일반적인 코드를 추구하기 위해서 먼저 <span class="math notranslate nohighlight">\(n\)</span>-step return 기능이 없는 아주 평범한 buffer인 <code class="docutils literal notranslate"><span class="pre">RolloutBuffer</span></code>을 구현하고, 다음으로 이를 상속 받아서 <code class="docutils literal notranslate"><span class="pre">NStepRolloutBuffer</span></code>를 구현할 것이다. 다음은 <code class="docutils literal notranslate"><span class="pre">RolloutBuffer</span></code> 코드이다.</p>
 <br>
 <p>사실 파이썬 리스트를 buffer로 사용했던 예전과 크게 다른 점은 없다.</p>
 <ul class="simple">
@@ -871,10 +888,9 @@ title="Print to PDF"
 </div>
 <br>
 </section>
-</section>
 <hr class="docutils" />
 <section id="id4">
-<h2><span class="section-number">12.2. </span><span class="math notranslate nohighlight">\(n\)</span>-step actor-critic 에이전트 훈련<a class="headerlink" href="#id4" title="Permalink to this headline">#</a></h2>
+<h3><span class="section-number">12.1.5. </span><span class="math notranslate nohighlight">\(n\)</span>-step actor-critic 에이전트 훈련<a class="headerlink" href="#id4" title="Permalink to this headline">#</a></h3>
 <p>에이전트 훈련 코드에서 <code class="docutils literal notranslate"><span class="pre">tqdm</span></code>을 추가하여 학습이 어느 정도 진행됐는지 볼 수 있도록 변경하였다.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1010,6 +1026,7 @@ title="Print to PDF"
    label="💬 comment"
    crossorigin="anonymous"
 /></section>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
