@@ -689,7 +689,7 @@ REINFORCE와 비교하여 actor-critic 알고리즘은 policy gradient 추정량
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_step</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_step</span> <span class="o">=</span> <span class="n">n_step</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gammas</span> <span class="o">=</span> <span class="p">[</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_step</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gammas</span> <span class="o">=</span> <span class="p">[</span><span class="n">gamma</span> <span class="o">**</span> <span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_step</span><span class="p">)]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_step_tracker</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_step</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_n_step_transition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -965,7 +965,7 @@ REINFORCE와 비교하여 actor-critic 알고리즘은 policy gradient 추정량
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 1000000/1000000 [09:02&lt;00:00, 1841.88it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 1000000/1000000 [08:13&lt;00:00, 2025.89it/s]
 </pre></div>
 </div>
 </div>
