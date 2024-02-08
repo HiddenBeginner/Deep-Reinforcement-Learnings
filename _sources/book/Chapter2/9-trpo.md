@@ -32,13 +32,13 @@ $$
 
 <br>
 
-한편, 주어진 정책 $\pi$의 상태가치함수 $V^{\pi}:\mathcal{S}\rightarrow\mathbb{R}$, 행동가치함수 $Q^{\pi}:\mathcal{S}\times \mathcal{A} \rightarrow\mathbb{R}$, 그리고 advantage 함수 $A_{\pi}: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}$는 다음과 같이 정의된다.
+한편, 주어진 정책 $\pi$의 상태가치함수 $V^{\pi}:\mathcal{S}\rightarrow\mathbb{R}$, 행동가치함수 $Q^{\pi}:\mathcal{S}\times \mathcal{A} \rightarrow\mathbb{R}$, 그리고 advantage 함수 $A^{\pi}: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}$는 다음과 같이 정의된다.
 
 $$
 \begin{matrix}
 V^{\pi}(s_t) = \mathbb{E}_{a_t, s_{t+1}, a_{t+1}, \cdots} \left[ \sum\limits_{l=0}^{\infty} \gamma^{l} r(s_{t+1})\right], \\
 Q^{\pi}({s_t, a_t}) = \mathbb{E}_{s_{t+1}, a_{t+1}, \cdots} \left[ \sum\limits_{l=0}^{\infty} \gamma^{l} r(s_{t+1})\right], \\
-A^{\pi}(s_t, a_t) = Q_{\pi}(s_t, a_t) - V_{\pi}(s_t), \text{ where } \\
+A^{\pi}(s_t, a_t) = Q^{\pi}(s_t, a_t) - V^{\pi}(s_t), \text{ where } \\
 a_t \sim \pi(a_t | s_t), \; s_{t+1} \sim p(s_{t+1}|s_{t}, a_{t}) \text{ for } t\ge0.
 \end{matrix}
 $$
@@ -59,10 +59,10 @@ $$
 
 여기서 $\tau \sim \tilde{\pi}$는 $\tau = (s_0, a_0, s_1, a_1, \cdots)$인데 $s_0 \sim d_0$ 이며 $a_t \sim \tilde{\pi}(a_t | s_t)$이다. $\eta(\tilde{\pi})$는 $\eta({\pi})$ 더하기 $\tilde{\pi}$로 trajectory를 만들 때 만들어지는 정책 $\pi$의 advantage 함수값의 기댓값이다. 필자의 언어로 정리하자면,
 
-- 현재 주어진 정책 $\pi$ 에 대해서 우리는 $\eta({\pi})$와 $A_{\pi}$를 알고 있는 상황이다.
-- 우리는 다른 정책 $\tilde{\pi}$ 의 $\eta(\tilde{\pi})$를 직접 계산하지 않고 $\eta({\pi})$와 $A_{\pi}$를 사용하여 계산할 것이다.
+- 현재 주어진 정책 $\pi$ 에 대해서 우리는 $\eta({\pi})$와 $A^{\pi}$를 알고 있는 상황이다.
+- 우리는 다른 정책 $\tilde{\pi}$ 의 $\eta(\tilde{\pi})$를 직접 계산하지 않고 $\eta({\pi})$와 $A^{\pi}$를 사용하여 계산할 것이다.
 - $\eta(\tilde{\pi})$은 $\eta({\pi})$에서 $\pi$ 대신 $\tilde{\pi}$로 trajectory를 뽑았을 때 얻게 되는 이익의 기댓값을 더해준 값이다.
-- 참고로 $\pi$로 행동을 뽑았을 때 $\mathbb{E}_{a_t \sim \pi(a_t | s_t)} \left[ A_{\pi}(s_t, a_t) \right]=0$ 인 것을 생각하면 , $\mathbb{E}_{a_t \sim \tilde{\pi}(a_t | s_t)} \left[ A_{\pi}(s_t, a_t) \right]$가 $\tilde{\pi}$ 를 사용했을 때 얻게 되는 추가 이득인 것을 받아들이기 쉽다.
+- 참고로 $\pi$로 행동을 뽑았을 때 $\mathbb{E}_{a_t \sim \pi(a_t | s_t)} \left[ A^{\pi}(s_t, a_t) \right]=0$ 인 것을 생각하면 , $\mathbb{E}_{a_t \sim \tilde{\pi}(a_t | s_t)} \left[ A^{\pi}(s_t, a_t) \right]$가 $\tilde{\pi}$ 를 사용했을 때 얻게 되는 추가 이득인 것을 받아들이기 쉽다.
 
 <br>
 

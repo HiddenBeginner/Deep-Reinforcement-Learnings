@@ -613,13 +613,13 @@ s_0 \sim d_0, \; a_t \sim \pi(a_t|s_t), \; s_{t+1} \sim p(s_{t+1}|s_t, a_t).
 <br>
 <p>위 수식이 누적할인보상의 기댓값을 컴팩트하게 잘 나타낸 것 같다. 정책 <span class="math notranslate nohighlight">\(\pi\)</span> 의 초기 상태의 상태가치함수의 기댓값이기도 하다.</p>
 <br>
-<p>한편, 주어진 정책 <span class="math notranslate nohighlight">\(\pi\)</span>의 상태가치함수 <span class="math notranslate nohighlight">\(V^{\pi}:\mathcal{S}\rightarrow\mathbb{R}\)</span>, 행동가치함수 <span class="math notranslate nohighlight">\(Q^{\pi}:\mathcal{S}\times \mathcal{A} \rightarrow\mathbb{R}\)</span>, 그리고 advantage 함수 <span class="math notranslate nohighlight">\(A_{\pi}: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}\)</span>는 다음과 같이 정의된다.</p>
+<p>한편, 주어진 정책 <span class="math notranslate nohighlight">\(\pi\)</span>의 상태가치함수 <span class="math notranslate nohighlight">\(V^{\pi}:\mathcal{S}\rightarrow\mathbb{R}\)</span>, 행동가치함수 <span class="math notranslate nohighlight">\(Q^{\pi}:\mathcal{S}\times \mathcal{A} \rightarrow\mathbb{R}\)</span>, 그리고 advantage 함수 <span class="math notranslate nohighlight">\(A^{\pi}: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}\)</span>는 다음과 같이 정의된다.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{matrix}
 V^{\pi}(s_t) = \mathbb{E}_{a_t, s_{t+1}, a_{t+1}, \cdots} \left[ \sum\limits_{l=0}^{\infty} \gamma^{l} r(s_{t+1})\right], \\
 Q^{\pi}({s_t, a_t}) = \mathbb{E}_{s_{t+1}, a_{t+1}, \cdots} \left[ \sum\limits_{l=0}^{\infty} \gamma^{l} r(s_{t+1})\right], \\
-A^{\pi}(s_t, a_t) = Q_{\pi}(s_t, a_t) - V_{\pi}(s_t), \text{ where } \\
+A^{\pi}(s_t, a_t) = Q^{\pi}(s_t, a_t) - V^{\pi}(s_t), \text{ where } \\
 a_t \sim \pi(a_t | s_t), \; s_{t+1} \sim p(s_{t+1}|s_{t}, a_{t}) \text{ for } t\ge0.
 \end{matrix}
 \end{split}\]</div>
@@ -636,10 +636,10 @@ a_t \sim \pi(a_t | s_t), \; s_{t+1} \sim p(s_{t+1}|s_{t}, a_{t}) \text{ for } t\
 <br>
 <p>여기서 <span class="math notranslate nohighlight">\(\tau \sim \tilde{\pi}\)</span>는 <span class="math notranslate nohighlight">\(\tau = (s_0, a_0, s_1, a_1, \cdots)\)</span>인데 <span class="math notranslate nohighlight">\(s_0 \sim d_0\)</span> 이며 <span class="math notranslate nohighlight">\(a_t \sim \tilde{\pi}(a_t | s_t)\)</span>이다. <span class="math notranslate nohighlight">\(\eta(\tilde{\pi})\)</span>는 <span class="math notranslate nohighlight">\(\eta({\pi})\)</span> 더하기 <span class="math notranslate nohighlight">\(\tilde{\pi}\)</span>로 trajectory를 만들 때 만들어지는 정책 <span class="math notranslate nohighlight">\(\pi\)</span>의 advantage 함수값의 기댓값이다. 필자의 언어로 정리하자면,</p>
 <ul class="simple">
-<li><p>현재 주어진 정책 <span class="math notranslate nohighlight">\(\pi\)</span> 에 대해서 우리는 <span class="math notranslate nohighlight">\(\eta({\pi})\)</span>와 <span class="math notranslate nohighlight">\(A_{\pi}\)</span>를 알고 있는 상황이다.</p></li>
-<li><p>우리는 다른 정책 <span class="math notranslate nohighlight">\(\tilde{\pi}\)</span> 의 <span class="math notranslate nohighlight">\(\eta(\tilde{\pi})\)</span>를 직접 계산하지 않고 <span class="math notranslate nohighlight">\(\eta({\pi})\)</span>와 <span class="math notranslate nohighlight">\(A_{\pi}\)</span>를 사용하여 계산할 것이다.</p></li>
+<li><p>현재 주어진 정책 <span class="math notranslate nohighlight">\(\pi\)</span> 에 대해서 우리는 <span class="math notranslate nohighlight">\(\eta({\pi})\)</span>와 <span class="math notranslate nohighlight">\(A^{\pi}\)</span>를 알고 있는 상황이다.</p></li>
+<li><p>우리는 다른 정책 <span class="math notranslate nohighlight">\(\tilde{\pi}\)</span> 의 <span class="math notranslate nohighlight">\(\eta(\tilde{\pi})\)</span>를 직접 계산하지 않고 <span class="math notranslate nohighlight">\(\eta({\pi})\)</span>와 <span class="math notranslate nohighlight">\(A^{\pi}\)</span>를 사용하여 계산할 것이다.</p></li>
 <li><p><span class="math notranslate nohighlight">\(\eta(\tilde{\pi})\)</span>은 <span class="math notranslate nohighlight">\(\eta({\pi})\)</span>에서 <span class="math notranslate nohighlight">\(\pi\)</span> 대신 <span class="math notranslate nohighlight">\(\tilde{\pi}\)</span>로 trajectory를 뽑았을 때 얻게 되는 이익의 기댓값을 더해준 값이다.</p></li>
-<li><p>참고로 <span class="math notranslate nohighlight">\(\pi\)</span>로 행동을 뽑았을 때 <span class="math notranslate nohighlight">\(\mathbb{E}_{a_t \sim \pi(a_t | s_t)} \left[ A_{\pi}(s_t, a_t) \right]=0\)</span> 인 것을 생각하면 , <span class="math notranslate nohighlight">\(\mathbb{E}_{a_t \sim \tilde{\pi}(a_t | s_t)} \left[ A_{\pi}(s_t, a_t) \right]\)</span>가 <span class="math notranslate nohighlight">\(\tilde{\pi}\)</span> 를 사용했을 때 얻게 되는 추가 이득인 것을 받아들이기 쉽다.</p></li>
+<li><p>참고로 <span class="math notranslate nohighlight">\(\pi\)</span>로 행동을 뽑았을 때 <span class="math notranslate nohighlight">\(\mathbb{E}_{a_t \sim \pi(a_t | s_t)} \left[ A^{\pi}(s_t, a_t) \right]=0\)</span> 인 것을 생각하면 , <span class="math notranslate nohighlight">\(\mathbb{E}_{a_t \sim \tilde{\pi}(a_t | s_t)} \left[ A^{\pi}(s_t, a_t) \right]\)</span>가 <span class="math notranslate nohighlight">\(\tilde{\pi}\)</span> 를 사용했을 때 얻게 되는 추가 이득인 것을 받아들이기 쉽다.</p></li>
 </ul>
 <br>
 <p>여전히 받아들이기 어려운 포인트가 있을 수 있다. 때로는 직관적인 설명보다 식으로 직접 증명하는게 이해에 도움을 줄 수 있다.</p>
