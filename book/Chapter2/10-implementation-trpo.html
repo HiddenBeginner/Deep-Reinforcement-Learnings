@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>14. TRPO 구현 &#8212; 심층강화학습</title>
+    <title>15. TRPO 구현 &#8212; 심층강화학습</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -91,7 +91,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="참고문헌" href="../Reference.html" />
-    <link rel="prev" title="13. Generalized Advantage Estimation (GAE)" href="8-gae.html" />
+    <link rel="prev" title="14. Trust Region Policy Optimization (TRPO)" href="9-trpo.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -241,9 +241,14 @@ const thebe_selector_output = ".output, .cell_output"
    13. Generalized Advantage Estimation (GAE)
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="9-trpo.html">
+   14. Trust Region Policy Optimization (TRPO)
+  </a>
+ </li>
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
-   14. TRPO 구현
+   15. TRPO 구현
   </a>
  </li>
 </ul>
@@ -466,44 +471,44 @@ title="Print to PDF"
         <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id1">
-   14.1. 구현을 위해 필요한 약간의 이론들
+   15.1. 구현을 위해 필요한 약간의 이론들
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#kl-divergence-fim">
-     14.1.1. KL divergence와 FIM 사이의 관계
+     15.1.1. KL divergence와 FIM 사이의 관계
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#conjugate-gradient-method">
-     14.1.2. Conjugate gradient method: 역행렬과 한 벡터의 곱 근사하는 방법
+     15.1.2. Conjugate gradient method: 역행렬과 한 벡터의 곱 근사하는 방법
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id2">
-     14.1.3. 정책 업데이트 알고리즘
+     15.1.3. 정책 업데이트 알고리즘
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id3">
-   14.2. TRPO 구현
+   15.2. TRPO 구현
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id4">
-     14.2.1. TRPO 클래스 구현
+     15.2.1. TRPO 클래스 구현
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#pendulum-v1">
-     14.2.2. Pendulum-v1 환경 제어
+     15.2.2. Pendulum-v1 환경 제어
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#hopper-v4">
-     14.2.3. Hopper-v4 환경 제어
+     15.2.3. Hopper-v4 환경 제어
     </a>
    </li>
   </ul>
@@ -529,44 +534,44 @@ title="Print to PDF"
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id1">
-   14.1. 구현을 위해 필요한 약간의 이론들
+   15.1. 구현을 위해 필요한 약간의 이론들
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#kl-divergence-fim">
-     14.1.1. KL divergence와 FIM 사이의 관계
+     15.1.1. KL divergence와 FIM 사이의 관계
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#conjugate-gradient-method">
-     14.1.2. Conjugate gradient method: 역행렬과 한 벡터의 곱 근사하는 방법
+     15.1.2. Conjugate gradient method: 역행렬과 한 벡터의 곱 근사하는 방법
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id2">
-     14.1.3. 정책 업데이트 알고리즘
+     15.1.3. 정책 업데이트 알고리즘
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id3">
-   14.2. TRPO 구현
+   15.2. TRPO 구현
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id4">
-     14.2.1. TRPO 클래스 구현
+     15.2.1. TRPO 클래스 구현
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#pendulum-v1">
-     14.2.2. Pendulum-v1 환경 제어
+     15.2.2. Pendulum-v1 환경 제어
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#hopper-v4">
-     14.2.3. Hopper-v4 환경 제어
+     15.2.3. Hopper-v4 환경 제어
     </a>
    </li>
   </ul>
@@ -582,9 +587,9 @@ title="Print to PDF"
               <div>
                 
   <section class="tex2jax_ignore mathjax_ignore" id="trpo">
-<h1><span class="section-number">14. </span>TRPO 구현<a class="headerlink" href="#trpo" title="Permalink to this headline">#</a></h1>
+<h1><span class="section-number">15. </span>TRPO 구현<a class="headerlink" href="#trpo" title="Permalink to this headline">#</a></h1>
 <section id="id1">
-<h2><span class="section-number">14.1. </span>구현을 위해 필요한 약간의 이론들<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
+<h2><span class="section-number">15.1. </span>구현을 위해 필요한 약간의 이론들<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
 <p>이번 장에서는 TRPO를 구현해볼 예정이다. TRPO 설명만큼이나 수식이 많이 나올 예정이다. 가독성과 간결성을 위하여 <span class="math notranslate nohighlight">\(\theta_{\text{old}}\)</span>를 <span class="math notranslate nohighlight">\(\bar{\theta}\)</span>으로 표기할 것이다. 먼저 지난 장에서 살펴본 surrogate objective를 적어보자.</p>
 <div class="math notranslate nohighlight">
 \[
@@ -608,7 +613,7 @@ J(\theta) = \mathbb{E}_{\pi_{\bar{\theta}}}\left[\frac{\pi_{\theta}(a_t|s_t)}{\p
 <hr class="docutils" />
 <br>
 <section id="kl-divergence-fim">
-<h3><span class="section-number">14.1.1. </span>KL divergence와 FIM 사이의 관계<a class="headerlink" href="#kl-divergence-fim" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">15.1.1. </span>KL divergence와 FIM 사이의 관계<a class="headerlink" href="#kl-divergence-fim" title="Permalink to this headline">#</a></h3>
 <p>1번과 관련하여, 원래 <span class="math notranslate nohighlight">\(\pi_\theta\)</span>의 FIM은 다음과 같이 정의된다.</p>
 <div class="math notranslate nohighlight">
 \[
@@ -643,7 +648,7 @@ J(\theta) = \mathbb{E}_{\pi_{\bar{\theta}}}\left[\frac{\pi_{\theta}(a_t|s_t)}{\p
 </section>
 <hr class="docutils" />
 <section id="conjugate-gradient-method">
-<h3><span class="section-number">14.1.2. </span>Conjugate gradient method: 역행렬과 한 벡터의 곱 근사하는 방법<a class="headerlink" href="#conjugate-gradient-method" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">15.1.2. </span>Conjugate gradient method: 역행렬과 한 벡터의 곱 근사하는 방법<a class="headerlink" href="#conjugate-gradient-method" title="Permalink to this headline">#</a></h3>
 <p>2번과 관련하여, conjugate gradient method (CGM)은 semi-positive definite 행렬 <span class="math notranslate nohighlight">\(\mathbf{F}\)</span>와 한 벡터 <span class="math notranslate nohighlight">\(\mathbf{g}\)</span>가 주어졌을 때, <span class="math notranslate nohighlight">\(\mathbf{F}\mathbf{x} = \mathbf{g}\)</span>를 만족하는 벡터 <span class="math notranslate nohighlight">\(\mathbf{x}\)</span>를 iterative하게 근사하는 방법이다. Conjugate gradient method는 굳이 행렬 <span class="math notranslate nohighlight">\(\mathbf{F}\)</span>를 알고 있지 않아도 <span class="math notranslate nohighlight">\(\mathbf{F}\)</span>와 임의의 벡터 <span class="math notranslate nohighlight">\(\mathbf{g}_k\)</span>의 곱인 <span class="math notranslate nohighlight">\(\mathbf{F}\mathbf{g}_k\)</span> 값만 알 수 있어도 적용할 수 있는 방법이다 (여기서 아래 첨자 <span class="math notranslate nohighlight">\(k\)</span>는 iterative 횟수이다).  TRPO 구현에서는 KL divergence의 그레디언트 <span class="math notranslate nohighlight">\(\nabla_{\theta} \bar{D}_{\text{KL}}\left(\pi_\bar{\theta} \Vert \pi_{\theta}\right)\)</span>에 <span class="math notranslate nohighlight">\(\mathbf{g}_k\)</span>를 곱해주고 이들의 원소를 더해준 값을 다시 한 번 <span class="math notranslate nohighlight">\(\theta\)</span>에 대해서 그레디언트를 구하여 <span class="math notranslate nohighlight">\(\mathbf{F}\mathbf{g}_k\)</span>을 계산한다.</p>
 <br>
 <p>벡터 <span class="math notranslate nohighlight">\(\mathbf{F} \mathbf{g}\)</span>의 <span class="math notranslate nohighlight">\(i\)</span>번 째 행을 적어보면 다음과 같을 것이다.</p>
@@ -703,7 +708,7 @@ J(\theta) = \mathbb{E}_{\pi_{\bar{\theta}}}\left[\frac{\pi_{\theta}(a_t|s_t)}{\p
 </section>
 <hr class="docutils" />
 <section id="id2">
-<h3><span class="section-number">14.1.3. </span>정책 업데이트 알고리즘<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">15.1.3. </span>정책 업데이트 알고리즘<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h3>
 <p>축하한다! 위 세 가지 메서드를 사용하면 파라미터 업데이트 방향 <span class="math notranslate nohighlight">\(\mathbf{s} = \mathbf{F}^{-1}\mathbf{g}\)</span>을 찾게 되었다! 이제 방향만 찾았을 뿐이다! 방향을 찾는 것을 구현해보면 다음과 같다. <code class="docutils literal notranslate"><span class="pre">learn()</span></code> 메서드 중 정책 업데이트 부분을 가져왔다. 부분 발췌를 하느라 아직까지 정의되지 않은 변수들이 있다. 앞부분이 궁금하신 분들은 아래 <code class="docutils literal notranslate"><span class="pre">TRPO</span></code> 클래스에서 찾아보면 좋을 것 같다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Policy loss</span>
 <span class="n">ratio_old</span> <span class="o">=</span> <span class="p">(</span><span class="n">log_prob</span> <span class="o">-</span> <span class="n">log_prob_old</span><span class="p">)</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span>
@@ -765,7 +770,7 @@ J(\theta) = \mathbb{E}_{\pi_{\bar{\theta}}}\left[\frac{\pi_{\theta}(a_t|s_t)}{\p
 </section>
 <hr class="docutils" />
 <section id="id3">
-<h2><span class="section-number">14.2. </span>TRPO 구현<a class="headerlink" href="#id3" title="Permalink to this headline">#</a></h2>
+<h2><span class="section-number">15.2. </span>TRPO 구현<a class="headerlink" href="#id3" title="Permalink to this headline">#</a></h2>
 <p>이번 장에서는 TRPO+GAE를 알고리즘을 <code class="docutils literal notranslate"><span class="pre">Pendulum-v1</span></code> 환경에 적용해볼 것이다. 그리고 TRPO+GAE 정도되면 슬슬 MuJoCo 환경도 제어할 수 있는 알고리즘이기 때문에 MuJoCo 환경 중 가장 쉬운 <code class="docutils literal notranslate"><span class="pre">Hopper-v4</span></code>도 제어를 해볼 예정이다. 먼저 필요한 패키지들을 불러오자</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -858,7 +863,7 @@ J(\theta) = \mathbb{E}_{\pi_{\bar{\theta}}}\left[\frac{\pi_{\theta}(a_t|s_t)}{\p
 </div>
 <br>
 <section id="id4">
-<h3><span class="section-number">14.2.1. </span>TRPO 클래스 구현<a class="headerlink" href="#id4" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">15.2.1. </span>TRPO 클래스 구현<a class="headerlink" href="#id4" title="Permalink to this headline">#</a></h3>
 <p>코드가 많이 길다. 그래도 한 번 따라써보면 자그마치 TRPO를 구현한 사람이 되는 것이다. 하기 싫은 마음을 한 번 꾹 참고 구현하여 TRPO를 손에 얻어내자.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1092,7 +1097,7 @@ J(\theta) = \mathbb{E}_{\pi_{\bar{\theta}}}\left[\frac{\pi_{\theta}(a_t|s_t)}{\p
 <br>
 </section>
 <section id="pendulum-v1">
-<h3><span class="section-number">14.2.2. </span>Pendulum-v1 환경 제어<a class="headerlink" href="#pendulum-v1" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">15.2.2. </span>Pendulum-v1 환경 제어<a class="headerlink" href="#pendulum-v1" title="Permalink to this headline">#</a></h3>
 <p>제목이 곧 내용이다! 참고로 TRPO 및 GAE 논문에서는 엄청 큰 배치 사이즈를 사용한다. 본 구현에서는 배치 사이즈 2000을 사용했지만 논문을 직접 찾아보면 더 큰 배치 사이즈에 대해서 더 많은 environment steps 동안 학습시킨다.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1230,7 +1235,7 @@ J(\theta) = \mathbb{E}_{\pi_{\bar{\theta}}}\left[\frac{\pi_{\theta}(a_t|s_t)}{\p
 </section>
 <hr class="docutils" />
 <section id="hopper-v4">
-<h3><span class="section-number">14.2.3. </span>Hopper-v4 환경 제어<a class="headerlink" href="#hopper-v4" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">15.2.3. </span>Hopper-v4 환경 제어<a class="headerlink" href="#hopper-v4" title="Permalink to this headline">#</a></h3>
 <p>제목이 곧 내용이다! 참고로 위의 Pendulum-v1 코드를 그대로 가져다 쓰면 안 된다. 사소하게 변경된 지점들이 있다. Pendulum-v1의 가능한 행동 범위가 <span class="math notranslate nohighlight">\([-2,2]\)</span>였는데 이를 위해 사용했던 <code class="docutils literal notranslate"><span class="pre">env.step(2</span> <span class="pre">*</span> <span class="pre">a)</span></code>를 <code class="docutils literal notranslate"><span class="pre">env.step(a)</span></code>으로 바꿔줘야 한다. MuJoCo 환경들은 모두 가능한 행동 범위가 모든 차원에서 <span class="math notranslate nohighlight">\([-1,1]\)</span>이다. 그리고 Pendulum-v1에서는 할인률 <span class="math notranslate nohighlight">\(\gamma\)</span>의 값을 0.95를 사용해줬었는데, 이를 0.99로 바꿔주었다. 학습률도 0.003에서 0.0003으로 줄여주었다.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1397,11 +1402,11 @@ PPO는 TRPO을 이론적으로 개선했다기 보다는 구현적으로 개선�
                 
     <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="8-gae.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="9-trpo.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">13. </span>Generalized Advantage Estimation (GAE)</p>
+            <p class="prev-next-title"><span class="section-number">14. </span>Trust Region Policy Optimization (TRPO)</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="../Reference.html" title="next page">
