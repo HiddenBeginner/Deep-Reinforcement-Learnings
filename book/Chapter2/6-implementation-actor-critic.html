@@ -90,7 +90,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="shortcut icon" href="../../_static/HDBG.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="참고문헌" href="../Reference.html" />
+    <link rel="next" title="12. \(n\)-step return actor-critic" href="7-n_step-actor-critic.html" />
     <link rel="prev" title="10. Actor-critic 알고리즘" href="5-actor-critic.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -225,6 +225,30 @@ const thebe_selector_output = ".output, .cell_output"
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    11. Online/batch actor-critic 구현
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="7-n_step-actor-critic.html">
+   12.
+   <span class="math notranslate nohighlight">
+    \(n\)
+   </span>
+   -step return actor-critic
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="8-gae.html">
+   13. Generalized Advantage Estimation (GAE)
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="9-trpo.html">
+   14. Trust Region Policy Optimization (TRPO)
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="10-implementation-trpo.html">
+   15. TRPO 구현
   </a>
  </li>
 </ul>
@@ -656,7 +680,7 @@ title="Print to PDF"
         <span class="n">mu</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">Normal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">std</span><span class="p">)</span>
         <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">atanh</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">1e-7</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1e-7</span><span class="p">))</span>
-        <span class="n">log_probs</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">log_probs</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         
         <span class="c1"># 가치 네트워크 업데이트하기</span>
         <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
@@ -756,11 +780,11 @@ title="Print to PDF"
 <p>이후 코드는 REINFORCE와 REINFORCE with baseline와 동일하다. 네트워크 구조는 이전과 살짝 다른데, 나중에 구현할 PPO와 비슷하게 만들어 놓았다.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">eval_iterations</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">eval_iterations</span><span class="p">):</span>
     <span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">env_name</span><span class="p">)</span>
     <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">eval_iterations</span><span class="p">):</span>
-        <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10000</span><span class="p">)),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">eval_iterations</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span> <span class="o">+</span> <span class="mi">100</span> <span class="o">+</span> <span class="n">i</span><span class="p">),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="p">(</span><span class="n">terminated</span> <span class="ow">or</span> <span class="n">truncated</span><span class="p">):</span>
             <span class="n">a</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">s_prime</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">a</span><span class="p">)</span>
@@ -773,9 +797,6 @@ title="Print to PDF"
 </div>
 </div>
 </div>
-<br> 
-<p>실험의 재현성과 알고리즘 사이의 동등한 비교를 위하여 다음과 같이 랜덤 시드를 설정해주는 <code class="docutils literal notranslate"><span class="pre">seed_all</span></code> 함수를 정의해주었다.
-각 알고리즘 실험을 시작하기 전에 <code class="docutils literal notranslate"><span class="pre">seed_all()</span></code> 함수를 실행해주면, 두 실험의 네트워크 파라미터들이 동일하게 초기화되며, 환경 초기화 등 환경에 내재된 무작위성도 모두 동일한 순서로 발생한다. 그리고 코드를 실행할 때마다 같은 결과를 얻게 해준다 (연산 장비에 따라서는 달라질 수 있다).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">seed_all</span><span class="p">(</span><span class="n">seed</span><span class="p">):</span>
@@ -799,7 +820,7 @@ title="Print to PDF"
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
 <span class="n">env_name</span> <span class="o">=</span> <span class="s1">&#39;Pendulum-v1&#39;</span>
 
-<span class="n">seed</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">seed_all</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
 <span class="n">hidden_dims</span> <span class="o">=</span> <span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="p">)</span>
 <span class="n">max_iterations</span> <span class="o">=</span> <span class="mi">1000000</span>
@@ -814,7 +835,7 @@ title="Print to PDF"
 <span class="n">agent</span> <span class="o">=</span> <span class="n">ActorCritic</span><span class="p">(</span><span class="n">state_dim</span><span class="p">,</span> <span class="n">action_dim</span><span class="p">,</span> <span class="n">hidden_dims</span><span class="o">=</span><span class="n">hidden_dims</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+<span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iterations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
     <span class="n">s_prime</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">a</span><span class="p">)</span>
@@ -829,14 +850,14 @@ title="Print to PDF"
         <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
         
     <span class="k">if</span> <span class="n">t</span> <span class="o">%</span> <span class="n">eval_intervals</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">score</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">eval_iterations</span><span class="p">)</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">eval_iterations</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;Avg return&#39;</span><span class="p">,</span> <span class="n">score</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 8min 44s, sys: 887 ms, total: 8min 44s
-Wall time: 8min 44s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 8min 48s, sys: 890 ms, total: 8min 49s
+Wall time: 8min 48s
 </pre></div>
 </div>
 </div>
@@ -881,7 +902,7 @@ Wall time: 8min 44s
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/6-implementation-actor-critic_14_0.png" src="../../_images/6-implementation-actor-critic_14_0.png" />
+<img alt="../../_images/6-implementation-actor-critic_13_0.png" src="../../_images/6-implementation-actor-critic_13_0.png" />
 </div>
 </div>
 <br>
@@ -894,7 +915,7 @@ Wall time: 8min 44s
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
 <span class="n">env_name</span> <span class="o">=</span> <span class="s1">&#39;Pendulum-v1&#39;</span>
 
-<span class="n">seed</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">seed_all</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
 <span class="n">hidden_dims</span> <span class="o">=</span> <span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="p">)</span>
 <span class="n">max_iterations</span> <span class="o">=</span> <span class="mi">1000000</span>
@@ -909,7 +930,7 @@ Wall time: 8min 44s
 <span class="n">agent</span> <span class="o">=</span> <span class="n">ActorCritic</span><span class="p">(</span><span class="n">state_dim</span><span class="p">,</span> <span class="n">action_dim</span><span class="p">,</span> <span class="n">hidden_dims</span><span class="o">=</span><span class="n">hidden_dims</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+<span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iterations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
     <span class="n">s_prime</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">a</span><span class="p">)</span>
@@ -924,14 +945,14 @@ Wall time: 8min 44s
         <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
         
     <span class="k">if</span> <span class="n">t</span> <span class="o">%</span> <span class="n">eval_intervals</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">score</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">eval_iterations</span><span class="p">)</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">eval_iterations</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;Avg return&#39;</span><span class="p">,</span> <span class="n">score</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 32min 12s, sys: 8.85 s, total: 32min 21s
-Wall time: 32min 18s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 33min 48s, sys: 9.4 s, total: 33min 57s
+Wall time: 33min 53s
 </pre></div>
 </div>
 </div>
@@ -975,7 +996,7 @@ Wall time: 32min 18s
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/6-implementation-actor-critic_18_0.png" src="../../_images/6-implementation-actor-critic_18_0.png" />
+<img alt="../../_images/6-implementation-actor-critic_17_0.png" src="../../_images/6-implementation-actor-critic_17_0.png" />
 </div>
 </div>
 <br>
@@ -1027,10 +1048,10 @@ Wall time: 32min 18s
             <p class="prev-next-title"><span class="section-number">10. </span>Actor-critic 알고리즘</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="../Reference.html" title="next page">
+    <a class='right-next' id="next-link" href="7-n_step-actor-critic.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">참고문헌</p>
+        <p class="prev-next-title"><span class="section-number">12. </span><span class="math notranslate nohighlight">\(n\)</span>-step return actor-critic</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

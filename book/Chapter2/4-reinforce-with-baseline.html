@@ -222,6 +222,35 @@ const thebe_selector_output = ".output, .cell_output"
    10. Actor-critic 알고리즘
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="6-implementation-actor-critic.html">
+   11. Online/batch actor-critic 구현
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="7-n_step-actor-critic.html">
+   12.
+   <span class="math notranslate nohighlight">
+    \(n\)
+   </span>
+   -step return actor-critic
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="8-gae.html">
+   13. Generalized Advantage Estimation (GAE)
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="9-trpo.html">
+   14. Trust Region Policy Optimization (TRPO)
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="10-implementation-trpo.html">
+   15. TRPO 구현
+  </a>
+ </li>
 </ul>
 <p aria-level="2" class="caption" role="heading">
  <span class="caption-text">
@@ -565,7 +594,8 @@ REINFORCE with baseline에서는 <span class="math notranslate nohighlight">\(V_
 이번 장에서는 연속 행동 공간을 갖는 <code class="docutils literal notranslate"><span class="pre">Pendulum-v1</span></code> 환경만 REINFORCE with baseline으로 제어해보는 실습을 할 것이다. 사용할 패키지는 다음과 같다.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
@@ -706,7 +736,7 @@ REINFORCE with baseline에서는 <span class="math notranslate nohighlight">\(V_
             <span class="n">mu</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
             <span class="n">m</span> <span class="o">=</span> <span class="n">Normal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">std</span><span class="p">)</span>
             <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">atanh</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">1e-7</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1e-7</span><span class="p">))</span>  <span class="c1"># torch.atanh(-1.0), torch.atanh(1.0)은 각각 -infty, infty라서 clipping 필요</span>
-            <span class="n">log_probs</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+            <span class="n">log_probs</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># 정책 손실함수 만들기 및 역전파</span>
         <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
@@ -740,11 +770,25 @@ REINFORCE with baseline에서는 <span class="math notranslate nohighlight">\(V_
 <p>에이전트 구현 이후의 코드는 이전 장과 동일하다.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">eval_iterations</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">seed_all</span><span class="p">(</span><span class="n">seed</span><span class="p">):</span>
+    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">manual_seed_all</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">deterministic</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">eval_iterations</span><span class="p">):</span>
     <span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">env_name</span><span class="p">)</span>
     <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">eval_iterations</span><span class="p">):</span>
-        <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10000</span><span class="p">)),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">eval_iterations</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span> <span class="o">+</span> <span class="mi">100</span> <span class="o">+</span> <span class="n">i</span><span class="p">),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="p">(</span><span class="n">terminated</span> <span class="ow">or</span> <span class="n">truncated</span><span class="p">):</span>
             <span class="n">a</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">s_prime</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">a</span><span class="p">)</span>
@@ -761,9 +805,10 @@ REINFORCE with baseline에서는 <span class="math notranslate nohighlight">\(V_
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">env_name</span> <span class="o">=</span> <span class="s1">&#39;Pendulum-v1&#39;</span>
 
-<span class="n">seed</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">seed_all</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
 <span class="n">max_iterations</span> <span class="o">=</span> <span class="mi">1000000</span>
-<span class="n">eval_intervals</span> <span class="o">=</span> <span class="mi">5000</span>
+<span class="n">eval_intervals</span> <span class="o">=</span> <span class="mi">10000</span>
 <span class="n">eval_iterations</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">gamma</span> <span class="o">=</span> <span class="mf">0.9</span>
 
@@ -773,7 +818,7 @@ REINFORCE with baseline에서는 <span class="math notranslate nohighlight">\(V_
 <span class="n">agent</span> <span class="o">=</span> <span class="n">BaselineREINFORCE</span><span class="p">(</span><span class="n">state_dim</span><span class="p">,</span> <span class="n">action_dim</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+<span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iterations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
     <span class="n">s_prime</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">a</span><span class="p">)</span>
@@ -788,7 +833,7 @@ REINFORCE with baseline에서는 <span class="math notranslate nohighlight">\(V_
         <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
         
     <span class="k">if</span> <span class="n">t</span> <span class="o">%</span> <span class="n">eval_intervals</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">score</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">eval_iterations</span><span class="p">)</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">eval_iterations</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;Avg return&#39;</span><span class="p">,</span> <span class="n">score</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -796,7 +841,7 @@ REINFORCE with baseline에서는 <span class="math notranslate nohighlight">\(V_
 </div>
 <br>
 <p>REINFORCE로는 전혀 학습되지 않았던 것과 다르게 baseline을 추가해주니 잘 학습되는 것을 확인할 수 있다.
-랜덤성에 의해 훈련이 안 될 때도 있다. 이때는 커널에 마가 낀 것이니 당황하지 말고 커널 재시작 후 다시 실행하면 된다.</p>
+랜덤성에 의해 훈련이 안 될 때도 있다. 이때는 커널이나 랜덤성에 마가 낀 것이니 당황하지 말고 커널 재시작 후 다시 실행하거나 시드를 바꿔주면 된다.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
@@ -834,7 +879,7 @@ REINFORCE with baseline에서는 <span class="math notranslate nohighlight">\(V_
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/4-reinforce-with-baseline_13_0.png" src="../../_images/4-reinforce-with-baseline_13_0.png" />
+<img alt="../../_images/4-reinforce-with-baseline_14_0.png" src="../../_images/4-reinforce-with-baseline_14_0.png" />
 </div>
 </div>
 <script
