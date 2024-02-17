@@ -219,7 +219,41 @@ const thebe_selector_output = ".output, .cell_output"
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="../Chapter2/5-actor-critic.html">
-   10. Actor-critic 방법론
+   10. Actor-critic 알고리즘
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../Chapter2/6-implementation-actor-critic.html">
+   11. Online/batch actor-critic 구현
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../Chapter2/7-n_step-actor-critic.html">
+   12.
+   <span class="math notranslate nohighlight">
+    \(n\)
+   </span>
+   -step return actor-critic
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../Chapter2/8-gae.html">
+   13. Generalized Advantage Estimation (GAE)
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../Chapter2/9-trpo.html">
+   14. Trust Region Policy Optimization (TRPO)
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../Chapter2/10-implementation-trpo.html">
+   15. TRPO 구현
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../Chapter2/13-sac.html">
+   16. Soft Actor-Critic (SAC)
   </a>
  </li>
 </ul>
@@ -621,8 +655,8 @@ title="Print to PDF"
 \[\begin{split}\pi'(a|s)=\begin{cases} 1 &amp; \text{ if } a = \operatorname*{argmax}\limits_{a\in\mathcal{A}} Q^{\pi}(s, a) \\ 0 &amp; \text{ otherwise} \end{cases}, \text{ for all } s \in \mathcal{S}\end{split}\]</div>
 <br>
 <p>한편, 알아두면 좋은 두 가치 함수 사이의 관계식이 있다. 기댓값의 정의를 잘 생각해보면, 상태 가치 함수와 행동 가치 함수가 다음과 같은 관계를 갖고 있는 것을 알 수 있다. 증명은 다음 절에 나올 예정이다 (예정일껄…).</p>
-<div class="math notranslate nohighlight">
-\[V^{\pi}(s) = \mathbb{E}_{a\sim\pi(\cdot|s)} \left[ Q^{\pi}(s, a) \right].\]</div>
+<div class="math notranslate nohighlight" id="equation-relation-state-action-value-function">
+<span class="eqno">(3.4)<a class="headerlink" href="#equation-relation-state-action-value-function" title="Permalink to this equation">#</a></span>\[V^{\pi}(s) = \mathbb{E}_{a\sim\pi(\cdot|s)} \left[ Q^{\pi}(s, a) \right].\]</div>
 <br>
 </section>
 <hr class="docutils" />
@@ -633,7 +667,7 @@ title="Print to PDF"
 <p class="admonition-title"><strong>Advantage 함수 (advantage function)</strong></p>
 <p>한 정책 <span class="math notranslate nohighlight">\(\pi\)</span>의 상태 <span class="math notranslate nohighlight">\(s \in \mathcal{S}\)</span>와 행동 <span class="math notranslate nohighlight">\(a \in \mathcal{A}\)</span>에서의 advantage 함수 <span class="math notranslate nohighlight">\(A^{\pi}: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}\)</span>는 행동 가치 함수에서 상태 가치 함수를 뺀 것으로 정의된다. 즉,</p>
 <div class="math notranslate nohighlight" id="equation-advantage-function">
-<span class="eqno">(3.4)<a class="headerlink" href="#equation-advantage-function" title="Permalink to this equation">#</a></span>\[A^{\pi}(s, a) := Q^{\pi}(s, a) - V^{\pi}(s) \quad \forall s \in \mathcal{S}, a \in \mathcal{A}.\]</div>
+<span class="eqno">(3.5)<a class="headerlink" href="#equation-advantage-function" title="Permalink to this equation">#</a></span>\[A^{\pi}(s, a) := Q^{\pi}(s, a) - V^{\pi}(s) \quad \forall s \in \mathcal{S}, a \in \mathcal{A}.\]</div>
 </div>
 <br>
 <hr class="docutils" />

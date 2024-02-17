@@ -178,7 +178,10 @@ $$\pi'(a|s)=\begin{cases} 1 & \text{ if } a = \operatorname*{argmax}\limits_{a\i
 
 한편, 알아두면 좋은 두 가치 함수 사이의 관계식이 있다. 기댓값의 정의를 잘 생각해보면, 상태 가치 함수와 행동 가치 함수가 다음과 같은 관계를 갖고 있는 것을 알 수 있다. 증명은 다음 절에 나올 예정이다 (예정일껄...).
 
-$$V^{\pi}(s) = \mathbb{E}_{a\sim\pi(\cdot|s)} \left[ Q^{\pi}(s, a) \right].$$
+```{math}
+:label: relation-state-action-value-function
+V^{\pi}(s) = \mathbb{E}_{a\sim\pi(\cdot|s)} \left[ Q^{\pi}(s, a) \right].
+```
 
 <br>
 
