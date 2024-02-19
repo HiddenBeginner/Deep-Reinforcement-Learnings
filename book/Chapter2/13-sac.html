@@ -835,7 +835,7 @@ J_{\pi}(\phi)\approx\mathbb{E}_{\mathbf{s}_t \sim \mathcal{D}}\left[ \mathbb{E}_
 <br>
 <p>여기서 <span class="math notranslate nohighlight">\(Z_{\theta}\)</span>는 <span class="math notranslate nohighlight">\(\phi\)</span>와 무관하기 때문에 생략했다. 현재 안쪽 기댓값은 <span class="math notranslate nohighlight">\(\mathbf{a}_t \sim \pi_{\phi}(\cdot|\mathbf{s}_t)\)</span>에 대해 계산된다.</p>
 <br>
-<p>우리는 식 <span class="math notranslate nohighlight">\((12)\)</span> 기댓값의 실제 그레디언트를 직접 구하는대신 경험 데이터 <span class="math notranslate nohighlight">\((\mathbf{s}_t, \mathbf{a}_t)\)</span>를 대입하여 기댓값을 추정하고, 그것의 그레디언트를 계산하고 싶다 (stochatic gradient).
+<p>우리는 식 <span class="math notranslate nohighlight">\((12)\)</span> 기댓값의 실제 그레디언트를 직접 구하는 대신 경험 데이터 <span class="math notranslate nohighlight">\((\mathbf{s}_t, \mathbf{a}_t)\)</span>를 대입하여 기댓값을 추정하고, 그것의 그레디언트를 계산하고 싶다 (stochatic gradient).
 데이터 <span class="math notranslate nohighlight">\((\mathbf{s}_t, \mathbf{a}_t)\)</span>를 대입한 값을 <strong>기댓값의 추정치</strong> 로 사용하는 것은 자연스러운 행위이다.
 하지만 <strong>기댓값의 추정치의 그레디언트</strong> 를 계산하는 것은 <span class="math notranslate nohighlight">\(\mathbf{a} \sim \pi_{\phi}(\cdot|\mathbf{s}_t)\)</span> 부분을 커버하지 못한다.
 <span class="math notranslate nohighlight">\(\phi\)</span>가 변하면 <span class="math notranslate nohighlight">\(\pi_{\phi}\)</span>가 변하고, 그로 인해 기댓값 계산의 범위 <span class="math notranslate nohighlight">\(\mathbf{a} \sim \pi_{\phi}(\cdot|\mathbf{s}_t)\)</span> 즉각적으로 바뀌기 때문이다.
@@ -843,7 +843,7 @@ J_{\pi}(\phi)\approx\mathbb{E}_{\mathbf{s}_t \sim \mathcal{D}}\left[ \mathbb{E}_
 stochastic gradient를 사용하면 <span class="math notranslate nohighlight">\(\log \pi_{\phi}(\cdot|\mathbf{s}_t)\)</span>의 순간변화만 고려하게 되는 셈이다.
 물론, 그 부분을 감수하고도 stochastic gradient를 그레디언트의 추정량으로 사용할 수 있다.</p>
 <br>
-<p>논문에서는 reparameterization trick을 사용해서 분산이 낮은 그레디언트를 추정량이 사용하게 된다. 즉, 행동 <span class="math notranslate nohighlight">\(\mathbf{a}_t\)</span>를 다른 랜덤변수 <span class="math notranslate nohighlight">\(\epsilon_t\)</span>를 사용하여 나타내게 만들었다.</p>
+<p>논문에서는 reparameterization trick을 사용해서 분산이 낮은 그레디언트를 추정량이 사용하게 된다. 즉, 행동 <span class="math notranslate nohighlight">\(\mathbf{a}_t\)</span>를 다른 확률 변수 <span class="math notranslate nohighlight">\(\epsilon_t\)</span>를 사용하여 나타내게 만들었다.</p>
 <div class="math notranslate nohighlight">
 \[
 \mathbf{a}_t=f_{\phi}(\epsilon_t; \mathbf{s}_t), \; \text{where} \;\epsilon_t \sim \mathcal{N}(\mathbf{0},  I). \qquad \qquad (13)
@@ -855,7 +855,7 @@ stochastic gradient를 사용하면 <span class="math notranslate nohighlight">\
 J_{\pi}(\phi)\approx\mathbb{E}_{\mathbf{s}_t \sim \mathcal{D}}\left[ \mathbb{E}_{\epsilon_t \sim \mathcal{N}} \left[\log \pi_{\phi}(f_{\phi}(\epsilon_t; \mathbf{s}_t) | \mathbf{s}_t) - Q_{\theta}(\mathbf{s}_t, f_{\phi}(\epsilon_t; \mathbf{s}_t)) \right]\right], \qquad \qquad (14)
 \]</div>
 <br>
-<p>이제 식 <span class="math notranslate nohighlight">\((14)\)</span>의 안쪽 기댓값은 <span class="math notranslate nohighlight">\(\epsilon_t \sim \mathcal{N}(\mathbb{0}, I)\)</span>에 대해 계산되기 때문에 <span class="math notranslate nohighlight">\(\phi\)</span> 변화에 따른 <span class="math notranslate nohighlight">\(\mathbf{a} \sim \pi_{\phi}(\cdot|\mathbf{s}_t)\)</span> 변화를 고려하지 않아도 된다. 식 <span class="math notranslate nohighlight">\((14)\)</span>에 경험 데이터 <span class="math notranslate nohighlight">\(\mathbf{s}_t\)</span>와 샘플링한 <span class="math notranslate nohighlight">\(\epsilon_t\)</span>를 대입하여 <span class="math notranslate nohighlight">\(\phi\)</span>에 대한 그레디언트를 계산하면 다음과 같다.</p>
+<p>이제 식 <span class="math notranslate nohighlight">\((14)\)</span>의 안쪽 기댓값은 <span class="math notranslate nohighlight">\(\epsilon_t \sim \mathcal{N}(\mathbf{0}, I)\)</span>에 대해 계산되기 때문에 <span class="math notranslate nohighlight">\(\phi\)</span> 변화에 따른 <span class="math notranslate nohighlight">\(\mathbf{a} \sim \pi_{\phi}(\cdot|\mathbf{s}_t)\)</span> 변화를 고려하지 않아도 된다. 식 <span class="math notranslate nohighlight">\((14)\)</span>에 경험 데이터 <span class="math notranslate nohighlight">\(\mathbf{s}_t\)</span>와 샘플링한 <span class="math notranslate nohighlight">\(\epsilon_t\)</span>를 대입하여 <span class="math notranslate nohighlight">\(\phi\)</span>에 대한 그레디언트를 계산하면 다음과 같다.</p>
 <div class="math notranslate nohighlight">
 \[
 \hat{\nabla}_{\phi}J_{\pi_{\phi}}(\phi)=\nabla_{\phi} \log \pi_{\phi}(\mathbf{a}_t | \mathbf{s}_t) + \nabla_{\phi}f_{\phi}(\epsilon_t; \mathbf{s}_t)(\nabla_{\mathbf{a}_{t}}\log \pi_{\phi}(\mathbf{a}_t | \mathbf{s}_t) - \nabla_{\mathbf{a}_t}Q_{\theta}(\mathbf{s}_t, \mathbf{a}_t)), \qquad \qquad (15)

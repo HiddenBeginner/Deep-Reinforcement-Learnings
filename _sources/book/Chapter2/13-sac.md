@@ -283,7 +283,7 @@ $$
 
 <br>
 
-우리는 식 $(12)$ 기댓값의 실제 그레디언트를 직접 구하는대신 경험 데이터 $(\mathbf{s}_t, \mathbf{a}_t)$를 대입하여 기댓값을 추정하고, 그것의 그레디언트를 계산하고 싶다 (stochatic gradient). 
+우리는 식 $(12)$ 기댓값의 실제 그레디언트를 직접 구하는 대신 경험 데이터 $(\mathbf{s}_t, \mathbf{a}_t)$를 대입하여 기댓값을 추정하고, 그것의 그레디언트를 계산하고 싶다 (stochatic gradient). 
 데이터 $(\mathbf{s}_t, \mathbf{a}_t)$를 대입한 값을 **기댓값의 추정치** 로 사용하는 것은 자연스러운 행위이다. 
 하지만 **기댓값의 추정치의 그레디언트** 를 계산하는 것은 $\mathbf{a} \sim \pi_{\phi}(\cdot|\mathbf{s}_t)$ 부분을 커버하지 못한다. 
 $\phi$가 변하면 $\pi_{\phi}$가 변하고, 그로 인해 기댓값 계산의 범위 $\mathbf{a} \sim \pi_{\phi}(\cdot|\mathbf{s}_t)$ 즉각적으로 바뀌기 때문이다. 
@@ -293,7 +293,7 @@ stochastic gradient를 사용하면 $\log \pi_{\phi}(\cdot|\mathbf{s}_t)$의 순
 
 <br>
 
-논문에서는 reparameterization trick을 사용해서 분산이 낮은 그레디언트를 추정량이 사용하게 된다. 즉, 행동 $\mathbf{a}_t$를 다른 랜덤변수 $\epsilon_t$를 사용하여 나타내게 만들었다.
+논문에서는 reparameterization trick을 사용해서 분산이 낮은 그레디언트를 추정량이 사용하게 된다. 즉, 행동 $\mathbf{a}_t$를 다른 확률 변수 $\epsilon_t$를 사용하여 나타내게 만들었다.
 
 $$
 \mathbf{a}_t=f_{\phi}(\epsilon_t; \mathbf{s}_t), \; \text{where} \;\epsilon_t \sim \mathcal{N}(\mathbf{0},  I). \qquad \qquad (13)
@@ -309,7 +309,7 @@ $$
 
 <br>
 
-이제 식 $(14)$의 안쪽 기댓값은 $\epsilon_t \sim \mathcal{N}(\mathbb{0}, I)$에 대해 계산되기 때문에 $\phi$ 변화에 따른 $\mathbf{a} \sim \pi_{\phi}(\cdot|\mathbf{s}_t)$ 변화를 고려하지 않아도 된다. 식 $(14)$에 경험 데이터 $\mathbf{s}_t$와 샘플링한 $\epsilon_t$를 대입하여 $\phi$에 대한 그레디언트를 계산하면 다음과 같다.
+이제 식 $(14)$의 안쪽 기댓값은 $\epsilon_t \sim \mathcal{N}(\mathbf{0}, I)$에 대해 계산되기 때문에 $\phi$ 변화에 따른 $\mathbf{a} \sim \pi_{\phi}(\cdot|\mathbf{s}_t)$ 변화를 고려하지 않아도 된다. 식 $(14)$에 경험 데이터 $\mathbf{s}_t$와 샘플링한 $\epsilon_t$를 대입하여 $\phi$에 대한 그레디언트를 계산하면 다음과 같다.
 
 $$
 \hat{\nabla}_{\phi}J_{\pi_{\phi}}(\phi)=\nabla_{\phi} \log \pi_{\phi}(\mathbf{a}_t | \mathbf{s}_t) + \nabla_{\phi}f_{\phi}(\epsilon_t; \mathbf{s}_t)(\nabla_{\mathbf{a}_{t}}\log \pi_{\phi}(\mathbf{a}_t | \mathbf{s}_t) - \nabla_{\mathbf{a}_t}Q_{\theta}(\mathbf{s}_t, \mathbf{a}_t)), \qquad \qquad (15)
