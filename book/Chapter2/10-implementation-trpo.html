@@ -90,7 +90,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="shortcut icon" href="../../_static/HDBG.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="참고문헌" href="../Reference.html" />
+    <link rel="next" title="16. Proximal Policy Optimization (PPO)" href="11-ppo.html" />
     <link rel="prev" title="14. Trust Region Policy Optimization (TRPO)" href="9-trpo.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -249,6 +249,26 @@ const thebe_selector_output = ".output, .cell_output"
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    15. TRPO 구현
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="11-ppo.html">
+   16. Proximal Policy Optimization (PPO)
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="12-implementation-ppo.html">
+   17. PPO 구현
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="13-sac.html">
+   18. Soft Actor-Critic (SAC)
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="14-implementation-sac.html">
+   19. SAC 구현
   </a>
  </li>
 </ul>
@@ -587,7 +607,7 @@ title="Print to PDF"
               <div>
                 
   <section class="tex2jax_ignore mathjax_ignore" id="trpo">
-<h1><span class="section-number">15. </span>TRPO 구현<a class="headerlink" href="#trpo" title="Permalink to this headline">#</a></h1>
+<span id="implementation-trpo"></span><h1><span class="section-number">15. </span>TRPO 구현<a class="headerlink" href="#trpo" title="Permalink to this headline">#</a></h1>
 <section id="id1">
 <h2><span class="section-number">15.1. </span>구현을 위해 필요한 약간의 이론들<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
 <p>이번 장에서는 TRPO를 구현해볼 예정이다. TRPO 설명만큼이나 수식이 많이 나올 예정이다. 가독성과 간결성을 위하여 <span class="math notranslate nohighlight">\(\theta_{\text{old}}\)</span>를 <span class="math notranslate nohighlight">\(\bar{\theta}\)</span>으로 표기할 것이다. 먼저 지난 장에서 살펴본 surrogate objective를 적어보자.</p>
@@ -1232,10 +1252,10 @@ J(\theta) = \mathbb{E}_{\pi_{\bar{\theta}}}\left[\frac{\pi_{\theta}(a_t|s_t)}{\p
 </div>
 </div>
 <br>
-</section>
 <hr class="docutils" />
+</section>
 <section id="hopper-v4">
-<h3><span class="section-number">15.2.3. </span>Hopper-v4 환경 제어<a class="headerlink" href="#hopper-v4" title="Permalink to this headline">#</a></h3>
+<span id="implementation-trpo-hopper"></span><h3><span class="section-number">15.2.3. </span>Hopper-v4 환경 제어<a class="headerlink" href="#hopper-v4" title="Permalink to this headline">#</a></h3>
 <p>제목이 곧 내용이다! 참고로 위의 Pendulum-v1 코드를 그대로 가져다 쓰면 안 된다. 사소하게 변경된 지점들이 있다. Pendulum-v1의 가능한 행동 범위가 <span class="math notranslate nohighlight">\([-2,2]\)</span>였는데 이를 위해 사용했던 <code class="docutils literal notranslate"><span class="pre">env.step(2</span> <span class="pre">*</span> <span class="pre">a)</span></code>를 <code class="docutils literal notranslate"><span class="pre">env.step(a)</span></code>으로 바꿔줘야 한다. MuJoCo 환경들은 모두 가능한 행동 범위가 모든 차원에서 <span class="math notranslate nohighlight">\([-1,1]\)</span>이다. 그리고 Pendulum-v1에서는 할인률 <span class="math notranslate nohighlight">\(\gamma\)</span>의 값을 0.95를 사용해줬었는데, 이를 0.99로 바꿔주었다. 학습률도 0.003에서 0.0003으로 줄여주었다.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1408,10 +1428,10 @@ PPO는 TRPO을 이론적으로 개선했다기 보다는 구현적으로 개선�
             <p class="prev-next-title"><span class="section-number">14. </span>Trust Region Policy Optimization (TRPO)</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="../Reference.html" title="next page">
+    <a class='right-next' id="next-link" href="11-ppo.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">참고문헌</p>
+        <p class="prev-next-title"><span class="section-number">16. </span>Proximal Policy Optimization (PPO)</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

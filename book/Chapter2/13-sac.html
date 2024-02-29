@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>17. Soft Actor-Critic (SAC) &#8212; 심층강화학습</title>
+    <title>18. Soft Actor-Critic (SAC) &#8212; 심층강화학습</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -90,8 +90,8 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="shortcut icon" href="../../_static/HDBG.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="18. SAC 구현" href="14-implementation-sac.html" />
-    <link rel="prev" title="16. Proximal Policy Optimization (PPO)" href="11-ppo.html" />
+    <link rel="next" title="19. SAC 구현" href="14-implementation-sac.html" />
+    <link rel="prev" title="17. PPO 구현" href="12-implementation-ppo.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -256,14 +256,19 @@ const thebe_selector_output = ".output, .cell_output"
    16. Proximal Policy Optimization (PPO)
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="12-implementation-ppo.html">
+   17. PPO 구현
+  </a>
+ </li>
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
-   17. Soft Actor-Critic (SAC)
+   18. Soft Actor-Critic (SAC)
   </a>
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="14-implementation-sac.html">
-   18. SAC 구현
+   19. SAC 구현
   </a>
  </li>
 </ul>
@@ -457,68 +462,68 @@ title="Print to PDF"
         <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id1">
-   17.1. 사전 지식
+   18.1. 사전 지식
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#on-policy-vs-off-policy">
-     17.1.1. On-policy vs. Off-policy
+     18.1.1. On-policy vs. Off-policy
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id2">
-     17.1.2. 엔트로피
+     18.1.2. 엔트로피
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#soft-policy-iteration">
-   17.2. Soft policy iteration
+   18.2. Soft policy iteration
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#soft-policy-evaluation">
-     17.2.1. Soft policy evaluation
+     18.2.1. Soft policy evaluation
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#soft-policy-improvement">
-     17.2.2. Soft policy improvement
+     18.2.2. Soft policy improvement
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#soft-actor-critic">
-   17.3. Soft Actor-Critic
+   18.3. Soft Actor-Critic
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id3">
-     17.3.1. 준비물
+     18.3.1. 준비물
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#soft-state-value-function">
-     17.3.2. Soft state value function 학습
+     18.3.2. Soft state value function 학습
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#soft-q-function">
-     17.3.3. Soft Q-function 학습
+     18.3.3. Soft Q-function 학습
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#policy">
-     17.3.4. Policy 학습
+     18.3.4. Policy 학습
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#experiment">
-   17.4. Experiment
+   18.4. Experiment
   </a>
  </li>
 </ul>
@@ -542,68 +547,68 @@ title="Print to PDF"
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id1">
-   17.1. 사전 지식
+   18.1. 사전 지식
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#on-policy-vs-off-policy">
-     17.1.1. On-policy vs. Off-policy
+     18.1.1. On-policy vs. Off-policy
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id2">
-     17.1.2. 엔트로피
+     18.1.2. 엔트로피
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#soft-policy-iteration">
-   17.2. Soft policy iteration
+   18.2. Soft policy iteration
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#soft-policy-evaluation">
-     17.2.1. Soft policy evaluation
+     18.2.1. Soft policy evaluation
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#soft-policy-improvement">
-     17.2.2. Soft policy improvement
+     18.2.2. Soft policy improvement
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#soft-actor-critic">
-   17.3. Soft Actor-Critic
+   18.3. Soft Actor-Critic
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id3">
-     17.3.1. 준비물
+     18.3.1. 준비물
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#soft-state-value-function">
-     17.3.2. Soft state value function 학습
+     18.3.2. Soft state value function 학습
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#soft-q-function">
-     17.3.3. Soft Q-function 학습
+     18.3.3. Soft Q-function 학습
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#policy">
-     17.3.4. Policy 학습
+     18.3.4. Policy 학습
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#experiment">
-   17.4. Experiment
+   18.4. Experiment
   </a>
  </li>
 </ul>
@@ -617,7 +622,7 @@ title="Print to PDF"
               <div>
                 
   <section class="tex2jax_ignore mathjax_ignore" id="soft-actor-critic-sac">
-<h1><span class="section-number">17. </span>Soft Actor-Critic (SAC)<a class="headerlink" href="#soft-actor-critic-sac" title="Permalink to this headline">#</a></h1>
+<h1><span class="section-number">18. </span>Soft Actor-Critic (SAC)<a class="headerlink" href="#soft-actor-critic-sac" title="Permalink to this headline">#</a></h1>
 <p>이번 장에서는 필자가 느끼기에 심층강화학습 분야에서 가장 널리 사용되는 알고리즘인 Soft Actor-Critic (SAC)에 대해 알아볼 예정이다.
 2018년에 공개된 SAC을 더 이상 state-of-the-art (SOTA)라고 부르진 않지만, 많은 연구들이 SAC 알고리즘을 베이스라인로 사용하여 발전시키고 있다.
 특히, 더 적은 environment steps만으로 더 높은 성능을 달성하고자 하는 sample efficiency 분야에서 SAC가 많이 사용된다. 예를 들어,</p>
@@ -631,9 +636,9 @@ SAC이 많이 사용되는 알고리즘이긴 하지만 내용이 쉬운 편은 
 <br>
 <hr class="docutils" />
 <section id="id1">
-<h2><span class="section-number">17.1. </span>사전 지식<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
+<h2><span class="section-number">18.1. </span>사전 지식<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
 <section id="on-policy-vs-off-policy">
-<h3><span class="section-number">17.1.1. </span>On-policy vs. Off-policy<a class="headerlink" href="#on-policy-vs-off-policy" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">18.1.1. </span>On-policy vs. Off-policy<a class="headerlink" href="#on-policy-vs-off-policy" title="Permalink to this headline">#</a></h3>
 <p>필자가 작성하고 있는 이 책은 어디서부터 어떻게 잘못된 것일까?
 어렵고 헷갈리는 용어 사용을 최대한 지양하다보니 on-policy와 off-policy라는 용어를 이제서야 소개를 한다.</p>
 <br>
@@ -650,7 +655,7 @@ Off-policy 기법은 수집한 데이터를 여러번 사용하기 때문에 상
 </section>
 <hr class="docutils" />
 <section id="id2">
-<h3><span class="section-number">17.1.2. </span>엔트로피<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">18.1.2. </span>엔트로피<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h3>
 <p>엔트로피는 확률 변수 (random variable)에 대해 정의되는 어떤 값이다. 잘 와닿지 않는다면 확률 분포에 정의되는 어떤 값이라고 생각해도 좋다.
 확률 분포 <span class="math notranslate nohighlight">\(p(x)\)</span>를 갖는 확률 변수 <span class="math notranslate nohighlight">\(X\)</span>의 엔트로피는 다음과 같이 정의된다. 참고로 두 번째 등호는 이산확률변수일 때 기대값의 정의이다.</p>
 <div class="math notranslate nohighlight">
@@ -678,12 +683,12 @@ Off-policy 기법은 수집한 데이터를 여러번 사용하기 때문에 상
 </section>
 <hr class="docutils" />
 <section id="soft-policy-iteration">
-<h2><span class="section-number">17.2. </span>Soft policy iteration<a class="headerlink" href="#soft-policy-iteration" title="Permalink to this headline">#</a></h2>
+<h2><span class="section-number">18.2. </span>Soft policy iteration<a class="headerlink" href="#soft-policy-iteration" title="Permalink to this headline">#</a></h2>
 <p>SAC 논문에서는 실용적인 알고리즘인 SAC를 소개하기 전에 policy iteration의 soft 버전인 soft policy iteration을 소개한다.
 Policy iteration은 주어진 정책의 행동가치함수를 계산하는 <strong>policy evaluation</strong>과 계산한 행동가치함수를 바탕으로 정책을 개선하는 <strong>policy improvement</strong>를 반복하며 optimal policy를 찾는 방법이다.</p>
 <br>
 <section id="soft-policy-evaluation">
-<h3><span class="section-number">17.2.1. </span>Soft policy evaluation<a class="headerlink" href="#soft-policy-evaluation" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">18.2.1. </span>Soft policy evaluation<a class="headerlink" href="#soft-policy-evaluation" title="Permalink to this headline">#</a></h3>
 <p>일반적인 policy evaluation과 다르게, soft policy iteration에서는 주어진 정책 <span class="math notranslate nohighlight">\(\pi\)</span>의 soft state value를 다음과 같이 정의한다.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
@@ -713,7 +718,7 @@ V^\pi(s) &amp; = &amp; \mathbb{E}_{a \sim \pi(\cdot | s)}\left[ Q^\pi(s, a) - \l
 </section>
 <hr class="docutils" />
 <section id="soft-policy-improvement">
-<h3><span class="section-number">17.2.2. </span>Soft policy improvement<a class="headerlink" href="#soft-policy-improvement" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">18.2.2. </span>Soft policy improvement<a class="headerlink" href="#soft-policy-improvement" title="Permalink to this headline">#</a></h3>
 <p>우리가 흔히 알고 있는 policy iteration의 policy improvement 단계에서는 각 상태에서 행동가치함수가 가장 높은 행동을 하도록 정책을 수정한다. 즉,</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
@@ -732,14 +737,14 @@ V^\pi(s) &amp; = &amp; \mathbb{E}_{a \sim \pi(\cdot | s)}\left[ Q^\pi(s, a) - \l
 </section>
 <hr class="docutils" />
 <section id="soft-actor-critic">
-<h2><span class="section-number">17.3. </span>Soft Actor-Critic<a class="headerlink" href="#soft-actor-critic" title="Permalink to this headline">#</a></h2>
+<h2><span class="section-number">18.3. </span>Soft Actor-Critic<a class="headerlink" href="#soft-actor-critic" title="Permalink to this headline">#</a></h2>
 <p>이제 SAC에 대해서 소개하고자 한다. Soft policy iteration에 off policy 기반 actor critic를 적용한 것이 SAC라고 생각해도 좋다. 논문에 나와 있는 알고리즘은 다음과 같다.</p>
 <figure class="align-default">
 <a class="reference internal image-reference" href="https://raw.githubusercontent.com/HiddenBeginner/hiddenbeginner.github.io/master/static/img/_posts/2022-11-6-sac/Untitled1.png"><img alt="https://raw.githubusercontent.com/HiddenBeginner/hiddenbeginner.github.io/master/static/img/_posts/2022-11-6-sac/Untitled1.png" src="https://raw.githubusercontent.com/HiddenBeginner/hiddenbeginner.github.io/master/static/img/_posts/2022-11-6-sac/Untitled1.png" style="width: 400px;" /></a>
 </figure>
 <br>
 <section id="id3">
-<h3><span class="section-number">17.3.1. </span>준비물<a class="headerlink" href="#id3" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">18.3.1. </span>준비물<a class="headerlink" href="#id3" title="Permalink to this headline">#</a></h3>
 <p>논문에서 소개하고 있는 SAC에서는 총 5개의 네트워크가 필요하다.</p>
 <ul class="simple">
 <li><p>1개의 정책 네트워크 <span class="math notranslate nohighlight">\(\pi_{\phi}\)</span></p></li>
@@ -767,7 +772,7 @@ V^\pi(s) &amp; = &amp; \mathbb{E}_{a \sim \pi(\cdot | s)}\left[ Q^\pi(s, a) - \l
 </section>
 <hr class="docutils" />
 <section id="soft-state-value-function">
-<h3><span class="section-number">17.3.2. </span>Soft state value function 학습<a class="headerlink" href="#soft-state-value-function" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">18.3.2. </span>Soft state value function 학습<a class="headerlink" href="#soft-state-value-function" title="Permalink to this headline">#</a></h3>
 <p>다시 한 번 말하지만 실제 SAC 구현체는 상태 가치 네트워크를 포함하고 있지 않다. 따라서 아래의 내용은 SAC 논문에서 나온 내용을 설명한 것뿐이다.
 상태 가치 네트워크는 식 <span class="math notranslate nohighlight">\((1.1)\)</span>을 이용하여 학습된다.
 실제 soft state value에 대해서는 식 <span class="math notranslate nohighlight">\((1.1)\)</span>이 성립하기 때문에 좌변과 우변의 차이의 제곱을 최소화하는 것을 목표로 한다.
@@ -788,7 +793,7 @@ J_V(\psi)=\mathbb{E}_{\mathbf{s}_t \in \mathcal{D}}\left[ \frac{1}{2}\left(V_\ps
 </section>
 <hr class="docutils" />
 <section id="soft-q-function">
-<h3><span class="section-number">17.3.3. </span>Soft Q-function 학습<a class="headerlink" href="#soft-q-function" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">18.3.3. </span>Soft Q-function 학습<a class="headerlink" href="#soft-q-function" title="Permalink to this headline">#</a></h3>
 <p>Soft Q-function은 temporal difference learning을 사용하여 업데이트한다. 즉, soft Q-function 학습을 위한 목적함수는 다음과 같다.</p>
 <div class="math notranslate nohighlight">
 \[
@@ -823,7 +828,7 @@ SAC는 후자의 방법은 선택한다.</p>
 </section>
 <hr class="docutils" />
 <section id="policy">
-<h3><span class="section-number">17.3.4. </span>Policy 학습<a class="headerlink" href="#policy" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">18.3.4. </span>Policy 학습<a class="headerlink" href="#policy" title="Permalink to this headline">#</a></h3>
 <p>이 부분도 굉장히 흥미롭다. 우리가 알고 있는 policy gradient는 평균 상태가치함수 <span class="math notranslate nohighlight">\(\mathbb{E}_{\pi}\left[V_\pi(s)\right]\)</span>를 최적화하는 것으로부터 유도되었다.
 하지만 이 논문에서는 상태 가치 함수의 정의가 다르기 때문에 다른 방식으로 policy를 학습하게 된다.  Soft policy improvement를 목적함수로 사용하여 policy를 학습한다.</p>
 <div class="math notranslate nohighlight">
@@ -896,7 +901,7 @@ J_{\pi}(\phi)\approx\mathbb{E}_{\mathbf{s}_t \sim \mathcal{D}}\left[ \mathbb{E}_
 </section>
 <hr class="docutils" />
 <section id="experiment">
-<h2><span class="section-number">17.4. </span>Experiment<a class="headerlink" href="#experiment" title="Permalink to this headline">#</a></h2>
+<h2><span class="section-number">18.4. </span>Experiment<a class="headerlink" href="#experiment" title="Permalink to this headline">#</a></h2>
 <p>SAC 논문에서는 OpenAI gym benchmark suite와 rllab의 Humanoid 환경을 사용하여 실험을 하였다. 논문에서는 다음 다섯 가지 알고리즘을 비교하고 있다.</p>
 <ul class="simple">
 <li><p>DDPG: off-policy, actor-critic</p></li>
@@ -963,17 +968,17 @@ J_{\pi}(\phi)\approx\mathbb{E}_{\mathbf{s}_t \sim \mathcal{D}}\left[ \mathbb{E}_
                 
     <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="11-ppo.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="12-implementation-ppo.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">16. </span>Proximal Policy Optimization (PPO)</p>
+            <p class="prev-next-title"><span class="section-number">17. </span>PPO 구현</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="14-implementation-sac.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">18. </span>SAC 구현</p>
+        <p class="prev-next-title"><span class="section-number">19. </span>SAC 구현</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

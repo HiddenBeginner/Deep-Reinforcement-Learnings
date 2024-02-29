@@ -1,0 +1,1336 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>17. PPO 구현 &#8212; 심층강화학습</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script kind="utterances">
+
+    var commentsRunWhenDOMLoaded = cb => {
+    if (document.readyState != 'loading') {
+        cb()
+    } else if (document.addEventListener) {
+        document.addEventListener('DOMContentLoaded', cb)
+    } else {
+        document.attachEvent('onreadystatechange', function() {
+        if (document.readyState == 'complete') cb()
+        })
+    }
+}
+
+var addUtterances = () => {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = "https://utteranc.es/client.js";
+    script.async = "async";
+
+    script.setAttribute("repo", "HiddenBeginner/Deep-Reinforcement-Learnings");
+    script.setAttribute("issue-term", "pathname");
+    script.setAttribute("theme", "github-light");
+    script.setAttribute("label", "💬 comment");
+    script.setAttribute("crossorigin", "anonymous");
+
+    sections = document.querySelectorAll("div.section");
+    if (sections !== null) {
+        section = sections[sections.length-1];
+        section.appendChild(script);
+    }
+}
+commentsRunWhenDOMLoaded(addUtterances);
+</script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="shortcut icon" href="../../_static/HDBG.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="18. Soft Actor-Critic (SAC)" href="13-sac.html" />
+    <link rel="prev" title="16. Proximal Policy Optimization (PPO)" href="11-ppo.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-FTQEC31PV8"></script>
+<script>
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){ dataLayer.push(arguments); }
+                    gtag('js', new Date());
+                    gtag('config', 'G-FTQEC31PV8');
+                </script>
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../../_static/HDBG.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">심층강화학습</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    심층강화학습 (Deep Reinforcement Learnings)
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Markov Decision Process
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../Chapter1/1-sequential-decision-making-problems.html">
+   1. 순차적 의사 결정 문제, 에이전트, 환경
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../Chapter1/2-markov-decision-processes.html">
+   2. Markov Decision Process (MDP)
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../Chapter1/3-policy-return-value.html">
+   3. 정책, Return, 가치 함수
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../Chapter1/4-bellman-equation.html">
+   4. 벨만 방정식: 가치 함수의 재귀적 성질
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../Chapter1/5-stochastic-approximation.html">
+   5. 가치 함수 근사하기: Stochastic approximation
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Policy gradient methods
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="1-policy-gradient-theorem.html">
+   6. Policy Gradient Theorem
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="2-reinforce.html">
+   7. REINFORCE
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="3-implementation-reinforce.html">
+   8. REINFORCE 구현
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="4-reinforce-with-baseline.html">
+   9. REINFORCE with baseline
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="5-actor-critic.html">
+   10. Actor-critic 알고리즘
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="6-implementation-actor-critic.html">
+   11. Online/batch actor-critic 구현
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="7-n_step-actor-critic.html">
+   12.
+   <span class="math notranslate nohighlight">
+    \(n\)
+   </span>
+   -step return actor-critic
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="8-gae.html">
+   13. Generalized Advantage Estimation (GAE)
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="9-trpo.html">
+   14. Trust Region Policy Optimization (TRPO)
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="10-implementation-trpo.html">
+   15. TRPO 구현
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="11-ppo.html">
+   16. Proximal Policy Optimization (PPO)
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   17. PPO 구현
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="13-sac.html">
+   18. Soft Actor-Critic (SAC)
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="14-implementation-sac.html">
+   19. SAC 구현
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  참고문헌
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../Reference.html">
+   참고문헌
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/hiddenbeginner/Deep-Reinforcement-Learnings/gh-pages?urlpath=tree/book/Chapter2/12-implementation-ppo.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/hiddenbeginner/Deep-Reinforcement-Learnings"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/hiddenbeginner/Deep-Reinforcement-Learnings/issues/new?title=Issue%20on%20page%20%2Fbook/Chapter2/12-implementation-ppo.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../../_sources/book/Chapter2/12-implementation-ppo.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id1">
+   17.1. 모듈 불러오기
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id2">
+   17.2. PPO 에이전트 구현
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#init">
+     17.2.1.
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       __init__()
+      </span>
+     </code>
+     메서드
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#learn">
+     17.2.2.
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       learn()
+      </span>
+     </code>
+     메서드
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#step">
+     17.2.3.
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       step()
+      </span>
+     </code>
+     메서드
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#rolloutbuffer">
+     17.2.4. RolloutBuffer 구현
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id3">
+     17.2.5. 정책 네트워크 및 상태 가치 네트워크 구현
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id4">
+     17.2.6. PPO 에이전트 구현
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id5">
+     17.2.7. PPO 에이전트 훈련
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>PPO 구현</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id1">
+   17.1. 모듈 불러오기
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id2">
+   17.2. PPO 에이전트 구현
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#init">
+     17.2.1.
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       __init__()
+      </span>
+     </code>
+     메서드
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#learn">
+     17.2.2.
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       learn()
+      </span>
+     </code>
+     메서드
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#step">
+     17.2.3.
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       step()
+      </span>
+     </code>
+     메서드
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#rolloutbuffer">
+     17.2.4. RolloutBuffer 구현
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id3">
+     17.2.5. 정책 네트워크 및 상태 가치 네트워크 구현
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id4">
+     17.2.6. PPO 에이전트 구현
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id5">
+     17.2.7. PPO 에이전트 훈련
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section class="tex2jax_ignore mathjax_ignore" id="ppo">
+<h1><span class="section-number">17. </span>PPO 구현<a class="headerlink" href="#ppo" title="Permalink to this headline">#</a></h1>
+<p>이번 장에서는 PPO를 직접 구현해볼 것이다. 여기서 다루는 PPO 구현은 공부 목적으로만 따라해보는 것이 좋고, 실제 연구나 프로젝트에서는 잘 짜여진 패키지의 구현체를 사용하는 것을 추천한다. 왜냐하면 PPO 알고리즘이 좋은 성능을 얻기 위해서는 병렬 환경 사용은 거의 필수이고, 논문에는 나와 있지 않은 여러 구현 디테일들이 반드시 필요하기 때문이다. 구현 디테일과 PPO 성능 사이의 관계는 “Implementation Matters in Deep RL: A Case Study on PPO and TRPO” 논문에 잘 나와 있다.</p>
+<br>
+<hr class="docutils" />
+<section id="id1">
+<h2><span class="section-number">17.1. </span>모듈 불러오기<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
+<p>PPO는 TRPO의 개선체이긴 하지만 TRPO 코드를 고쳐나가는 것보다는 예전에 구현했던 GAE actor-critic 코드에서 추가하는 방식이 훨씬 더 편하다. 가장 먼저 필요한 모듈들을 불러오자. 이전과 다르게 <code class="docutils literal notranslate"><span class="pre">torch.utils.data</span></code>의 <code class="docutils literal notranslate"><span class="pre">TensorDataset</span></code>과 <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code>가 추가되었다. PPO의 경우 수집한 데이터로 네트워크를 <span class="math notranslate nohighlight">\(K\)</span> epoch번 업데이트하게 되는데, 이때 두 클래스를 사용할 것이다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">from</span> <span class="nn">torch.distributions</span> <span class="kn">import</span> <span class="n">Normal</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">TensorDataset</span><span class="p">,</span> <span class="n">DataLoader</span>
+</pre></div>
+</div>
+</div>
+</div>
+<br>
+</section>
+<hr class="docutils" />
+<section id="id2">
+<h2><span class="section-number">17.2. </span>PPO 에이전트 구현<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">PPO</span></code> 클래스에서 중요한 부분들을 먼저 살펴보고 이후 코드를 나열하도록 할 것이다.</p>
+<br>
+<hr class="docutils" />
+<section id="init">
+<h3><span class="section-number">17.2.1. </span><code class="docutils literal notranslate"><span class="pre">__init__()</span></code> 메서드<a class="headerlink" href="#init" title="Permalink to this headline">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">__init__()</span></code> 메서드에 다양한 인자들이 추가되었다. PPO는 TRPO처럼 2,000번 이상 환경과 상호작용하며 데이터를 수집하고 네트워크 파라미터를 여러 번 업데이트시킨다. <code class="docutils literal notranslate"><span class="pre">n_steps</span></code> 인자는 환경과 상호작용하는 횟수를 결정하고, <code class="docutils literal notranslate"><span class="pre">n_epochs</span></code>는 수집한 데이터를 몇 번 반복 학습할지를 결정한다. 각 <code class="docutils literal notranslate"><span class="pre">epoch</span></code>에서는 <code class="docutils literal notranslate"><span class="pre">batch_size</span></code>개씩 데이터를 뽑아서 손실함수를 계산하고 네트워크를 업데이트시킨다. 이때 손실함수는 정책 네트워크를 위한 손실함수, 가치 네트워크를 위한 손실함수, 엔트로피 보너스로 구성되는데, 가치 네트워크 손실함수와 엔트로피 보너스에 대한 가중치가 각각 <code class="docutils literal notranslate"><span class="pre">vf_coef</span></code>와 <code class="docutils literal notranslate"><span class="pre">ent_coef</span></code>이다. 그리고 PPO 알고리즘의 clipped surrogate objective에 사용될 하이퍼파라미터 <span class="math notranslate nohighlight">\(\epsilon\)</span>의 이름을 <code class="docutils literal notranslate"><span class="pre">clip_ratio</span></code>으로 설정하였다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">PPO</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">state_dim</span><span class="p">,</span>
+        <span class="n">action_dim</span><span class="p">,</span>
+        <span class="n">hidden_dims</span><span class="o">=</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">64</span> <span class="p">),</span>
+        <span class="n">activation_fn</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">,</span>
+        <span class="n">n_steps</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span>
+        <span class="n">n_epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">policy_lr</span><span class="o">=</span><span class="mf">0.0003</span><span class="p">,</span>
+        <span class="n">value_lr</span><span class="o">=</span><span class="mf">0.0003</span><span class="p">,</span>
+        <span class="n">gamma</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span>
+        <span class="n">lmda</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
+        <span class="n">clip_ratio</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">vf_coef</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">ent_coef</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy</span> <span class="o">=</span> <span class="n">MLPGaussianPolicy</span><span class="p">(</span><span class="n">state_dim</span><span class="p">,</span> <span class="n">action_dim</span><span class="p">,</span> <span class="n">hidden_dims</span><span class="p">,</span> <span class="n">activation_fn</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">MLPStateValue</span><span class="p">(</span><span class="n">state_dim</span><span class="p">,</span> <span class="n">hidden_dims</span><span class="p">,</span> <span class="n">activation_fn</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span> <span class="o">=</span> <span class="n">n_steps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_epochs</span> <span class="o">=</span> <span class="n">n_epochs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lmda</span> <span class="o">=</span> <span class="n">lmda</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">=</span> <span class="n">gamma</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clip_ratio</span> <span class="o">=</span> <span class="n">clip_ratio</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vf_coef</span> <span class="o">=</span> <span class="n">vf_coef</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ent_coef</span> <span class="o">=</span> <span class="n">ent_coef</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy_optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">policy_lr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">value_lr</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="n">RolloutBuffer</span><span class="p">()</span>
+</pre></div>
+</div>
+<br>
+</section>
+<hr class="docutils" />
+<section id="learn">
+<h3><span class="section-number">17.2.2. </span><code class="docutils literal notranslate"><span class="pre">learn()</span></code> 메서드<a class="headerlink" href="#learn" title="Permalink to this headline">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">learn()</span></code> 메서드에서 GAE와 return을 계산해주는 것까지는 GAE actor-critic과 완전히 동일하다. 그 이후부터 코드를 살펴보자. 먼저, 수집한 데이터를 네트워크를 <strong>여러 번</strong> 업데이트시킬 것이다. 하지만, 단 한 번의 업데이트만 해도 수집해놓은 데이터가 더 이상 현재 정책 네트워크의 데이터가 아니게 된다. 즉, on-policy 알고리즘이 깨져버린다. 이를 위해 TRPO와 PPO의 surrogate objective에는 importance sampling항인 <span class="math notranslate nohighlight">\(\frac{\pi_{\theta}\left( a_t |s_t\right)}{\pi_{\theta_{\text{old}}}\left( a_t |s_t\right)}\)</span>이 있다. <code class="docutils literal notranslate"><span class="pre">n_epochs</span></code>번 네트워크가 업데이트되는 동안 <span class="math notranslate nohighlight">\(\pi_{\theta_{\text{old}}}\)</span>는 고정되어 있기 때문에 이를 먼저 구해주는 코드이다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">learn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="o">...</span><span class="n">중략</span><span class="o">...</span>
+
+    <span class="c1"># GAE 및 log_prob_old 계산</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="o">...</span><span class="n">중략</span><span class="o">...</span>
+
+        <span class="c1"># \pi_{old}(a|s) 로그 확률 값 계산하기</span>
+        <span class="n">mu</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">Normal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">std</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">atanh</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">1e-7</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1e-7</span><span class="p">))</span>
+        <span class="n">log_prob_old</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<br>
+<p>업데이트에 필요한 타겟값들은 다 만들어졌다. 이제 <code class="docutils literal notranslate"><span class="pre">n_epochs</span></code>번 동안 네트워크를 학습시키는 코드를 살펴보자. 매 epoch에서는 총 <code class="docutils literal notranslate"><span class="pre">n_steps</span></code>/<code class="docutils literal notranslate"><span class="pre">batch_size</span></code>번 네트워크를 업데이트하게 되는데, 각 iteration에서는 데이터를 <code class="docutils literal notranslate"><span class="pre">batch_size</span></code>개씩 뽑아서 손실함수를 계산하고 네트워크를 업데이트한다. 필자는 이 과정을 <code class="docutils literal notranslate"><span class="pre">TensorDataset</span></code>과 <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code>로 구현했다. 가치 네트워크를 위한 손실함수 및 정책의 <span class="math notranslate nohighlight">\(\log \pi(a \mid s)\)</span> 계산하는 것은 이전 구현들과 동일하다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="o">...</span><span class="n">중략</span>
+    <span class="c1"># Training the policy and value network ``n_epochs`` time</span>
+    <span class="n">dts</span> <span class="o">=</span> <span class="n">TensorDataset</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">adv</span><span class="p">,</span> <span class="n">log_prob_old</span><span class="p">)</span>
+    <span class="n">loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dts</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_epochs</span><span class="p">):</span>
+        <span class="n">value_losses</span><span class="p">,</span> <span class="n">policy_losses</span><span class="p">,</span> <span class="n">entropy_bonuses</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">loader</span><span class="p">:</span>
+            <span class="n">s_</span><span class="p">,</span> <span class="n">a_</span><span class="p">,</span> <span class="n">ret_</span><span class="p">,</span> <span class="n">adv_</span><span class="p">,</span> <span class="n">log_prob_old_</span> <span class="o">=</span> <span class="n">batch</span>
+
+            <span class="c1"># 가치 네트워크의 손실함수 계산</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">s_</span><span class="p">)</span>
+            <span class="n">value_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ret_</span><span class="p">)</span>
+
+            <span class="c1"># 정책 네트워크의 손실함수 계산</span>
+            <span class="n">mu</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="p">(</span><span class="n">s_</span><span class="p">)</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">Normal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">std</span><span class="p">)</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">atanh</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">a_</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">1e-7</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1e-7</span><span class="p">))</span>
+            <span class="n">log_prob</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<br>
+<p>아래 코드가 clipped surrogate objective를 계산하고, 손실함수를 만들어서 네트워크를 업데이트하는 코드이다. 코드들이 모두 직관적이기 때문에 이해가 잘 될 것이라 믿어 의심치 아니하지 아니할 수 없다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+            <span class="n">ratio</span> <span class="o">=</span> <span class="p">(</span><span class="n">log_prob</span> <span class="o">-</span> <span class="n">log_prob_old_</span><span class="p">)</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span>
+            <span class="n">surr1</span> <span class="o">=</span> <span class="n">adv_</span> <span class="o">*</span> <span class="n">ratio</span>
+            <span class="n">surr2</span> <span class="o">=</span> <span class="n">adv_</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">ratio</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">clip_ratio</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">clip_ratio</span><span class="p">)</span>
+
+            <span class="n">policy_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">surr1</span><span class="p">,</span> <span class="n">surr2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+            <span class="n">entropy_bonus</span> <span class="o">=</span> <span class="o">-</span><span class="n">m</span><span class="o">.</span><span class="n">entropy</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">policy_loss</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">vf_coef</span> <span class="o">*</span> <span class="n">value_loss</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ent_coef</span> <span class="o">*</span> <span class="n">entropy_bonus</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">policy_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+            <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">policy_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</pre></div>
+</div>
+<br>
+</section>
+<hr class="docutils" />
+<section id="step">
+<h3><span class="section-number">17.2.3. </span><code class="docutils literal notranslate"><span class="pre">step()</span></code> 메서드<a class="headerlink" href="#step" title="Permalink to this headline">#</a></h3>
+<p>이전 구현들에서 <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> 대신 <code class="docutils literal notranslate"><span class="pre">n_steps</span></code>을 사용한 것 외에 동일하다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transition</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">transition</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learn</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+<br>
+<p>코드의 변경점은 여기까지가 전부이다. 이후 모든 코드는 그 동안 해왔던 것과 거의 동일하다. 복사 붙여넣기를 사용하자.</p>
+<br>
+</section>
+<hr class="docutils" />
+<section id="rolloutbuffer">
+<h3><span class="section-number">17.2.4. </span>RolloutBuffer 구현<a class="headerlink" href="#rolloutbuffer" title="Permalink to this headline">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">RolloutBuffer</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transition</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">transition</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s_prime</span><span class="p">,</span> <span class="n">done</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">(</span><span class="n">s</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">(</span><span class="n">a</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">(</span><span class="n">s_prime</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">(</span><span class="n">done</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<br>
+</section>
+<hr class="docutils" />
+<section id="id3">
+<h3><span class="section-number">17.2.5. </span>정책 네트워크 및 상태 가치 네트워크 구현<a class="headerlink" href="#id3" title="Permalink to this headline">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MLPGaussianPolicy</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dim</span><span class="p">,</span> <span class="n">action_dim</span><span class="p">,</span> <span class="n">hidden_dims</span><span class="o">=</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="p">),</span> <span class="n">activation_fn</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MLPGaussianPolicy</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">state_dim</span><span class="p">,</span> <span class="n">hidden_dims</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hidden_dims</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">hidden_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dims</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden_dims</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hidden_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hidden_layer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mu_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dims</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">action_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_std_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dims</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">action_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation_fn</span> <span class="o">=</span> <span class="n">activation_fn</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_fn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_layer</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">hidden_layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_layers</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_fn</span><span class="p">(</span><span class="n">hidden_layer</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+        <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu_layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">log_std</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_std_layer</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">mu</span><span class="p">,</span> <span class="n">log_std</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">MLPStateValue</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dim</span><span class="p">,</span> <span class="n">hidden_dims</span><span class="o">=</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="p">),</span> <span class="n">activation_fn</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MLPStateValue</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">state_dim</span><span class="p">,</span> <span class="n">hidden_dims</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hidden_dims</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">hidden_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dims</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden_dims</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hidden_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hidden_layer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dims</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation_fn</span> <span class="o">=</span> <span class="n">activation_fn</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_fn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_layer</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">hidden_layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_layers</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_fn</span><span class="p">(</span><span class="n">hidden_layer</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x</span>
+</pre></div>
+</div>
+</div>
+</div>
+<br>
+</section>
+<hr class="docutils" />
+<section id="id4">
+<h3><span class="section-number">17.2.6. </span>PPO 에이전트 구현<a class="headerlink" href="#id4" title="Permalink to this headline">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">PPO</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">state_dim</span><span class="p">,</span>
+        <span class="n">action_dim</span><span class="p">,</span>
+        <span class="n">hidden_dims</span><span class="o">=</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">64</span> <span class="p">),</span>
+        <span class="n">activation_fn</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">,</span>
+        <span class="n">n_steps</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span>
+        <span class="n">n_epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">policy_lr</span><span class="o">=</span><span class="mf">0.0003</span><span class="p">,</span>
+        <span class="n">value_lr</span><span class="o">=</span><span class="mf">0.0003</span><span class="p">,</span>
+        <span class="n">gamma</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span>
+        <span class="n">lmda</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
+        <span class="n">clip_ratio</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">vf_coef</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">ent_coef</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy</span> <span class="o">=</span> <span class="n">MLPGaussianPolicy</span><span class="p">(</span><span class="n">state_dim</span><span class="p">,</span> <span class="n">action_dim</span><span class="p">,</span> <span class="n">hidden_dims</span><span class="p">,</span> <span class="n">activation_fn</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">MLPStateValue</span><span class="p">(</span><span class="n">state_dim</span><span class="p">,</span> <span class="n">hidden_dims</span><span class="p">,</span> <span class="n">activation_fn</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span> <span class="o">=</span> <span class="n">n_steps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_epochs</span> <span class="o">=</span> <span class="n">n_epochs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lmda</span> <span class="o">=</span> <span class="n">lmda</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">=</span> <span class="n">gamma</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clip_ratio</span> <span class="o">=</span> <span class="n">clip_ratio</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vf_coef</span> <span class="o">=</span> <span class="n">vf_coef</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ent_coef</span> <span class="o">=</span> <span class="n">ent_coef</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy_optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">policy_lr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">value_lr</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="n">RolloutBuffer</span><span class="p">()</span>
+
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">act</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">training</span><span class="p">)</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">mu</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">std</span><span class="p">)</span> <span class="k">if</span> <span class="n">training</span> <span class="k">else</span> <span class="n">mu</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">learn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+        <span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s_prime</span><span class="p">,</span> <span class="n">done</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>
+        <span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s_prime</span><span class="p">,</span> <span class="n">done</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span> <span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s_prime</span><span class="p">,</span> <span class="n">done</span><span class="p">])</span>
+        
+        <span class="c1"># GAE 및 log_prob_old 계산</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">done</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">s_prime</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>  <span class="c1"># \delta_t 담은 배열</span>
+            <span class="n">adv</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span>  <span class="c1"># gae를 담을 배열</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="c1"># return을 담을 배열</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)):</span>
+                <span class="n">adv</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">done</span><span class="p">[</span><span class="n">t</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lmda</span> <span class="o">*</span> <span class="n">adv</span><span class="p">[</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">ret</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">done</span><span class="p">[</span><span class="n">t</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">ret</span><span class="p">[</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+            <span class="c1"># \pi_{old}(a|s) 로그 확률 값 계산하기</span>
+            <span class="n">mu</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">Normal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">std</span><span class="p">)</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">atanh</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">1e-7</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1e-7</span><span class="p">))</span>
+            <span class="n">log_prob_old</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+        <span class="c1"># Training the policy and value network ``n_epochs`` time</span>
+        <span class="n">dts</span> <span class="o">=</span> <span class="n">TensorDataset</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">adv</span><span class="p">,</span> <span class="n">log_prob_old</span><span class="p">)</span>
+        <span class="n">loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dts</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_epochs</span><span class="p">):</span>
+            <span class="n">value_losses</span><span class="p">,</span> <span class="n">policy_losses</span><span class="p">,</span> <span class="n">entropy_bonuses</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">loader</span><span class="p">:</span>
+                <span class="n">s_</span><span class="p">,</span> <span class="n">a_</span><span class="p">,</span> <span class="n">ret_</span><span class="p">,</span> <span class="n">adv_</span><span class="p">,</span> <span class="n">log_prob_old_</span> <span class="o">=</span> <span class="n">batch</span>
+                <span class="c1"># 가치 네트워크의 손실함수 계산</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">s_</span><span class="p">)</span>
+                <span class="n">value_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ret_</span><span class="p">)</span>
+
+                <span class="c1"># 정책 네트워크의 손실함수 계산</span>
+                <span class="n">mu</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="p">(</span><span class="n">s_</span><span class="p">)</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">Normal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">std</span><span class="p">)</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">atanh</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">a_</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">1e-7</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1e-7</span><span class="p">))</span>
+                <span class="n">log_prob</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                
+                <span class="n">ratio</span> <span class="o">=</span> <span class="p">(</span><span class="n">log_prob</span> <span class="o">-</span> <span class="n">log_prob_old_</span><span class="p">)</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span>
+                <span class="n">surr1</span> <span class="o">=</span> <span class="n">adv_</span> <span class="o">*</span> <span class="n">ratio</span>
+                <span class="n">surr2</span> <span class="o">=</span> <span class="n">adv_</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">ratio</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">clip_ratio</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">clip_ratio</span><span class="p">)</span>
+
+                <span class="n">policy_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">surr1</span><span class="p">,</span> <span class="n">surr2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="n">entropy_bonus</span> <span class="o">=</span> <span class="o">-</span><span class="n">m</span><span class="o">.</span><span class="n">entropy</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+                <span class="n">loss</span> <span class="o">=</span> <span class="n">policy_loss</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">vf_coef</span> <span class="o">*</span> <span class="n">value_loss</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ent_coef</span> <span class="o">*</span> <span class="n">entropy_bonus</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">value_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">policy_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+                <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">value_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">policy_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+                <span class="n">value_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value_loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+                <span class="n">policy_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">policy_loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+                <span class="n">entropy_bonuses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">entropy_bonus</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;policy_loss&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">policy_losses</span><span class="p">),</span>
+                  <span class="s1">&#39;value_loss&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">value_losses</span><span class="p">),</span>
+                  <span class="s1">&#39;entropy_bonus&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">entropy_bonuses</span><span class="p">)}</span>
+
+        <span class="k">return</span> <span class="n">result</span>
+    
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transition</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">transition</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learn</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">result</span>
+        
+</pre></div>
+</div>
+</div>
+</div>
+<br>
+</section>
+<hr class="docutils" />
+<section id="id5">
+<h3><span class="section-number">17.2.7. </span>PPO 에이전트 훈련<a class="headerlink" href="#id5" title="Permalink to this headline">#</a></h3>
+<p>PPO 알고리즘으로 <code class="docutils literal notranslate"><span class="pre">Pendulum-v1</span></code> 환경 제어는 베리 이지하기 때문에 바로 Gymnasium MuJoCo 환경 중 하나인 <code class="docutils literal notranslate"><span class="pre">Hopper-v4</span></code>를 제어해볼 것이다. 지난 <a class="reference internal" href="10-implementation-trpo.html#implementation-trpo"><span class="std std-ref">TRPO 구현</span></a>에서 구현했던 TRPO와 성능을 비교해보면 좋을 것이다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">eval_iterations</span><span class="p">):</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">env_name</span><span class="p">)</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">eval_iterations</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span> <span class="o">+</span> <span class="mi">100</span> <span class="o">+</span> <span class="n">i</span><span class="p">),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="p">(</span><span class="n">terminated</span> <span class="ow">or</span> <span class="n">truncated</span><span class="p">):</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">s_prime</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+            <span class="n">score</span> <span class="o">+=</span> <span class="n">r</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">s_prime</span>
+        <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+    <span class="n">env</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">seed_all</span><span class="p">(</span><span class="n">seed</span><span class="p">):</span>
+    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">manual_seed_all</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">deterministic</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">env_name</span> <span class="o">=</span> <span class="s1">&#39;Hopper-v4&#39;</span>
+
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">seed_all</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+<span class="n">max_iterations</span> <span class="o">=</span> <span class="mi">1000000</span>
+<span class="n">eval_intervals</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">eval_iterations</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">activation_fn</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span>
+
+<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">env_name</span><span class="p">)</span>
+<span class="n">state_dim</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">action_dim</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">agent</span> <span class="o">=</span> <span class="n">PPO</span><span class="p">(</span>
+    <span class="n">state_dim</span><span class="p">,</span>
+    <span class="n">action_dim</span><span class="p">,</span>
+    <span class="n">activation_fn</span><span class="o">=</span><span class="n">activation_fn</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iterations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">s_prime</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">step</span><span class="p">((</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s_prime</span><span class="p">,</span> <span class="n">terminated</span><span class="p">))</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s_prime</span>
+    
+    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;policy_loss&#39;</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;policy_loss&#39;</span><span class="p">]])</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;value_loss&#39;</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;value_loss&#39;</span><span class="p">]])</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;entropy_bonus&#39;</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;entropy_bonus&#39;</span><span class="p">]])</span>
+    
+    <span class="k">if</span> <span class="n">terminated</span> <span class="ow">or</span> <span class="n">truncated</span><span class="p">:</span>
+        <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+        
+    <span class="k">if</span> <span class="n">t</span> <span class="o">%</span> <span class="n">eval_intervals</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">eval_iterations</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;Avg return&#39;</span><span class="p">,</span> <span class="n">score</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 1000000/1000000 [17:26&lt;00:00, 955.36it/s]
+</pre></div>
+</div>
+</div>
+</div>
+<br>
+<p>아래는 결과 학습 곡선이다. 참고로 TRPO의 학습 곡선은 <a class="reference internal" href="10-implementation-trpo.html#implementation-trpo-hopper"><span class="std std-ref">Hopper-v4 환경 제어</span></a>에서 찾아볼 수 있다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">]</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;Avg return&#39;</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;step&#39;</span><span class="p">],</span> <span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="s1">&#39;b-&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Average return over 10 episodes&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Step&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Avg return&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;policy_loss&#39;</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;step&#39;</span><span class="p">],</span> <span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="s1">&#39;b-&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Policy loss&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Step&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Policy loss&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;value_loss&#39;</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;step&#39;</span><span class="p">],</span> <span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="s1">&#39;b-&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Value loss&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Step&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Value loss&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;entropy_bonus&#39;</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;step&#39;</span><span class="p">],</span> <span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="s1">&#39;b-&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Entropy bonus&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Step&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Entropy bonus&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/12-implementation-ppo_16_0.png" src="../../_images/12-implementation-ppo_16_0.png" />
+</div>
+</div>
+<br>
+<p>아니 왜 TRPO보다 성능이 안 좋아요? 코드 구현 제대로 안 한거 아니에요?라고 물어본다면 그건 바로 ReLU를 사용했기 때문이다! 이게 무슨 소리인가 싶을 것이다. 우리의 일반적인 믿음은 활성화 함수로는 ReLU가 hyperbolic tangent (tanh)보다 좋다는 것이다. 필자도 그렇게 생각했다. 그래서 필자가 예전에 PPO 논문을 읽고 직접 구현해볼 때 ReLU를 사용했었다. 그런데 논문에 보고한 성능에 훨씬 못 미치는 성능이 나오는 것이었다. 처음엔 내 코드에 버그가 있는줄 알았지, 오타가 있는줄 알았지, 구현 디테일을 빼고 구현해서 그런가 싶었지, 근데 며칠 동안 내 코드를 아무리 뜯어 보고 살펴 보고 남의 코드 따라써도 죽어도 결과가 안 나오던 것이었다. 논문에서 사용한 하이퍼파라미터 그대로 다 사용했었는데도 말이다.</p>
+<br>
+<p>단 한 가지, 활성화 함수를 tanh 대신 ReLU를 사용한 것 제외하고는. 진짜 설마하는 마음으로 ReLU를 지우고 tanh를 사용하니 귀신 같이 논문에 보고한 성능에 가까워지는 것을 목격해버렸다. 그리고 나는 그때 깨달았다. On-policy 알고리즘은 학습에 있어서 굉장히 불안정하다는 것을. 그래서 학습 안정화를 위한 여러 코드 구현 디테일이 필요하다는 것을. 그 모든 디테일을 내가 알 수는 없으니 남이 잘 짜놓은 것을 갖다 쓰는게 좋다는 것을.</p>
+<br>
+<p>팩트 체크 들어가보자. <code class="docutils literal notranslate"><span class="pre">activation_fn</span></code>을 <code class="docutils literal notranslate"><span class="pre">torch.tanh</span></code>으로 변경 후 돌려볼 것이다.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">env_name</span> <span class="o">=</span> <span class="s1">&#39;Hopper-v4&#39;</span>
+
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">seed_all</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+<span class="n">max_iterations</span> <span class="o">=</span> <span class="mi">1000000</span>
+<span class="n">eval_intervals</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">eval_iterations</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">activation_fn</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tanh</span>
+
+<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">env_name</span><span class="p">)</span>
+<span class="n">state_dim</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">action_dim</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">agent</span> <span class="o">=</span> <span class="n">PPO</span><span class="p">(</span>
+    <span class="n">state_dim</span><span class="p">,</span>
+    <span class="n">action_dim</span><span class="p">,</span>
+    <span class="n">activation_fn</span><span class="o">=</span><span class="n">activation_fn</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iterations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">s_prime</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">step</span><span class="p">((</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s_prime</span><span class="p">,</span> <span class="n">terminated</span><span class="p">))</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s_prime</span>
+    
+    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;policy_loss&#39;</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;policy_loss&#39;</span><span class="p">]])</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;value_loss&#39;</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;value_loss&#39;</span><span class="p">]])</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;entropy_bonus&#39;</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;entropy_bonus&#39;</span><span class="p">]])</span>
+    
+    <span class="k">if</span> <span class="n">terminated</span> <span class="ow">or</span> <span class="n">truncated</span><span class="p">:</span>
+        <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+        
+    <span class="k">if</span> <span class="n">t</span> <span class="o">%</span> <span class="n">eval_intervals</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">eval_iterations</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;Avg return&#39;</span><span class="p">,</span> <span class="n">score</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 1000000/1000000 [18:57&lt;00:00, 879.07it/s]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">]</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;Avg return&#39;</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;step&#39;</span><span class="p">],</span> <span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="s1">&#39;b-&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Average return over 10 episodes&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Step&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Avg return&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;policy_loss&#39;</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;step&#39;</span><span class="p">],</span> <span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="s1">&#39;b-&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Policy loss&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Step&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Policy loss&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;value_loss&#39;</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;step&#39;</span><span class="p">],</span> <span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="s1">&#39;b-&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Value loss&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Step&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Value loss&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;entropy_bonus&#39;</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;step&#39;</span><span class="p">],</span> <span class="n">logger</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">logger</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="s1">&#39;b-&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Entropy bonus&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Step&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Entropy bonus&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/12-implementation-ppo_19_0.png" src="../../_images/12-implementation-ppo_19_0.png" />
+</div>
+</div>
+<br>
+<p>학습 곡선은 위와 같다. 모든 것이 동일하고 네트워크의 활성화 함수를 ReLu에서 tanh로 바꿔줬을 뿐인데 <code class="docutils literal notranslate"><span class="pre">Avg</span> <span class="pre">return</span></code>의 높이가 약 1.5배 높아진 것을 확인할 수 있다. 사실 사소한 코드 변화에 의해서 성능이 크게 달라지는 이러한 현상은 on-policy 알고리즘에 있어서 굉장히 흔한 일이다. 한편, 그래도 여전히 TRPO와 비슷한 수준의 성능이다. 실제 PPO 논문에서 보고하는 성능을 달성하기 위해서는 더 많은 구현 디테일이 필요하다. 다음 장에서는 사용하기 쉬운 구현 디테일 몇 가지를 알아보며 PPO 알고리즘을 개선해볼 것이다.</p>
+<br>
+<script
+   type="text/javascript"
+   src="https://utteranc.es/client.js"
+   async="async"
+   repo="HiddenBeginner/Deep-Reinforcement-Learnings"
+   issue-term="pathname"
+   theme="github-light"
+   label="💬 comment"
+   crossorigin="anonymous"
+/></section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "rl2"
+        },
+        kernelOptions: {
+            kernelName: "rl2",
+            path: "./book/Chapter2"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'rl2'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="11-ppo.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title"><span class="section-number">16. </span>Proximal Policy Optimization (PPO)</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="13-sac.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">18. </span>Soft Actor-Critic (SAC)</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By 재야의 숨은 초보<br/>
+  
+      &copy; Copyright 2022.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

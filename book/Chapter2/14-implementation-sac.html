@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>18. SAC 구현 &#8212; 심층강화학습</title>
+    <title>19. SAC 구현 &#8212; 심층강화학습</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -91,7 +91,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="참고문헌" href="../Reference.html" />
-    <link rel="prev" title="17. Soft Actor-Critic (SAC)" href="13-sac.html" />
+    <link rel="prev" title="18. Soft Actor-Critic (SAC)" href="13-sac.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -257,13 +257,18 @@ const thebe_selector_output = ".output, .cell_output"
   </a>
  </li>
  <li class="toctree-l1">
+  <a class="reference internal" href="12-implementation-ppo.html">
+   17. PPO 구현
+  </a>
+ </li>
+ <li class="toctree-l1">
   <a class="reference internal" href="13-sac.html">
-   17. Soft Actor-Critic (SAC)
+   18. Soft Actor-Critic (SAC)
   </a>
  </li>
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
-   18. SAC 구현
+   19. SAC 구현
   </a>
  </li>
 </ul>
@@ -486,34 +491,34 @@ title="Print to PDF"
         <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#double-q">
-   18.1. Double Q-네트워크 구현
+   19.1. Double Q-네트워크 구현
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#q-overestimation-bias-double-q">
-     18.1.1. Q-네트워크의 overestimation bias과 double Q-네트워크
+     19.1.1. Q-네트워크의 overestimation bias과 double Q-네트워크
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id1">
-     18.1.2. Double Q-네트워크 및 정책 네트워크 구현
+     19.1.2. Double Q-네트워크 및 정책 네트워크 구현
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#replay-buffer">
-   18.2. Replay buffer 구현
+   19.2. Replay buffer 구현
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id2">
-   18.3. SAC 구현
+   19.3. SAC 구현
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#halfcheetah-v4">
-     18.3.1. HalfCheetah-v4 환경 제어
+     19.3.1. HalfCheetah-v4 환경 제어
     </a>
    </li>
   </ul>
@@ -539,34 +544,34 @@ title="Print to PDF"
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#double-q">
-   18.1. Double Q-네트워크 구현
+   19.1. Double Q-네트워크 구현
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#q-overestimation-bias-double-q">
-     18.1.1. Q-네트워크의 overestimation bias과 double Q-네트워크
+     19.1.1. Q-네트워크의 overestimation bias과 double Q-네트워크
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id1">
-     18.1.2. Double Q-네트워크 및 정책 네트워크 구현
+     19.1.2. Double Q-네트워크 및 정책 네트워크 구현
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#replay-buffer">
-   18.2. Replay buffer 구현
+   19.2. Replay buffer 구현
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id2">
-   18.3. SAC 구현
+   19.3. SAC 구현
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#halfcheetah-v4">
-     18.3.1. HalfCheetah-v4 환경 제어
+     19.3.1. HalfCheetah-v4 환경 제어
     </a>
    </li>
   </ul>
@@ -582,7 +587,7 @@ title="Print to PDF"
               <div>
                 
   <section class="tex2jax_ignore mathjax_ignore" id="sac">
-<h1><span class="section-number">18. </span>SAC 구현<a class="headerlink" href="#sac" title="Permalink to this headline">#</a></h1>
+<h1><span class="section-number">19. </span>SAC 구현<a class="headerlink" href="#sac" title="Permalink to this headline">#</a></h1>
 <p>먼저 사용할 모듈들을 불러오자.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -608,9 +613,9 @@ title="Print to PDF"
 <br>
 <hr class="docutils" />
 <section id="double-q">
-<h2><span class="section-number">18.1. </span>Double Q-네트워크 구현<a class="headerlink" href="#double-q" title="Permalink to this headline">#</a></h2>
+<h2><span class="section-number">19.1. </span>Double Q-네트워크 구현<a class="headerlink" href="#double-q" title="Permalink to this headline">#</a></h2>
 <section id="q-overestimation-bias-double-q">
-<h3><span class="section-number">18.1.1. </span>Q-네트워크의 overestimation bias과 double Q-네트워크<a class="headerlink" href="#q-overestimation-bias-double-q" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">19.1.1. </span>Q-네트워크의 overestimation bias과 double Q-네트워크<a class="headerlink" href="#q-overestimation-bias-double-q" title="Permalink to this headline">#</a></h3>
 <p>SAC는 Q-네트워크를 2개 사용하고 있다. 이는 off-policy 알고리즘에서 흔히 사용되는 기법이다.
 뉴럴 네트워크가 편향 (bias)을 갖는 것은 자연스러운 현상이다.
 하지만, Q-네트워크의 경우 네트워크의 출력값을 타겟으로 사용하여 네트워크를 학습시키기 때문에 편향이 더 큰 편향을 발생시킬 수 있다.</p>
@@ -634,7 +639,7 @@ title="Print to PDF"
 <br>
 </section>
 <section id="id1">
-<h3><span class="section-number">18.1.2. </span>Double Q-네트워크 및 정책 네트워크 구현<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">19.1.2. </span>Double Q-네트워크 및 정책 네트워크 구현<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h3>
 <p>다음은 double Q-네트워크를 구현한 코드이다.
 필자는 DQN 계열 알고리즘에서 등장하는 double Q-네트워크와 이름을 구분하기 위하여 이름을 장황하게 지었는데, 그냥 <code class="docutils literal notranslate"><span class="pre">DoubleQNetwork</span></code>로 사용해도 좋다.
 정책 네트워크는 이전과 같다.</p>
@@ -700,7 +705,7 @@ title="Print to PDF"
 </section>
 <hr class="docutils" />
 <section id="replay-buffer">
-<h2><span class="section-number">18.2. </span>Replay buffer 구현<a class="headerlink" href="#replay-buffer" title="Permalink to this headline">#</a></h2>
+<h2><span class="section-number">19.2. </span>Replay buffer 구현<a class="headerlink" href="#replay-buffer" title="Permalink to this headline">#</a></h2>
 <p>Off-policy 알고리즘들은 현재 정책이 수집한 데이터로만 네트워크를 학습시켜야 한다는 가정을 벗어 던졌다.
 따라서 학습 동안에 수집한 데이터 <span class="math notranslate nohighlight">\((s, a, r, s')\)</span>을 계속 저장해놓고, 매 스탭마다 batch_size 개수만큼 꺼내서 네트워크들을 업데이트시킨다.
 데이터를 저장해놓는 공간을 experience replay memory 또는 replay buffer라고 부른다.
@@ -772,7 +777,7 @@ title="Print to PDF"
 </section>
 <hr class="docutils" />
 <section id="id2">
-<h2><span class="section-number">18.3. </span>SAC 구현<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h2>
+<h2><span class="section-number">19.3. </span>SAC 구현<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SAC</span><span class="p">:</span>
@@ -888,7 +893,7 @@ title="Print to PDF"
 </div>
 <br>
 <section id="halfcheetah-v4">
-<h3><span class="section-number">18.3.1. </span>HalfCheetah-v4 환경 제어<a class="headerlink" href="#halfcheetah-v4" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">19.3.1. </span>HalfCheetah-v4 환경 제어<a class="headerlink" href="#halfcheetah-v4" title="Permalink to this headline">#</a></h3>
 <p>제목이 곧 내용이다!</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1064,7 +1069,7 @@ title="Print to PDF"
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">17. </span>Soft Actor-Critic (SAC)</p>
+            <p class="prev-next-title"><span class="section-number">18. </span>Soft Actor-Critic (SAC)</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="../Reference.html" title="next page">
